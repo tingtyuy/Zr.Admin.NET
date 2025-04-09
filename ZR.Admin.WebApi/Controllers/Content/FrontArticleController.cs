@@ -23,7 +23,7 @@ namespace ZR.Admin.WebApi.Controllers
         private readonly IArticlePraiseService _ArticlePraiseService;
         private readonly ISysUserService _SysUserService;
         private readonly IArticleTopicService _ArticleTopicService;
-
+        private readonly IArticleUserCirclesService _ArticleUserCirclesService;
         /// <summary>
         /// 
         /// </summary>
@@ -32,12 +32,14 @@ namespace ZR.Admin.WebApi.Controllers
         /// <param name="articlePraiseService"></param>
         /// <param name="sysUserService"></param>
         /// <param name="articleTopicService"></param>
+        /// <param name="articleUserCirclesService"></param>
         public FrontArticleController(
             IArticleService ArticleService,
             IArticleCategoryService articleCategoryService,
             IArticlePraiseService articlePraiseService,
             ISysUserService sysUserService,
-            IArticleTopicService articleTopicService)
+            IArticleTopicService articleTopicService,
+            IArticleUserCirclesService articleUserCirclesService)
         {
             _ArticleService = ArticleService;
             _ArticleCategoryService = articleCategoryService;
@@ -45,6 +47,7 @@ namespace ZR.Admin.WebApi.Controllers
             _ArticlePraiseService = articlePraiseService;
             _SysUserService = sysUserService;
             _ArticleTopicService = articleTopicService;
+            _ArticleUserCirclesService = articleUserCirclesService;
         }
 
         /// <summary>
@@ -227,6 +230,40 @@ namespace ZR.Admin.WebApi.Controllers
 
             var info = response.Adapt<ArticleTopicDto>();
             return SUCCESS(info);
+        }
+
+        /// <summary>
+        /// 查询文章目录详情
+        /// </summary>
+        /// <param name="CategoryId"></param>
+        /// <returns></returns>
+        [HttpGet("QueryCircle/{CategoryId}")]
+        [AllowAnonymous]
+        public IActionResult GetArticleCategory(int CategoryId)
+        {
+            var userId = HttpContext.GetUId();
+            var info = _ArticleCategoryService.GetFirst(x => x.CategoryId == CategoryId);
+            var infoDto = info.Adapt<CircleInfoDto>();
+            if(infoDto != null)
+            {
+                infoDto.IsJoin = _ArticleUserCirclesService.IsJoin((int)userId, CategoryId);
+            }
+            return SUCCESS(infoDto);
+        }
+
+        /// <summary>
+        /// 发布文章
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("publish")]
+        [ActionPermissionFilter(Permission = "common")]
+        public IActionResult Create([FromBody] ArticleDto parm)
+        {
+            if (parm == null) { return ToResponse(ResultCode.PARAM_ERROR); }
+            var addModel = parm.Adapt<Article>().ToCreate(context: HttpContext);
+            addModel.ArticleType = Model.Enum.ArticleTypeEnum.Article;
+            addModel.Tags = parm.TopicName;
+            return SUCCESS(_ArticleService.Publish(addModel));
         }
     }
 }

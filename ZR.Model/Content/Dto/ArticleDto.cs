@@ -30,6 +30,10 @@ namespace ZR.Model.Content.Dto
         /// 审核状态
         /// </summary>
         public AuditStatusEnum? AuditStatus { get; set; }
+        /// <summary>
+        /// 查询我加入的圈子
+        /// </summary>
+        public bool QueryMyJoin { get; set; }
     }
 
     /// <summary>

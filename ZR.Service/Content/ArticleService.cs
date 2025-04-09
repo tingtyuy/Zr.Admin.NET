@@ -151,6 +151,15 @@ namespace ZR.Service.Content
             predicate = predicate.AndIF(parm.TopicId != null, m => m.TopicId == parm.TopicId);
             predicate = predicate.AndIF(parm.CategoryId != null, m => m.CategoryId == parm.CategoryId);
 
+            //获取我的圈子
+            if (parm.QueryMyJoin)
+            {
+                var myJoin = Context.Queryable<ArticleUserCircles>()
+                    .Where(m => m.UserId == parm.UserId)
+                    .Select(m => m.CategoryId)
+                    .ToList();
+                predicate = predicate.And(m => myJoin.Contains(m.CategoryId));
+            }
             var response = Queryable()
                 .Includes(x => x.ArticleCategoryNav) //填充子对象
                 .LeftJoin<SysUser>((m, u) => m.UserId == u.UserId).Filter(null, true)
@@ -182,23 +191,7 @@ namespace ZR.Service.Content
 
             return response;
         }
-        /// <summary>
-        /// 前台查询关注动态列表
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        public PagedInfo<ArticleDto> GetFollowMonentList(ArticleQueryDto parm)
-        {
-            var predicate = Expressionable.Create<Article>();
-            predicate = predicate.And(m => m.Status == "1");
-            predicate = predicate.And(m => m.IsPublic == 1);
-            predicate = predicate.And(m => m.ArticleType == ArticleTypeEnum.Monent);
-            predicate = predicate.AndIF(parm.TopicId != null, m => m.TopicId == parm.TopicId);
-            predicate = predicate.AndIF(parm.CategoryId != null, m => m.CategoryId == parm.CategoryId);
 
-
-            return new PagedInfo<ArticleDto>() { };
-        }
         /// <summary>
         /// 查询我的文章列表
         /// </summary>
@@ -326,14 +319,13 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 发布动态
+        /// 前端-发布动态,文章
         /// </summary>
         /// <param name="article"></param>
         /// <returns></returns>
-        public Article PublishMonent(Article article)
+        public Article Publish(Article article)
         {
             var httpContext = App.HttpContext;
-            article.ArticleType = ArticleTypeEnum.Monent;
             article.AuthorName = HttpContextExtension.GetName(httpContext);
             article.UserId = HttpContextExtension.GetUId(httpContext);
             article.UserIP = HttpContextExtension.GetClientUserIp(httpContext);

@@ -28,14 +28,14 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询我的
+        /// 查询我的(后台)
         /// </summary>
         /// <returns></returns>
         [HttpGet("mylist")]
         public IActionResult QueryMyList([FromQuery] ArticleQueryDto parm)
         {
             parm.UserId = HttpContext.GetUId();
-            parm.ArticleType = 2;
+            parm.ArticleType = (int)ArticleTypeEnum.Monent;
             var response = _ArticleService.GetMyList(parm);
 
             return SUCCESS(response);
@@ -50,11 +50,9 @@ namespace ZR.Admin.WebApi.Controllers
         public IActionResult QueryMonentList([FromQuery] ArticleQueryDto parm)
         {
             parm.UserId = HttpContext.GetUId();
-            parm.ArticleType = 2;
-            if (parm.TabId == 100)
-            {
-                return SUCCESS(_ArticleService.GetFollowMonentList(parm));
-            }
+            parm.ArticleType = (int)ArticleTypeEnum.Monent;
+            parm.QueryMyJoin = parm.TabId == 100;//查询关注的圈子动态
+
             return SUCCESS(_ArticleService.GetMonentList(parm));
         }
 
@@ -69,8 +67,9 @@ namespace ZR.Admin.WebApi.Controllers
             if (parm == null) { return ToResponse(ResultCode.PARAM_ERROR); }
             var addModel = parm.Adapt<Article>().ToCreate(context: HttpContext);
             addModel.Tags = parm.TopicName;
+            addModel.ArticleType = ArticleTypeEnum.Monent;
 
-            return SUCCESS(_ArticleService.PublishMonent(addModel));
+            return SUCCESS(_ArticleService.Publish(addModel));
         }
 
         /// <summary>

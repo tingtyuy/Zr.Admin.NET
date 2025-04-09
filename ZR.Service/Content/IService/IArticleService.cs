@@ -15,7 +15,6 @@ namespace ZR.Service.Content.IService
         public int UpdateArticle(Article model);
         PagedInfo<ArticleDto> GetArticleList(ArticleQueryDto parm);
         PagedInfo<ArticleDto> GetMonentList(ArticleQueryDto parm);
-        PagedInfo<ArticleDto> GetFollowMonentList(ArticleQueryDto parm);
         int TopArticle(Article model);
         int ChangeComment(Article model);
         int ChangeArticlePublic(Article model);
@@ -23,7 +22,7 @@ namespace ZR.Service.Content.IService
         int PraiseArticle(long cid);
         int CancelPraise(long cid);
         Article PublishArticle(Article article);
-        Article PublishMonent(Article article);
+        Article Publish(Article article);
 
         ArticleDto GetArticle(long cid, long userId);
         int Passed(long[] idsArr);

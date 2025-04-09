@@ -37,16 +37,18 @@
         /// <summary>
         /// 文章数
         /// </summary>
+        [SugarColumn(DefaultValue = "0")]
         public int ArticleNum { get; set; }
         /// <summary>
         /// 加入人数
         /// </summary>
+        [SugarColumn(DefaultValue = "0")]
         public int JoinNum { get; set; }
         /// <summary>
         /// 创建时间
         /// </summary>
         [SugarColumn(ColumnDescription = "创建时间", ColumnName = "create_time", InsertServerTime = true)]
-        public DateTime CreateTime { get; set; }
+        public DateTime? CreateTime { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         [SugarColumn(IsIgnore = true)]
