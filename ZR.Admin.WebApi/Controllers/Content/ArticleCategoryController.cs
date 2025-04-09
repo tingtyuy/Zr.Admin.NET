@@ -144,7 +144,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 获取文章目录,前端没用到
+        /// 获取文章目录
         /// </summary>
         /// <returns></returns>
         [HttpGet("CategoryList")]

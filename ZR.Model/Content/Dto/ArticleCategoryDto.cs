@@ -30,6 +30,7 @@ namespace ZR.Model.Content.Dto
         /// 加入人数
         /// </summary>
         public int JoinNum { get; set; }
+        public List<ArticleCategory> Children { get; set; }
     }
 
     /// <summary>

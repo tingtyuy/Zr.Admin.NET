@@ -338,10 +338,10 @@ namespace ZR.Service.Content
             {
                 _topicService.Update(w => w.TopicId == article.TopicId, it => new ArticleTopic() { JoinNum = it.JoinNum + 1 });
             }
-            //更新圈子加入数
+            //更新发布文章数
             if (article.Cid > 0 && article.CategoryId > 0)
             {
-                _categoryService.Update(w => w.CategoryId == article.CategoryId, it => new ArticleCategory() { JoinNum = it.JoinNum + 1 });
+                _categoryService.Update(w => w.CategoryId == article.CategoryId, it => new ArticleCategory() { ArticleNum = it.ArticleNum + 1 });
             }
             return article;
         }
@@ -401,7 +401,7 @@ namespace ZR.Service.Content
         public int Passed(long[] idsArr)
         {
             int result = 0;
-            List<Article> monents = new();
+            List<Article> monents = [];
             foreach (var item in idsArr)
             {
                 var model = GetFirst(x => x.Cid == item && x.AuditStatus == 0);
