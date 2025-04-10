@@ -92,7 +92,7 @@ namespace ZR.Service.Content
             predicate = predicate.And(m => m.IsPublic == 1);
             predicate = predicate.And(m => m.AuditStatus == AuditStatusEnum.Passed);
             predicate = predicate.And(m => m.ArticleType == ArticleTypeEnum.Article);
-            //predicate = predicate.AndIF(!string.IsNullOrEmpty(parm.Title), m => m.Title.Contains(parm.Title));
+            predicate = predicate.AndIF(parm.SearchText.IsNotEmpty(), m => m.Title.Contains(parm.SearchText) || m.AbstractText.Contains(parm.SearchText));
             predicate = predicate.AndIF(parm.TopicId != null, m => m.TopicId == parm.TopicId);
 
             if (parm.CategoryId != null)
@@ -134,6 +134,27 @@ namespace ZR.Service.Content
             }
 
             return response;
+        }
+
+        /// <summary>
+        /// 查询最新文章列表
+        /// </summary>
+        /// <returns></returns>
+        public List<ArticleDto> GetNewArticleList()
+        {
+            var predicate = Expressionable.Create<Article>();
+            predicate = predicate.And(m => m.Status == "1");
+            predicate = predicate.And(m => m.IsPublic == 1);
+            predicate = predicate.And(m => m.ArticleType == ArticleTypeEnum.Article);
+            predicate = predicate.And(m => m.AuditStatus == AuditStatusEnum.Passed);
+
+            var response = Queryable()
+                .Where(predicate.ToExpression())
+                .Includes(x => x.ArticleCategoryNav) //填充子对象
+                .Take(10)
+                .OrderBy(f => f.CreateTime, OrderByType.Desc)
+                .ToList();
+            return response.Adapt<List<ArticleDto>>();
         }
 
         /// <summary>

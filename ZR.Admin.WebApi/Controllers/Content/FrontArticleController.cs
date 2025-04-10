@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SqlSugar;
 using ZR.Admin.WebApi.Filters;
 using ZR.Model.Content;
 using ZR.Model.Content.Dto;
@@ -72,19 +71,7 @@ namespace ZR.Admin.WebApi.Controllers
         [AllowAnonymous]
         public IActionResult QueryNew()
         {
-            var predicate = Expressionable.Create<Article>();
-            predicate = predicate.And(m => m.Status == "1");
-            predicate = predicate.And(m => m.IsPublic == 1);
-            predicate = predicate.And(m => m.ArticleType == 0);
-            predicate = predicate.And(m => m.AuditStatus == Model.Enum.AuditStatusEnum.Passed);
-
-            var response = _ArticleService.Queryable()
-                .Where(predicate.ToExpression())
-                .Includes(x => x.ArticleCategoryNav) //填充子对象
-                .Take(10)
-                .OrderBy(f => f.UpdateTime, OrderByType.Desc).ToList();
-
-            return SUCCESS(response);
+            return SUCCESS(_ArticleService.GetNewArticleList());
         }
 
         /// <summary>
@@ -197,7 +184,7 @@ namespace ZR.Admin.WebApi.Controllers
                 NickName = user.NickName,
                 Sex = user.Sex,
             };
-            //apiResult.Put("user", user.Adapt<UserDto>());
+            
             return ToResponse(apiResult);
         }
 

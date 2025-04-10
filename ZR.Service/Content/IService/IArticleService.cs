@@ -14,6 +14,7 @@ namespace ZR.Service.Content.IService
         /// <returns></returns>
         public int UpdateArticle(Article model);
         PagedInfo<ArticleDto> GetArticleList(ArticleQueryDto parm);
+        List<ArticleDto> GetNewArticleList();
         PagedInfo<ArticleDto> GetMonentList(ArticleQueryDto parm);
         int TopArticle(Article model);
         int ChangeComment(Article model);

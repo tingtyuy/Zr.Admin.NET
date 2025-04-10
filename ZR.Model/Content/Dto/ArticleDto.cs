@@ -34,6 +34,10 @@ namespace ZR.Model.Content.Dto
         /// 查询我加入的圈子
         /// </summary>
         public bool QueryMyJoin { get; set; }
+        /// <summary>
+        /// 搜索内容
+        /// </summary>
+        public string SearchText { get; set; }
     }
 
     /// <summary>

@@ -134,12 +134,9 @@ namespace ZR.Service.Content
         /// <returns></returns>
         public List<ArticleCategoryDto> GetMyJoinCircles(int userId)
         {
-            var predicate = Expressionable.Create<ArticleUserCircles>()
-                .And(x => x.UserId == userId);
-
             var response = Queryable()
-                .LeftJoin<ArticleCategory>((it, c) => it.Id == c.CategoryId)
-                .Where(predicate.ToExpression())
+                .LeftJoin<ArticleCategory>((it, c) => it.CategoryId == c.CategoryId)
+                .Where((it,c) => it.UserId == userId)
                 .Select((it, c) => new ArticleCategoryDto()
                 {
 
