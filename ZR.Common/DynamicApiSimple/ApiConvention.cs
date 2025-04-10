@@ -172,7 +172,7 @@ class ApiConvention : IApplicationModelConvention
 
     private static string GetName(string actionName)
     {
-        string result = "POST";
+        string result = "GET";
         foreach (string key in Methods.Keys)
         {
             if (actionName.Contains(key))
