@@ -28,6 +28,10 @@
 
 ---
 
+## 🌟 Github star
+
+[![Star History Chart](https://api.star-history.com/svg?repos=izhaorui/Zr.Admin.NET&type=Date)](https://github.com/izhaorui/Zr.Admin.NET)
+
 ## 🍟 概述
 
 - 本项目适合有一定 NetCore 和 vue 基础的开发人员
@@ -68,7 +72,7 @@
 
 | 仓库                | Github                                                          | Gitee                                                          |
 | ------------------- | --------------------------------------------------------------- | -------------------------------------------------------------- |
-| net8                | [克隆/下载](https://github.com/izhaorui/Zr.Admin.NET/tree/net8) | [克隆/下载](https://gitee.com/izory/ZrAdminNetCore) |
+| net8                | [克隆/下载](https://github.com/izhaorui/Zr.Admin.NET) | [克隆/下载](https://gitee.com/izory/ZrAdminNetCore) |
 | web 前端 vue3(推荐) | [克隆/下载](https://github.com/izhaorui/ZR.Admin.Vue3)          | [克隆/下载](https://gitee.com/izory/ZRAdmin-vue)               |
 | 移动端              | [联系作者](http://www.izhaorui.cn/vip/)                         | [联系作者](http://www.izhaorui.cn/vip/)                        |
 
