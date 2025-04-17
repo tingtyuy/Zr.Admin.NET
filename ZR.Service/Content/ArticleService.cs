@@ -21,7 +21,6 @@ namespace ZR.Service.Content
     {
         private readonly IArticleCategoryService _categoryService;
         private readonly IArticleTopicService _topicService;
-        private readonly ISysConfigService _sysConfigService;
         private readonly ISysUserMsgService _userMsgService;
 
         /// <summary>
@@ -29,17 +28,14 @@ namespace ZR.Service.Content
         /// </summary>
         /// <param name="categoryService"></param>
         /// <param name="topicService"></param>
-        /// <param name="sysConfigService"></param>
         /// <param name="userMsgService"></param>
         public ArticleService(
             IArticleCategoryService categoryService,
             IArticleTopicService topicService,
-            ISysConfigService sysConfigService,
             ISysUserMsgService userMsgService)
         {
             _categoryService = categoryService;
             _topicService = topicService;
-            _sysConfigService = sysConfigService;
             _userMsgService = userMsgService;
         }
 
@@ -72,7 +68,7 @@ namespace ZR.Service.Content
             var response = Queryable()
                 .WithCache(60 * 24)
                 .IgnoreColumns(x => new { x.Content })
-                .Includes(x => x.ArticleCategoryNav) //填充子对象
+                .Includes(x => x.CategoryNav) //填充子对象
                 .Where(predicate.ToExpression())
                 //.OrderBy(x => x.CreateTime, OrderByType.Desc)
                 .ToPage<Article, ArticleDto>(parm);
@@ -105,7 +101,7 @@ namespace ZR.Service.Content
 
             var response = Queryable()
                 .WithCache(60 * 30)
-                .Includes(x => x.ArticleCategoryNav)
+                .Includes(x => x.CategoryNav)
                 .LeftJoin<SysUser>((m, u) => m.UserId == u.UserId).Filter(null, true)
                 .Where(predicate.ToExpression())
                 .OrderByDescending(m => m.Cid)
@@ -118,8 +114,7 @@ namespace ZR.Service.Content
                         Sex = u.Sex,
                     },
                     Content = string.Empty,
-                    UserIP = string.Empty,
-                    CategoryNav = m.ArticleCategoryNav.Adapt<ArticleCategoryDto>()
+                    UserIP = string.Empty
                 }, true)
                 .ToPage(parm);
 
@@ -150,7 +145,7 @@ namespace ZR.Service.Content
 
             var response = Queryable()
                 .Where(predicate.ToExpression())
-                .Includes(x => x.ArticleCategoryNav) //填充子对象
+                .Includes(x => x.CategoryNav) //填充子对象
                 .Take(10)
                 .OrderBy(f => f.CreateTime, OrderByType.Desc)
                 .ToList();
@@ -182,7 +177,7 @@ namespace ZR.Service.Content
                 predicate = predicate.And(m => myJoin.Contains(m.CategoryId));
             }
             var response = Queryable()
-                .Includes(x => x.ArticleCategoryNav) //填充子对象
+                .Includes(x => x.CategoryNav) //填充子对象
                 .LeftJoin<SysUser>((m, u) => m.UserId == u.UserId).Filter(null, true)
                 .Where(predicate.ToExpression())
                 .OrderByIF(parm.OrderBy == 1, m => new { m.PraiseNum, m.CommentNum }, OrderByType.Desc)
@@ -196,7 +191,6 @@ namespace ZR.Service.Content
                         NickName = u.NickName,
                         Sex = u.Sex,
                     },
-                    CategoryNav = m.ArticleCategoryNav.Adapt<ArticleCategoryDto>()
                 }, true)
                 .ToPage(parm);
 
@@ -232,7 +226,7 @@ namespace ZR.Service.Content
 
             var response = Queryable()
                 //.IgnoreColumns(x => new { x.Content })
-                .Includes(x => x.ArticleCategoryNav)
+                .Includes(x => x.CategoryNav)
                 .Where(predicate.ToExpression())
                 .OrderByIF(parm.TabId == 3, m => new { m.IsTop, m.PraiseNum }, OrderByType.Desc)
                 .OrderByDescending(m => new { m.IsTop, m.Cid })
@@ -336,7 +330,7 @@ namespace ZR.Service.Content
 
         public Article PublishArticle(Article article)
         {
-            throw new NotImplementedException();
+            return Publish(article);
         }
 
         /// <summary>
@@ -354,15 +348,18 @@ namespace ZR.Service.Content
             article.AuditStatus = AuditStatusEnum.Passed;
 
             article = InsertReturnEntity(article);
-            //跟新话题加入数
-            if (article.Cid > 0 && article.TopicId > 0)
+            if (article.Status == "1")
             {
-                _topicService.Update(w => w.TopicId == article.TopicId, it => new ArticleTopic() { JoinNum = it.JoinNum + 1 });
-            }
-            //更新发布文章数
-            if (article.Cid > 0 && article.CategoryId > 0)
-            {
-                _categoryService.Update(w => w.CategoryId == article.CategoryId, it => new ArticleCategory() { ArticleNum = it.ArticleNum + 1 });
+                //跟新话题加入数
+                if (article.Cid > 0 && article.TopicId > 0)
+                {
+                    _topicService.Update(w => w.TopicId == article.TopicId, it => new ArticleTopic() { JoinNum = it.JoinNum + 1 });
+                }
+                //更新发布文章数
+                if (article.Cid > 0 && article.CategoryId > 0)
+                {
+                    _categoryService.Update(w => w.CategoryId == article.CategoryId, it => new ArticleCategory() { ArticleNum = it.ArticleNum + 1 });
+                }
             }
             return article;
         }

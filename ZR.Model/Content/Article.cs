@@ -94,7 +94,7 @@ namespace ZR.Model.Content
         /// </summary>
 
         [Navigate(NavigateType.OneToOne, nameof(CategoryId), nameof(ArticleCategory.CategoryId))] //自定义关系映射
-        public ArticleCategory ArticleCategoryNav { get; set; }
+        public ArticleCategory CategoryNav { get; set; }
         /// <summary>
         /// 评论数
         /// </summary>
