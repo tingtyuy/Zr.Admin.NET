@@ -26,6 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Controllers\social\" />
 		<Folder Include="Properties\PublishProfiles\" />
 	</ItemGroup>
 
