@@ -3,6 +3,7 @@ using ZR.Admin.WebApi.Filters;
 using ZR.Model.Content;
 using ZR.Model.Content.Dto;
 using ZR.Service.Content.IService;
+using ZR.Service.Social.IService;
 
 namespace ZR.Admin.WebApi.Controllers
 {
@@ -23,6 +24,8 @@ namespace ZR.Admin.WebApi.Controllers
         private readonly ISysUserService _SysUserService;
         private readonly IArticleTopicService _ArticleTopicService;
         private readonly IArticleUserCirclesService _ArticleUserCirclesService;
+        private readonly IFansInfoService _FansInfoService;
+
         /// <summary>
         /// 
         /// </summary>
@@ -32,13 +35,15 @@ namespace ZR.Admin.WebApi.Controllers
         /// <param name="sysUserService"></param>
         /// <param name="articleTopicService"></param>
         /// <param name="articleUserCirclesService"></param>
+        /// <param name="fansInfoService"></param>
         public FrontArticleController(
             IArticleService ArticleService,
             IArticleCategoryService articleCategoryService,
             IArticlePraiseService articlePraiseService,
             ISysUserService sysUserService,
             IArticleTopicService articleTopicService,
-            IArticleUserCirclesService articleUserCirclesService)
+            IArticleUserCirclesService articleUserCirclesService,
+            IFansInfoService fansInfoService)
         {
             _ArticleService = ArticleService;
             _ArticleCategoryService = articleCategoryService;
@@ -47,6 +52,7 @@ namespace ZR.Admin.WebApi.Controllers
             _SysUserService = sysUserService;
             _ArticleTopicService = articleTopicService;
             _ArticleUserCirclesService = articleUserCirclesService;
+            _FansInfoService = fansInfoService;
         }
 
         /// <summary>
@@ -184,7 +190,7 @@ namespace ZR.Admin.WebApi.Controllers
                 NickName = user.NickName,
                 Sex = user.Sex,
             };
-            
+
             return ToResponse(apiResult);
         }
 
@@ -231,7 +237,7 @@ namespace ZR.Admin.WebApi.Controllers
             var userId = HttpContext.GetUId();
             var info = _ArticleCategoryService.GetFirst(x => x.CategoryId == CategoryId);
             var infoDto = info.Adapt<CircleInfoDto>();
-            if(infoDto != null)
+            if (infoDto != null)
             {
                 infoDto.IsJoin = _ArticleUserCirclesService.IsJoin((int)userId, CategoryId);
             }
@@ -251,6 +257,19 @@ namespace ZR.Admin.WebApi.Controllers
             addModel.ArticleType = Model.Enum.ArticleTypeEnum.Article;
             addModel.Tags = parm.TopicName;
             return SUCCESS(_ArticleService.Publish(addModel));
+        }
+
+        /// <summary>
+        /// 获取我的成就信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetUserWidget")]
+        public IActionResult GetUserWidget(int toUserid)
+        {
+            var userId = HttpContext.GetUId();
+            var fansInfo = _FansInfoService.GetFirst(f => f.Userid == toUserid) ?? new Model.social.FansInfo() { };
+
+            return SUCCESS(new { fansInfo });
         }
     }
 }
