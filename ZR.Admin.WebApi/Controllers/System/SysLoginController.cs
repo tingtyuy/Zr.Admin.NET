@@ -51,6 +51,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         [Route("login")]
         [HttpPost]
         [Log(Title = "登录")]
+        [AllowAnonymous]
         public IActionResult Login([FromBody] LoginBodyDto loginBody)
         {
             if (loginBody == null) { throw new CustomException("请求参数错误"); }
@@ -68,8 +69,11 @@ namespace ZR.Admin.WebApi.Controllers.System
             List<SysRole> roles = roleService.SelectUserRoleListByUserId(user.UserId);
             //权限集合 eg *:*:*,system:user:list
             List<string> permissions = permissionService.GetMenuPermission(user);
-
-            TokenModel loginUser = new(user.Adapt<TokenModel>(), roles.Adapt<List<Roles>>());
+            
+            TokenModel loginUser = new(user.Adapt<TokenModel>(), roles.Adapt<List<Roles>>())
+            {
+                TenantId = loginBody.TenantId
+            };
             CacheService.SetUserPerms(GlobalConstant.UserPermKEY + user.UserId, permissions);
             return SUCCESS(JwtUtil.GenerateJwtToken(JwtUtil.AddClaims(loginUser)));
         }
@@ -80,6 +84,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         /// <returns></returns>
         [Log(Title = "注销")]
         [HttpPost("logout")]
+        [AllowAnonymous]
         public IActionResult LogOut()
         {
             var userid = HttpContext.GetUId();
@@ -143,6 +148,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         /// </summary>
         /// <returns></returns>
         [HttpGet("captchaImage")]
+        [AllowAnonymous]
         public IActionResult CaptchaImage()
         {
             string uuid = Guid.NewGuid().ToString().Replace("-", "");
@@ -193,6 +199,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         /// <param name="deviceId"></param>
         /// <returns></returns>
         [HttpGet("/GenerateQrcode")]
+        [AllowAnonymous]
         public IActionResult GenerateQrcode(string uuid, string deviceId)
         {
             var state = Guid.NewGuid().ToString();
@@ -315,6 +322,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         [Route("PhoneLogin")]
         [HttpPost]
         [Log(Title = "手机号登录")]
+        [AllowAnonymous]
         public IActionResult PhoneLogin([FromBody] PhoneLoginDto loginBody)
         {
             if (loginBody == null) { throw new CustomException("请求参数错误"); }

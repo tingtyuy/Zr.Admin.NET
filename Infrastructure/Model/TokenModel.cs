@@ -34,6 +34,10 @@ namespace Infrastructure.Model
         /// Jwt过期时间
         /// </summary>
         public DateTime ExpireTime { get; set; }
+        /// <summary>
+        /// 租户ID
+        /// </summary>
+        public string TenantId { get; set; }
         public TokenModel()
         {
         }

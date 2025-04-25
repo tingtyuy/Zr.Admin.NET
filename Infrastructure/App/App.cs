@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
+using System.Linq;
 using System.Security.Claims;
 
 namespace Infrastructure
@@ -101,5 +102,17 @@ namespace Infrastructure
                 return defaultValue ?? null;
             }
         }
+
+        /// <summary>
+        /// 获取默认租户ID
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCurrentTenantId()
+        {
+            var headerId = HttpContext?.Request?.Headers["tenantId"].ToString();
+            var claimId = User?.Claims.FirstOrDefault(f => f.Type == ClaimTypes.PrimaryGroupSid)?.Value;
+            return !string.IsNullOrEmpty(headerId) ? headerId : (claimId ?? "tenant0");
+        }
+
     }
 }

@@ -1,3 +1,4 @@
+using Infrastructure;
 using Infrastructure.Extensions;
 using Mapster;
 using SqlSugar;
@@ -20,15 +21,42 @@ namespace ZR.Repository
         public ITenant itenant = null;//多租户事务
         public BaseRepository(ISqlSugarClient context = null) : base(context)
         {
-            //通过特性拿到ConfigId
-            var configId = typeof(T).GetCustomAttribute<TenantAttribute>()?.configId;
-            if (configId != null)
+            //是否启用多租户
+            var tenantConfig = App.Configuration["UseTenant"];
+            // 如果实现了公共数据库接口，则访问主库（ConfigId = "0"）
+            if (tenantConfig != null && tenantConfig == "1")
             {
-                Context = DbScoped.SugarScope.GetConnectionScope(configId);//根据类传入的ConfigId自动选择
+                if (typeof(IMainDbEntity).IsAssignableFrom(typeof(T)))
+                {
+                    var mainDb = App.Configuration["MainDb"];
+                    Context = DbScoped.SugarScope.GetConnectionScope(mainDb); // 主库
+                }
+                else
+                {
+                    var tenantId = App.GetCurrentTenantId();
+                    try
+                    {
+                        //Console.WriteLine($"当前用户租户={tenantId}");
+                        Context = DbScoped.SugarScope.GetConnectionScope(tenantId);//根据类传入的ConfigId自动选择
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"无效的租户ID: {tenantId}", ex);
+                    }
+                }
             }
             else
             {
-                Context = context ?? DbScoped.SugarScope.GetConnectionScope(0);//没有默认db0
+                //通过特性拿到ConfigId
+                var configId = typeof(T).GetCustomAttribute<TenantAttribute>()?.configId;
+                if (configId != null)
+                {
+                    Context = DbScoped.SugarScope.GetConnectionScope(configId);//根据类传入的ConfigId自动选择
+                }
+                else
+                {
+                    Context = context ?? DbScoped.SugarScope.GetConnectionScope(0);//没有默认db0
+                }
             }
             //Context = DbScoped.SugarScope.GetConnectionScopeWithAttr<T>();
             itenant = DbScoped.SugarScope;//设置租户接口

@@ -2,7 +2,7 @@
 {
     [SugarTable("sys_role_dept", "角色部门")]
     [Tenant(0)]
-    public class SysRoleDept
+    public class SysRoleDept : SysBase
     {
         [SugarColumn(ExtendedAttribute = ProteryConstant.NOTNULL, IsPrimaryKey = true)]
         public long RoleId { get; set; }

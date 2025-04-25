@@ -147,6 +147,16 @@ namespace Infrastructure.Extensions
         }
 
         /// <summary>
+        /// 获取租户ID
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static string GetTenantId(this HttpContext context)
+        {
+            return context.Request.Headers["tenantId"];
+        }
+
+        /// <summary>
         /// 获取请求Url
         /// </summary>
         /// <param name="context"></param>

@@ -1,6 +1,4 @@
-﻿using SqlSugar;
-
-namespace ZR.Model.System
+﻿namespace ZR.Model.System
 {
     /// <summary>
     /// 参数配置，数据实体对象
@@ -10,7 +8,7 @@ namespace ZR.Model.System
     /// </summary>
     [SugarTable("sys_config", "配置表")]
     [Tenant("0")]
-    public class SysConfig : SysBase
+    public class SysConfig : SysBase, IMainDbEntity
     {
         /// <summary>
         /// 配置id

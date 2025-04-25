@@ -57,8 +57,10 @@ namespace ZR.Admin.WebApi.Extensions
         /// <returns></returns>
         public static IApplicationBuilder UseInit(this IApplicationBuilder app)
         {
+            var mainDb = App.Configuration["mainDb"];
+            //var tenantId = App.GetCurrentTenantId();
             //Console.WriteLine("初始化字典数据...");
-            var db = DbScoped.SugarScope;
+            var db = DbScoped.SugarScope.GetConnection(mainDb);
             var types = db.Queryable<SysDictType>()
                 .Where(it => it.Status == "0")
                 .Select(it => it.DictType)

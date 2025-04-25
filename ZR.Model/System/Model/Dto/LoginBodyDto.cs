@@ -27,5 +27,9 @@ namespace ZR.Model.System.Dto
         public string Uuid { get; set; } = "";
         public string LoginIP { get; set; }
         public string ClientId { get; set; }
+        /// <summary>
+        /// 租户ID
+        /// </summary>
+        public string TenantId { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Infrastructure;
-using SqlSugar.IOC;
 using ZR.Model;
 using ZR.Model.Models;
 using ZR.Model.System;
@@ -38,14 +37,14 @@ namespace ZR.ServiceCore.SqlSugar
         /// <summary>
         /// 数据过滤
         /// </summary>
-        /// <param name="configId">多库id</param>
-        public static void FilterData(int configId)
+        /// <param name="db">多库id</param>
+        public static void FilterData(SqlSugarClient db)
         {
             //获取当前用户的信息
             var user = JwtUtil.GetLoginUser(App.HttpContext);
             if (user == null) return;
             
-            var db = DbScoped.SugarScope.GetConnectionScope(configId);
+            //var db = DbScoped.SugarScope.GetConnectionScope(configId);
             var expUser = Expressionable.Create<SysUser>().And(it => it.DelFlag == 0);
             var expRole = Expressionable.Create<SysRole>();
             var expLoginlog = Expressionable.Create<SysLogininfor>();

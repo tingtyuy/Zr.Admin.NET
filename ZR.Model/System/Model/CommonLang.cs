@@ -7,7 +7,7 @@ namespace ZR.Model.Models
     /// </summary>
     [Tenant("0")]
     [SugarTable("sys_common_lang", "多语言配置表")]
-    public class CommonLang
+    public class CommonLang : IMainDbEntity
     {
         /// <summary>
         /// id

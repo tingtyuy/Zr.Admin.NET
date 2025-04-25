@@ -46,14 +46,12 @@ namespace ZR.ServiceCore.SqlSugar
             }
             SugarIocServices.ConfigurationSugar(db =>
             {
-                var u = App.User;
-                if (u != null)
+                var user = App.User;
+                if (user != null)
                 {
-                    DataPermi.FilterData(0);
-                    //ConfigId = 1的数据权限过滤
-                    //DataPermiSevice.FilterData(1);
+                    DataPermi.FilterData(db);
                 }
-
+                
                 iocList.ForEach(iocConfig =>
                 {
                     SetSugarAop(db, iocConfig, cache);
@@ -149,7 +147,7 @@ namespace ZR.ServiceCore.SqlSugar
                         log.AfterData = afterPars;
                     }
                     //logger.WithProperty("title", data).Info(pars);
-                    db.GetConnectionScope(0)
+                    db.GetConnectionScope(configId)
                     .Insertable(log)
                     .ExecuteReturnSnowflakeId();
                 }

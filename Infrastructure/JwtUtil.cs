@@ -159,7 +159,8 @@ namespace Infrastructure
                     new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new(ClaimTypes.Name, user.UserName),
                     new(ClaimTypes.GroupSid, user.DeptId.ToString()),
-                    new(ClaimTypes.UserData, JsonConvert.SerializeObject(user))
+                    new(ClaimTypes.UserData, JsonConvert.SerializeObject(user)),
+                    new(ClaimTypes.PrimaryGroupSid, user.TenantId)//租户ID
                 };
 
             return claims;
