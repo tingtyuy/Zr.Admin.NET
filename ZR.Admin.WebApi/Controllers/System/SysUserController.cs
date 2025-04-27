@@ -86,6 +86,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         public IActionResult AddUser([FromBody] SysUserDto parm)
         {
             var user = parm.Adapt<SysUser>().ToCreate(HttpContext);
+            user.DeptId = parm.DeptId;
             if (user == null) { return ToResponse(ApiResult.Error(101, "请求参数错误")); }
             if (UserConstants.NOT_UNIQUE.Equals(UserService.CheckUserNameUnique(user.UserName)))
             {
