@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.Dto;
 using ZR.Model.Models;
 
@@ -9,7 +8,6 @@ namespace ZR.Admin.WebApi.Controllers.Email
     /// <summary>
     /// 邮件模板
     /// </summary>
-    [Verify]
     [Route("system/EmailTpl")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class EmailTplController : BaseController

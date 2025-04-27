@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Service.Content.IService;
 
 //创建时间：2025-04-07
@@ -45,7 +44,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("join/{id}")]
-        [Verify]
         public IActionResult JoinCircles([FromRoute] int id)
         {
             var userId = HttpContext.GetUId();
@@ -57,7 +55,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("delete/{id}")]
-        [Verify]
         public IActionResult DeleteCircles([FromRoute] int id)
         {
             var userId = HttpContext.GetUId();

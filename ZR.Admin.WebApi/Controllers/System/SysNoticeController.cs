@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
@@ -11,7 +10,6 @@ namespace ZR.Admin.WebApi.Controllers.System
     /// <summary>
     /// 系统通知
     /// </summary>
-    [Verify]
     [Route("system/notice")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysNoticeController : BaseController

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.Dto;
-using ZR.ServiceCore.Services;
 
 //创建时间：2023-11-19
 namespace ZR.Admin.WebApi.Controllers.System.monitor
@@ -9,7 +7,6 @@ namespace ZR.Admin.WebApi.Controllers.System.monitor
     /// <summary>
     /// 短信验证码记录
     /// </summary>
-    [Verify]
     [Route("system/SmscodeLog")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SmsCodeLogController : BaseController

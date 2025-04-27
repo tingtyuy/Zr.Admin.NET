@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
-
 
 namespace ZR.Admin.WebApi.Controllers.System
 {
     /// <summary>
     /// 角色信息
     /// </summary>
-    [Verify]
     [Route("system/role")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysRoleController : BaseController

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.Content;
 using ZR.Model.Content.Dto;
 using ZR.Service.Content.IService;
@@ -11,7 +10,6 @@ namespace ZR.Admin.WebApi.Controllers
     /// </summary>
     [Route("front/article")]
     [ApiExplorerSettings(GroupName = "article")]
-    [Verify]
     public class FrontArticleController : BaseController
     {
         /// <summary>

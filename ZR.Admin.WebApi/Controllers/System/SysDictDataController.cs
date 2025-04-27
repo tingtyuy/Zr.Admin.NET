@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
@@ -10,7 +9,6 @@ namespace ZR.Admin.WebApi.Controllers.System
     /// <summary>
     /// 数据字典信息
     /// </summary>
-    [Verify]
     [Route("system/dict/data")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysDictDataController : BaseController

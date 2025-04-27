@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.System.Dto;
 
 namespace ZR.Admin.WebApi.Controllers.monitor
@@ -7,7 +6,6 @@ namespace ZR.Admin.WebApi.Controllers.monitor
     /// <summary>
     /// 操作日志记录
     /// </summary>
-    [Verify]
     [Route("/monitor/operlog")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysOperlogController : BaseController

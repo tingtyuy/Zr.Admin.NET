@@ -141,6 +141,7 @@ app.UseCors("Policy");//要放在app.UseEndpoints前。
 //app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseMiddleware<JwtAuthMiddleware>();
 app.UseAuthorization();
 
 //开启缓存

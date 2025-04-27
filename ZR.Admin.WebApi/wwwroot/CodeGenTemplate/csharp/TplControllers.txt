@@ -13,7 +13,6 @@ namespace ${options.ApiControllerNamespace}.Controllers.${options.SubNamespace}
     /// <summary>
     /// ${genTable.functionName}
     /// </summary>
-    [Verify]
     [Route("${genTable.ModuleName}/${genTable.BusinessName}")]
     public class ${replaceDto.ModelTypeName}Controller : BaseController
     {

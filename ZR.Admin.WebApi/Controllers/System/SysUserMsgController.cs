@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model;
 using ZR.Model.Dto;
 
@@ -9,7 +8,6 @@ namespace ZR.Admin.WebApi.Controllers.System
     /// <summary>
     /// 用户系统消息
     /// </summary>
-    [Verify]
     [Route("SysUserMsg")]
     public class SysUserMsgController : BaseController
     {

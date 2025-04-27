@@ -1,17 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
-
 
 namespace ZR.Admin.WebApi.Controllers.System
 {
     /// <summary>
     /// 任务日志
     /// </summary>
-    [Verify]
     [Route("/monitor/jobLog")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class TasksLogController : BaseController

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MiniExcelLibs;
 using SqlSugar;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
@@ -11,7 +10,6 @@ namespace ZR.Admin.WebApi.Controllers.System
     /// <summary>
     /// 用户管理
     /// </summary>
-    [Verify]
     [Route("system/user")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysUserController : BaseController

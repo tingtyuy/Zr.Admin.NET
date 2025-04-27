@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model;
 using ZR.Model.Content;
 using ZR.Model.Content.Dto;
@@ -35,6 +34,7 @@ namespace ZR.Admin.WebApi.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet("list")]
+        [AllowAnonymous]
         public IActionResult QueryList([FromQuery] MessageQueryDto parm)
         {
             parm.PageSize = 10;
@@ -57,7 +57,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("add")]
-        [Verify]
         [ActionPermissionFilter(Permission = "common")]
         public IActionResult Create([FromBody] ArticleCommentDto parm)
         {
@@ -77,7 +76,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// <returns></returns>
         [HttpPost("praise")]
         [ActionPermissionFilter(Permission = "common")]
-        [Verify]
         public IActionResult Praise([FromBody] ArticleCommentDto dto)
         {
             if (dto == null || dto.CommentId <= 0) return ToResponse(ResultCode.PARAM_ERROR);
@@ -93,7 +91,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// <returns></returns>
         [HttpDelete("delete/{mid}")]
         [ActionPermissionFilter(Permission = "common")]
-        [Verify]
         public IActionResult Delete(long mid)
         {
             var uid = HttpContextExtension.GetUId(HttpContext);
@@ -107,7 +104,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet("mylist")]
-        [Verify]
         public IActionResult QueryMyCommentList([FromQuery] MessageQueryDto parm)
         {
             PagedInfo<ArticleCommentDto> response = messageService.GetMyMessageList(parm);
@@ -120,7 +116,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("top")]
-        [Verify]
         [ActionPermissionFilter(Permission = "common")]
         public IActionResult Top([FromBody] ArticleCommentDto parm)
         {

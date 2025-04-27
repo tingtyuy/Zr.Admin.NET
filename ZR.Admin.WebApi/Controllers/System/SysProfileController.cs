@@ -1,15 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
-
 
 namespace ZR.Admin.WebApi.Controllers.System
 {
     /// <summary>
     /// 个人中心
     /// </summary>
-    [Verify]
     [Route("system/user/profile")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysProfileController : BaseController

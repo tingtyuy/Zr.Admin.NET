@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quartz;
 using SqlSugar;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
 
@@ -12,7 +11,6 @@ namespace ZR.Admin.WebApi.Controllers
     /// <summary>
     /// 计划任务
     /// </summary>
-    [Verify]
     [Route("system/Tasks")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class TasksController : BaseController

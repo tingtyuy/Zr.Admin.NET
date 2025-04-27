@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.Dto;
 using ZR.Model.Models;
-using ZR.ServiceCore.Model;
 
 //创建时间：2023-11-20
 namespace ZR.Admin.WebApi.Controllers.Email
@@ -11,7 +9,6 @@ namespace ZR.Admin.WebApi.Controllers.Email
     /// <summary>
     /// 邮件发送记录
     /// </summary>
-    [Verify]
     [Route("system/EmailLog")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class EmailLogController : BaseController

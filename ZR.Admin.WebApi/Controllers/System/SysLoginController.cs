@@ -98,7 +98,6 @@ namespace ZR.Admin.WebApi.Controllers.System
         /// 获取用户信息
         /// </summary>
         /// <returns></returns>
-        [Verify]
         [HttpGet("getInfo")]
         public IActionResult GetUserInfo()
         {
@@ -119,7 +118,6 @@ namespace ZR.Admin.WebApi.Controllers.System
         /// 获取路由信息
         /// </summary>
         /// <returns></returns>
-        [Verify]
         [HttpGet("getRouters")]
         public IActionResult GetRouters()
         {
@@ -133,7 +131,6 @@ namespace ZR.Admin.WebApi.Controllers.System
         /// 获取路由信息
         /// </summary>
         /// <returns></returns>
-        [Verify]
         [HttpGet("getAppRouters")]
         public IActionResult GetAppRouters(int v = 0)
         {
@@ -249,7 +246,6 @@ namespace ZR.Admin.WebApi.Controllers.System
         /// <returns></returns>
         [HttpPost("/ScanLogin")]
         [Log(Title = "扫码登录")]
-        [Verify]
         public IActionResult ScanLogin([FromBody] ScanDto dto)
         {
             if (dto == null) { return ToResponse(ResultCode.CUSTOM_ERROR, "扫码失败"); }
@@ -278,6 +274,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         /// <returns></returns>
         [HttpPost("/checkMobile")]
         [Log(Title = "发送短息", BusinessType = BusinessType.INSERT)]
+        [AllowAnonymous]
         public IActionResult CheckMobile([FromBody] PhoneLoginDto dto)
         {
             dto.LoginIP = HttpContextExtension.GetClientUserIp(HttpContext);
@@ -354,6 +351,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         [Route("/PhoneBind")]
         [HttpPost]
         [Log(Title = "手机号绑定")]
+        [AllowAnonymous]
         public IActionResult PhoneBind([FromBody] PhoneLoginDto loginBody)
         {
             if (loginBody == null) { throw new CustomException("请求参数错误"); }

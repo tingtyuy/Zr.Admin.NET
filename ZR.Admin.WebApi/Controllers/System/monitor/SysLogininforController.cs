@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
 
@@ -9,7 +8,6 @@ namespace ZR.Admin.WebApi.Controllers.monitor
     /// <summary>
     /// 系统访问记录
     /// </summary>
-    [Verify]
     [Route("/monitor/logininfor")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysLogininforController : BaseController

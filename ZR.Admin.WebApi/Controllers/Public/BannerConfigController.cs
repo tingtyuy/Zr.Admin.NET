@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Model.Public.Dto;
 using ZR.Model.Public;
+using ZR.Model.Public.Dto;
 using ZR.Service.Public.IPublicService;
-using ZR.Admin.WebApi.Filters;
 
 //创建时间：2024-05-11
 namespace ZR.Admin.WebApi.Controllers.Public
@@ -10,7 +9,6 @@ namespace ZR.Admin.WebApi.Controllers.Public
     /// <summary>
     /// 广告管理
     /// </summary>
-    [Verify]
     [Route("public/BannerConfig")]
     public class BannerConfigController : BaseController
     {

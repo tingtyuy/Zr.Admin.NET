@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SqlSugar;
-using ZR.Admin.WebApi.Filters;
 using ZR.CodeGenerator;
 using ZR.CodeGenerator.Model;
 using ZR.CodeGenerator.Service;
@@ -14,7 +13,6 @@ namespace ZR.Admin.WebApi.Controllers
     /// <summary>
     /// 代码生成
     /// </summary>
-    [Verify]
     [Route("tool/gen")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class CodeGeneratorController : BaseController

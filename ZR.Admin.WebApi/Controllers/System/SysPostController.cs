@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.System;
 using ZR.Repository;
 using ZR.ServiceCore.Model.Dto;
@@ -10,7 +9,6 @@ namespace ZR.Admin.WebApi.Controllers.System
     /// <summary>
     /// 岗位管理
     /// </summary>
-    [Verify]
     [Route("system/post")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysPostController : BaseController

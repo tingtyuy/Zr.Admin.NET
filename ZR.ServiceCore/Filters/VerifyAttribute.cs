@@ -25,6 +25,7 @@ namespace ZR.Admin.WebApi.Filters
         /// <param name="context"></param>
         public void OnAuthorization(AuthorizationFilterContext context)
         {
+            return;
             var noNeedCheck = false;
             if (context.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
             {
@@ -48,7 +49,7 @@ namespace ZR.Admin.WebApi.Filters
                 //Console.WriteLine($"jwt到期剩余：{ts.TotalMinutes}分,{ts.TotalSeconds}秒");
 
                 var CK = "token_" + loginUser.UserId;
-                if (!CacheHelper.Exists(CK) && ts.TotalMinutes < 5)
+                if (!CacheHelper.Exists(CK) && ts.TotalMinutes < 5 && ts.TotalMinutes > 0)
                 {
                     var newToken = JwtUtil.GenerateJwtToken(JwtUtil.AddClaims(loginUser));
                     

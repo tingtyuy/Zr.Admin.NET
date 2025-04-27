@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using MiniExcelLibs;
-using ZR.Admin.WebApi.Filters;
 using ZR.Infrastructure.IPTools;
 using ZR.Model.Dto;
 using ZR.Model.System;
@@ -49,6 +48,7 @@ namespace ZR.Admin.WebApi.Controllers
         /// <returns></returns>
         [Route("/")]
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var hello = _localizer["hello"].Value;
@@ -62,6 +62,7 @@ namespace ZR.Admin.WebApi.Controllers
         /// <returns></returns>
         [Route("/ip")]
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult IPInfo(string ip)
         {
             if (ip.IsEmpty()) return ToResponse(ResultCode.CUSTOM_ERROR, "IP异常");
@@ -95,8 +96,7 @@ namespace ZR.Admin.WebApi.Controllers
         /// <param name="file"></param>
         /// <param name="storeType">上传类型1、保存到本地 2、保存到阿里云</param>
         /// <returns></returns>
-        [HttpPost()]
-        [Verify]
+        [HttpPost]
         [ActionPermissionFilter(Permission = "common")]
         public async Task<IActionResult> UploadFile([FromForm] UploadDto uploadDto, IFormFile file, StoreType storeType = StoreType.LOCAL)
         {
@@ -174,7 +174,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// <param name="fileId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Verify]
         [ActionPermissionFilter(Permission = "common")]
         [Log(Title = "下载文件", IsSaveResponseData = false)]
         public IActionResult DownloadFile(string? path, long fileId = 0)

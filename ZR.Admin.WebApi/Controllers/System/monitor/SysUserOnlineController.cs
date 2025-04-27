@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model;
 using ZR.Model.System.Dto;
 using ZR.ServiceCore.Signalr;
@@ -10,7 +9,6 @@ namespace ZR.Admin.WebApi.Controllers.monitor
     /// <summary>
     /// 在线用户
     /// </summary>
-    [Verify]
     [Route("monitor/online")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysUserOnlineController : BaseController

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.System;
 using ZR.Model.System.Dto;
 
@@ -9,7 +8,6 @@ namespace ZR.Admin.WebApi.Controllers
     /// <summary>
     /// 参数配置Controller
     /// </summary>
-    [Verify]
     [Route("system/config")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SysConfigController : BaseController

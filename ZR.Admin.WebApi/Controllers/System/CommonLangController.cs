@@ -10,7 +10,6 @@ namespace ZR.Admin.WebApi.Controllers
     /// <summary>
     /// 多语言配置Controller
     /// </summary>
-    [Verify]
     [Route("system/CommonLang")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class CommonLangController : BaseController

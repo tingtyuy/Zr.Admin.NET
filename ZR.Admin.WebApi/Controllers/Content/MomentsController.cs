@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.Content;
 using ZR.Model.Content.Dto;
 using ZR.Model.Enum;
@@ -7,7 +6,6 @@ using ZR.Service.Content.IService;
 
 namespace ZR.Admin.WebApi.Controllers
 {
-    [Verify]
     [Route("moment")]
     [ApiExplorerSettings(GroupName = "article")]
     public class MomentsController : BaseController

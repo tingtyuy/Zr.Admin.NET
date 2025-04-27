@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.System.Dto;
 
 
@@ -9,7 +8,6 @@ namespace ZR.Admin.WebApi.Controllers
     /// <summary>
     /// 数据差异日志
     /// </summary>
-    [Verify]
     [Route("monitor/SqlDiffLog")]
     [ApiExplorerSettings(GroupName = "sys")]
     public class SqlDiffLogController : BaseController

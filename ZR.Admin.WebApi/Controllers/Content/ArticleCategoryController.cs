@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.Content;
 using ZR.Model.Content.Dto;
 using ZR.Service.Content.IService;
@@ -83,7 +82,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Verify]
         [ActionPermissionFilter(Permission = "articlecategory:add")]
         [Log(Title = "文章目录", BusinessType = BusinessType.INSERT)]
         public IActionResult AddArticleCategory([FromBody] ArticleCategoryDto parm)
@@ -99,7 +97,6 @@ namespace ZR.Admin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [Verify]
         [ActionPermissionFilter(Permission = "articlecategory:edit")]
         [Log(Title = "文章目录", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateArticleCategory([FromBody] ArticleCategoryDto parm)
