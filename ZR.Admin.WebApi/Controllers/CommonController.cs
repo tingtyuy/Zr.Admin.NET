@@ -202,6 +202,7 @@ namespace ZR.Admin.WebApi.Controllers
         /// <param name="clean">是否清空数据</param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [ActionPermissionFilter(Permission = "common")]
         [Log(BusinessType = BusinessType.INSERT, Title = "初始化数据")]
         public IActionResult InitSeedData(bool clean = false)
@@ -230,6 +231,7 @@ namespace ZR.Admin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [ActionPermissionFilter(Permission = "common")]
         [Log(BusinessType = BusinessType.INSERT, Title = "初始化数据")]
         public IActionResult UpdateSeedData()
