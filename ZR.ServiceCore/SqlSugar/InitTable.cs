@@ -3,6 +3,7 @@ using ZR.Model;
 using ZR.Model.Content;
 using ZR.Model.Models;
 using ZR.Model.Public;
+using ZR.Model.social;
 using ZR.Model.System;
 using ZR.Model.System.Generate;
 
@@ -61,6 +62,8 @@ namespace ZR.ServiceCore.SqlSugar
             db.CodeFirst.InitTables(typeof(ArticleTopic));
             db.CodeFirst.InitTables(typeof(BannerConfig));
             db.CodeFirst.InitTables(typeof(SysUserMsg));
+            //db.CodeFirst.InitTables(typeof(SocialFans));
+            //db.CodeFirst.InitTables(typeof(SocialFansInfo));
             //db.CodeFirst.InitTables(typeof(UserOnlineLog));
         }
         public static void InitNewTb()

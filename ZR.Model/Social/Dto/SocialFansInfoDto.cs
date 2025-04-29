@@ -1,6 +1,6 @@
 ﻿namespace ZR.Model.social
 {
-    public class FansInfoDto
+    public class SocialFansInfoDto
     {
         public int Userid { get; set; }
         public int FollowNum { get; set; }

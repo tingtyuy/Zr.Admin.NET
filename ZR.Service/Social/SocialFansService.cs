@@ -15,8 +15,8 @@ namespace ZR.Service.Social
     /// <summary>
     /// 粉丝
     /// </summary>
-    [AppService(ServiceType = typeof(IFansService), ServiceLifetime = LifeTime.Transient)]
-    public class FansService : BaseService<Fans>, IFansService, IDynamicApi
+    [AppService(ServiceType = typeof(ISocialFansService), ServiceLifetime = LifeTime.Transient)]
+    public class SocialFansService : BaseService<SocialFans>, ISocialFansService, IDynamicApi
     {
         /// <summary>
         /// 查询关注/粉丝列表
@@ -28,7 +28,7 @@ namespace ZR.Service.Social
         public ApiResult FollowList([FromQuery] FansQueryDto dto)
         {
             var userid = (int)HttpContextExtension.GetUId(App.HttpContext);
-            PagedInfo<FansDto> list = dto.SelectType == 1 ? GetFollow(dto, userid) : GetFans(dto, userid);
+            PagedInfo<SocialFansDto> list = dto.SelectType == 1 ? GetFollow(dto, userid) : GetFans(dto, userid);
 
             return ApiResult.Success(list);
         }
@@ -58,7 +58,7 @@ namespace ZR.Service.Social
         /// <returns></returns>
         [HttpPost]
         [Verify]
-        public ApiResult Follow([FromBody] FansDto dto)
+        public ApiResult Follow([FromBody] SocialFansDto dto)
         {
             dto.Userid = (int)HttpContextExtension.GetUId(App.HttpContext);
             if (dto.Userid == dto.ToUserid)
@@ -76,7 +76,7 @@ namespace ZR.Service.Social
             {
                 throw new CustomException("已关注");
             }
-            var fans = new Fans
+            var fans = new SocialFans
             {
                 Userid = dto.Userid,
                 ToUserid = dto.ToUserid,
@@ -96,7 +96,7 @@ namespace ZR.Service.Social
             {
                 return ApiResult.Error("关注失败");
             }
-            var data = Context.Queryable<FansInfo>()
+            var data = Context.Queryable<SocialFansInfo>()
                     .Where(x => x.Userid == dto.Userid)
                     .First();
             return ApiResult.Success("关注成功", data);
@@ -109,7 +109,7 @@ namespace ZR.Service.Social
         /// <returns></returns>
         [HttpPost]
         [Verify]
-        public ApiResult CancelFollow([FromBody] FansDto dto)
+        public ApiResult CancelFollow([FromBody] SocialFansDto dto)
         {
             dto.Userid = (int)HttpContextExtension.GetUId(App.HttpContext);
             var result = UseTran(() =>
@@ -117,12 +117,12 @@ namespace ZR.Service.Social
                 //删除粉丝
                 Delete(f => f.Userid == dto.Userid && f.ToUserid == dto.ToUserid);
 
-                Context.Updateable<FansInfo>()
+                Context.Updateable<SocialFansInfo>()
                 .SetColumns(x => x.FollowNum == x.FollowNum - 1)
                 .Where(x => x.Userid == dto.Userid)
                 .ExecuteCommand();
 
-                Context.Updateable<FansInfo>()
+                Context.Updateable<SocialFansInfo>()
                 .SetColumns(x => x.FansNum == x.FansNum - 1)
                 .Where(x => x.Userid == dto.ToUserid)
                 .ExecuteCommand();
@@ -132,7 +132,7 @@ namespace ZR.Service.Social
             {
                 return ApiResult.Error("取消关注失败");
             }
-            var data = Context.Queryable<FansInfo>()
+            var data = Context.Queryable<SocialFansInfo>()
                     .Where(x => x.Userid == dto.Userid)
                     .First();
             return ApiResult.Success("取消关注成功", data);
@@ -140,7 +140,7 @@ namespace ZR.Service.Social
 
         private void UpdateFollowInfo(int userId, bool isFollowNum)
         {
-            var count = Context.Updateable<FansInfo>()
+            var count = Context.Updateable<SocialFansInfo>()
                 .SetColumnsIF(isFollowNum, x => x.FollowNum == x.FollowNum + 1)
                 .SetColumnsIF(!isFollowNum, x => x.FansNum == x.FansNum + 1)
                 .Where(x => x.Userid == userId)
@@ -148,7 +148,7 @@ namespace ZR.Service.Social
 
             if (count > 0) return;
 
-            Context.Insertable(new FansInfo
+            Context.Insertable(new SocialFansInfo
             {
                 Userid = userId,
                 FollowNum = isFollowNum ? 1 : 0,
@@ -157,12 +157,12 @@ namespace ZR.Service.Social
             }).ExecuteCommand();
         }
 
-        private PagedInfo<FansDto> GetFollow(FansQueryDto dto, int userid)
+        private PagedInfo<SocialFansDto> GetFollow(FansQueryDto dto, int userid)
         {
             return Queryable()
                             .LeftJoin<SysUser>((it, u) => it.ToUserid == u.UserId)
                             .Where(it => it.Userid == userid)
-                            .Select((it, u) => new FansDto()
+                            .Select((it, u) => new SocialFansDto()
                             {
                                 User = new ArticleUser()
                                 {
@@ -174,12 +174,12 @@ namespace ZR.Service.Social
                             }, true)
                             .ToPage(dto);
         }
-        private PagedInfo<FansDto> GetFans(FansQueryDto dto, int userid)
+        private PagedInfo<SocialFansDto> GetFans(FansQueryDto dto, int userid)
         {
             return Queryable()
                             .LeftJoin<SysUser>((it, u) => it.Userid == u.UserId)
                             .Where(it => it.ToUserid == userid)
-                            .Select((it, u) => new FansDto()
+                            .Select((it, u) => new SocialFansDto()
                             {
                                 User = new ArticleUser()
                                 {

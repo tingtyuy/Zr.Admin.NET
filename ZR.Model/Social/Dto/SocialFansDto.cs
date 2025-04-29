@@ -5,7 +5,7 @@ namespace ZR.Model.social
     /// <summary>
     /// 粉丝表
     /// </summary>
-    public class FansDto
+    public class SocialFansDto
     {
         [JsonIgnore]
         public long PId { get; set; }

@@ -3,11 +3,11 @@
     /// <summary>
     /// 粉丝信息表
     /// </summary>
-    [SugarTable("fans_info")]
-    public class FansInfo
+    [SugarTable("social_fans_info")]
+    public class SocialFansInfo
     {
         [SugarColumn(IsPrimaryKey = true)]
-        public int Userid { get; set; }
+        public long Userid { get; set; }
         /// <summary>
         /// 关注数
         /// </summary>

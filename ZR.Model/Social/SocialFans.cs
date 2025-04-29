@@ -3,13 +3,17 @@
     /// <summary>
     /// 粉丝表
     /// </summary>
-    [SugarTable("fans")]
-    public class Fans
+    [SugarTable("social_fans")]
+    public class SocialFans
     {
         [SugarColumn(IsPrimaryKey = true)]
         public long PId { get; set; }
-        public int Userid { get; set; }
-        public int ToUserid { get; set; }
+        public long Userid { get; set; }
+        public long ToUserid { get; set; }
+        /// <summary>
+        /// 备注名
+        /// </summary>
+        public string RemarkName { get; set; }
         public DateTime FollowTime { get; set; }
         public string UserIP { get; set; }
     }

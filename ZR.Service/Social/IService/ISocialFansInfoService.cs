@@ -2,7 +2,7 @@
 
 namespace ZR.Service.Social.IService
 {
-    public interface IFansInfoService : IBaseService<FansInfo>
+    public interface ISocialFansInfoService : IBaseService<SocialFansInfo>
     {
     }
 }

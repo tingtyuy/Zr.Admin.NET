@@ -22,7 +22,7 @@ namespace ZR.Admin.WebApi.Controllers
         private readonly ISysUserService _SysUserService;
         private readonly IArticleTopicService _ArticleTopicService;
         private readonly IArticleUserCirclesService _ArticleUserCirclesService;
-        private readonly IFansInfoService _FansInfoService;
+        private readonly ISocialFansInfoService _FansInfoService;
 
         /// <summary>
         /// 
@@ -41,7 +41,7 @@ namespace ZR.Admin.WebApi.Controllers
             ISysUserService sysUserService,
             IArticleTopicService articleTopicService,
             IArticleUserCirclesService articleUserCirclesService,
-            IFansInfoService fansInfoService)
+            ISocialFansInfoService fansInfoService)
         {
             _ArticleService = ArticleService;
             _ArticleCategoryService = articleCategoryService;
@@ -265,7 +265,7 @@ namespace ZR.Admin.WebApi.Controllers
         public IActionResult GetUserWidget(int toUserid)
         {
             var userId = HttpContext.GetUId();
-            var fansInfo = _FansInfoService.GetFirst(f => f.Userid == toUserid) ?? new Model.social.FansInfo() { };
+            var fansInfo = _FansInfoService.GetFirst(f => f.Userid == toUserid) ?? new Model.social.SocialFansInfo() { };
 
             return SUCCESS(new { fansInfo });
         }
