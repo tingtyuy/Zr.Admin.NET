@@ -17,7 +17,8 @@ namespace ZR.ServiceCore.Middleware
         private readonly ILogger<JwtAuthMiddleware> _logger;
         private static readonly string[] _whitelistPaths = new[]
         {
-            ".png"
+            ".png",
+            "/msgHub"
         };
 
         public JwtAuthMiddleware(RequestDelegate next, ILogger<JwtAuthMiddleware> logger)
