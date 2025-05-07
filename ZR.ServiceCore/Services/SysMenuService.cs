@@ -149,7 +149,15 @@ namespace ZR.ServiceCore.Services
         {
             long menuId = menu.MenuId == 0 ? -1 : menu.MenuId;
             SysMenu info = GetFirst(it => it.MenuName == menu.MenuName && it.ParentId == menu.ParentId);
-
+            if (menu.MenuType == "C")
+            {
+                SysMenu info2 = GetFirst(it => it.Path == menu.Path);
+                if (info2 != null)
+                {
+                    throw new CustomException($"{menu.Path}路由地址已存在");
+                }
+            }
+       
             //if (info != null && menuId != info.menuId && menu.menuName.Equals(info.menuName))
             //{
             //    return UserConstants.NOT_UNIQUE;
