@@ -1,4 +1,5 @@
 ﻿using Infrastructure;
+using SqlSugar.IOC;
 using ZR.Model;
 using ZR.Model.Models;
 using ZR.Model.System;
@@ -37,18 +38,19 @@ namespace ZR.ServiceCore.SqlSugar
         /// <summary>
         /// 数据过滤
         /// </summary>
-        /// <param name="db">多库id</param>
-        public static void FilterData(SqlSugarClient db)
+        /// <param name="configId">多库id</param>
+        public static void FilterData(string configId)
         {
             //获取当前用户的信息
             var user = JwtUtil.GetLoginUser(App.HttpContext);
             if (user == null) return;
             
-            //var db = DbScoped.SugarScope.GetConnectionScope(configId);
+            var db = DbScoped.SugarScope.GetConnectionScope(configId);
             var expUser = Expressionable.Create<SysUser>().And(it => it.DelFlag == 0);
             var expRole = Expressionable.Create<SysRole>();
             var expLoginlog = Expressionable.Create<SysLogininfor>();
             var expSysMsg = Expressionable.Create<SysUserMsg>().And(it => it.IsDelete == 0);
+            var expDept = Expressionable.Create<SysDept>();
             
             db.QueryFilter.AddTableFilter(expSysMsg.ToExpression());
             //管理员不过滤
@@ -69,14 +71,17 @@ namespace ZR.ServiceCore.SqlSugar
                 }
                 else if (DataPermiEnum.DEPT.Equals(dataScope))//本部门数据
                 {
-                    expUser.Or(it => it.DeptId == user.DeptId);
+                    expUser.And(it => it.DeptId == user.DeptId);
+                    expDept.And(it => it.DeptId == user.DeptId);
                 }
                 else if (DataPermiEnum.DEPT_CHILD.Equals(dataScope))//本部门及以下数据
                 {
                     //SQl  OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )
                     var allChildDepts = db.Queryable<SysDept>().ToChildList(it => it.ParentId, user.DeptId);
+                    var allDeptId = allChildDepts.Select(f => f.DeptId).ToList();
 
-                    expUser.Or(it => allChildDepts.Select(f => f.DeptId).ToList().Contains(it.DeptId));
+                    expUser.Or(it => allDeptId.Contains(it.DeptId));
+                    expDept.And(it => allDeptId.Contains(it.DeptId));
                 }
                 else if (DataPermiEnum.SELF.Equals(dataScope))//仅本人数据
                 {
@@ -86,6 +91,7 @@ namespace ZR.ServiceCore.SqlSugar
                 }
             }
 
+            db.QueryFilter.AddTableFilter(expDept.ToExpression());
             db.QueryFilter.AddTableFilter(expUser.ToExpression());
             db.QueryFilter.AddTableFilter(expRole.ToExpression());
             db.QueryFilter.AddTableFilter(expLoginlog.ToExpression());
