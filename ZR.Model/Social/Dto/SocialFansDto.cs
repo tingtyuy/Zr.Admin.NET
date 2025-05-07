@@ -9,8 +9,8 @@ namespace ZR.Model.social
     {
         [JsonIgnore]
         public long PId { get; set; }
-        public int Userid { get; set; }
-        public int ToUserid { get; set; }
+        public long Userid { get; set; }
+        public long ToUserid { get; set; }
         [JsonIgnore]
         public DateTime FollowTime { get; set; }
         [JsonIgnore]

@@ -3,7 +3,6 @@ using Infrastructure.Attribute;
 using Infrastructure.Extensions;
 using Infrastructure.Model;
 using Microsoft.AspNetCore.Mvc;
-using ZR.Admin.WebApi.Filters;
 using ZR.Model.Content.Dto;
 using ZR.Model.social;
 using ZR.Model.System;
@@ -15,7 +14,7 @@ namespace ZR.Service.Social
     /// <summary>
     /// 粉丝
     /// </summary>
-    [AppService(ServiceType = typeof(ISocialFansService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(ServiceType = typeof(ISocialFansService))]
     public class SocialFansService : BaseService<SocialFans>, ISocialFansService, IDynamicApi
     {
         /// <summary>
@@ -23,7 +22,6 @@ namespace ZR.Service.Social
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [Verify]
         [HttpGet]
         public ApiResult FollowList([FromQuery] FansQueryDto dto)
         {
@@ -38,7 +36,6 @@ namespace ZR.Service.Social
         /// </summary>
         /// <param name="toUserid"></param>
         /// <returns></returns>
-        [Verify]
         public ApiResult IsFollow([FromQuery] int toUserid)
         {
             var userid = (int)HttpContextExtension.GetUId(App.HttpContext);
@@ -57,7 +54,6 @@ namespace ZR.Service.Social
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Verify]
         public ApiResult Follow([FromBody] SocialFansDto dto)
         {
             dto.Userid = (int)HttpContextExtension.GetUId(App.HttpContext);
@@ -108,7 +104,6 @@ namespace ZR.Service.Social
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Verify]
         public ApiResult CancelFollow([FromBody] SocialFansDto dto)
         {
             dto.Userid = (int)HttpContextExtension.GetUId(App.HttpContext);
@@ -138,7 +133,7 @@ namespace ZR.Service.Social
             return ApiResult.Success("取消关注成功", data);
         }
 
-        private void UpdateFollowInfo(int userId, bool isFollowNum)
+        private void UpdateFollowInfo(long userId, bool isFollowNum)
         {
             var count = Context.Updateable<SocialFansInfo>()
                 .SetColumnsIF(isFollowNum, x => x.FollowNum == x.FollowNum + 1)
@@ -170,8 +165,9 @@ namespace ZR.Service.Social
                                     NickName = u.NickName,
                                     Sex = u.Sex,
                                 },
-                                Status = 1
-                            }, true)
+                                Status = 1,
+                                ToUserid = it.ToUserid,
+                            })
                             .ToPage(dto);
         }
         private PagedInfo<SocialFansDto> GetFans(FansQueryDto dto, int userid)
@@ -187,7 +183,8 @@ namespace ZR.Service.Social
                                     NickName = u.NickName,
                                     Sex = u.Sex,
                                 },
-                            }, true)
+                                Userid = it.Userid,
+                            })
                             .ToPage(dto);
         }
     }
