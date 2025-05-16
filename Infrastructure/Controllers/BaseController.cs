@@ -86,7 +86,7 @@ namespace Infrastructure.Controllers
         {
             if (!System.IO.File.Exists(path))
             {
-                return NotFound();
+                return ToResponse(ResultCode.CUSTOM_ERROR, "文件不存在");
             }
             var stream = System.IO.File.OpenRead(path);  //创建文件流
             Response.Headers.Append("Access-Control-Expose-Headers", "Content-Disposition");
