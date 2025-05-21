@@ -263,6 +263,7 @@ $if(column.CsharpType == "int" || column.CsharpType == "long")
     $set(switchType = ":active-value='1' :inactive-value='0'")
 $end
 
+$if(column.IsEdit)
 $if(column.IsPK || column.IsIncrement)
 $if(column.IsPK && column.IsIncrement == false && replaceDto.useSnowflakeId == false)
           <el-col :lg="${options.ColNum}">
@@ -378,6 +379,7 @@ $else
 $end
 $end
 $end
+$end
         </el-row>
 $* 子表信息 *$
 $if(sub)
@@ -458,7 +460,7 @@ $end
       <template #footer v-if="opertype != 3">
         <el-button text @click="cancel">{{ ${t}t('btn.cancel') }}</el-button>
 $if(replaceDto.ShowBtnEdit || replaceDto.ShowBtnAdd)
-        <el-button type="primary" @click="submitForm">{{ ${t}t('btn.submit') }}</el-button>
+        <el-button type="primary" :loading="state.submitLoading" @click="submitForm">{{ ${t}t('btn.submit') }}</el-button>
 $end
       </template>
     </el-dialog>
@@ -654,6 +656,7 @@ const open = ref(false)
 const state = reactive({
   single: true,
   multiple: true,
+  submitLoading: false,
   form: {},
   rules: {
 $foreach(column in genTable.Columns)
@@ -735,6 +738,7 @@ $if(replaceDto.ShowBtnAdd)
 function handleAdd() {
   reset();
   open.value = true
+  state.submitLoading = false
   title.value = '添加${genTable.functionName}'
   opertype.value = 1
 }
@@ -771,6 +775,7 @@ $end
 function submitForm() {
   proxy.${refs}refs["formRef"].validate((valid) => {
     if (valid) {
+      state.submitLoading = true
 $foreach(item in genTable.Columns)
 $if(item.HtmlType == "checkbox" || item.HtmlType == "selectMulti")
       form.value.${item.CsharpFieldFl} = form.value.${item.CsharpFieldFl}Checked.toString();
@@ -794,6 +799,11 @@ $if(replaceDto.ShowBtnAdd)
             proxy.${modal}modal.msgSuccess("新增成功")
             open.value = false
             getList()
+          })
+          .finally(() => {
+            setTimeout(() => {
+              state.submitLoading = false
+            }, 800)
           })
 $end
       }
