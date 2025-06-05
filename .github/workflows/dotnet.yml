@@ -30,12 +30,4 @@ jobs:
     - name: Package
       run: dotnet pack --configuration Release --output ./dist
 
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }} # 仅在 release 事件中可用
-        asset_path: ./dist/*.nupkg
-        asset_name: ${{ github.event.repository.name }}.${{ github.event.release.tag_name }}.nupkg
-        asset_content_type: application/zip
+
