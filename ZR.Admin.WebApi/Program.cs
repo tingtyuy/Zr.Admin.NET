@@ -12,6 +12,8 @@ using ZR.Common.DynamicApiSimple.Extens;
 using ZR.Infrastructure.WebExtensions;
 using ZR.ServiceCore.Signalr;
 using ZR.ServiceCore.SqlSugar;
+using ZR.Mall;
+//using SQLitePCL;
 
 var builder = WebApplication.CreateBuilder(args);
 // NLog: Setup NLog for Dependency injection
@@ -52,7 +54,8 @@ builder.Services.AddAppService();
 builder.Services.AddTaskSchedulers();
 //请求大小限制
 builder.Services.AddRequestLimit(builder.Configuration);
-
+//sqlite 包需要的驱动
+//Batteries_V2.Init();
 //注册REDIS 服务
 var openRedis = builder.Configuration["RedisServer:open"];
 if (openRedis == "1")
@@ -86,13 +89,14 @@ builder.Services.AddSwaggerConfig();
 builder.Services.AddLogo();
 // 添加本地化服务
 builder.Services.AddLocalization(options => options.ResourcesPath = "");
-
+// 在应用程序启动的最开始处调用
 var app = builder.Build();
 InternalApp.ServiceProvider = app.Services;
 InternalApp.Configuration = builder.Configuration;
 InternalApp.WebHostEnvironment = app.Environment;
 //初始化db
 builder.Services.AddDb(app.Environment);
+builder.Services.InitDb(app.Environment);
 var workId = builder.Configuration["workId"].ParseToInt();
 if (app.Environment.IsDevelopment())
 {
@@ -154,8 +158,12 @@ if (builder.Environment.IsProduction())
 //初始化字典数据
 app.UseInit();
 
-//使用swagger
-app.UseSwagger();
+//swagger 只在开发环境中使用
+if (builder.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+}
+
 //启用客户端IP限制速率
 app.UseIpRateLimiting();
 app.UseRateLimiter();
