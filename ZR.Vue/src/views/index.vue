@@ -1,6 +1,6 @@
 <template>
   <div class="app-container home">
-    <el-row :gutter="20">
+    <!-- <el-row :gutter="20">
       <el-col :sm="24" :lg="24">
         <blockquote class="text-warning" style="font-size: 14px">
           【阿里云特惠专区】
@@ -161,7 +161,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-divider />
+    <el-divider /> -->
   </div>
 </template>
 
@@ -176,15 +176,15 @@ export default {
     }
   },
   mounted() {
-    this.$notify({
-      title: 'Vue2停止更新公告',
-      message:
-        'Vue2已不再更新新功能，请使用Vue3版本<a href="https://gitee.com/izory/ZRAdmin-vue" target="_blank"> https://gitee.com/izory/ZRAdmin-vue </a>',
-      position: 'bottom-right',
-      type: 'warning',
-      dangerouslyUseHTMLString: true,
-      duration: 0,
-    })
+    // this.$notify({
+    //   title: 'Vue2停止更新公告',
+    //   message:
+    //     'Vue2已不再更新新功能，请使用Vue3版本<a href="https://gitee.com/izory/ZRAdmin-vue" target="_blank"> https://gitee.com/izory/ZRAdmin-vue </a>',
+    //   position: 'bottom-right',
+    //   type: 'warning',
+    //   dangerouslyUseHTMLString: true,
+    //   duration: 0,
+    // })
   },
   methods: {
     goTarget(href) {
