@@ -1,5 +1,6 @@
 <template>
   <div class="app-container home">
+    <h1>欢迎进入，客户自动化管理后台</h1>
     <!-- <el-row :gutter="20">
       <el-col :sm="24" :lg="24">
         <blockquote class="text-warning" style="font-size: 14px">
@@ -37,7 +38,7 @@
     </el-row>
     <el-row :gutter="20">
       <el-col :lg="16" :sm="24">
-        <h2>ZRAdmin.NET后台管理框架</h2>
+        <h2>后台管理</h2>
         <p>
           ZRAdmin.NET借鉴了很多开源项目的优点，让你开发Web管理系统更简单，所以我也把它给开源了（前端
           <code>vue页面</code>主要参考若依，在此表示感谢.)

@@ -1,6 +1,6 @@
 {
   "name": "zradmin",
-  "description": "ZrAdmnin.NET后台管理",
+  "description": "客服自动化管理后台",
   "author": "ZR",
   "scripts": {
     "dev": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",

@@ -1,0 +1,56 @@
+
+namespace ZR.Model.Business
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    [SugarTable("tb_result")]
+    public class TbResult
+    {
+        /// <summary>
+        /// ID 
+        /// </summary>
+        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+        public long Id { get; set; }
+        /// <summary>
+        /// 问题件类型 
+        /// </summary>
+        public string 问题件类型 { get; set; }
+
+        /// <summary>
+        /// 单号 
+        /// </summary>
+        public string 单号 { get; set; }
+
+        /// <summary>
+        /// 商家名称 
+        /// </summary>
+        public string 商家名称 { get; set; }
+
+        /// <summary>
+        /// 收件人信息 
+        /// </summary>
+        public string 收件人信息 { get; set; }
+
+        /// <summary>
+        /// 结果 
+        /// </summary>
+        public string 结果 { get; set; }
+
+        /// <summary>
+        /// 执行机器人 
+        /// </summary>
+        public string 执行机器人 { get; set; }
+
+        /// <summary>
+        /// 操作时间 
+        /// </summary>
+        public string 操作时间 { get; set; }
+
+        /// <summary>
+        /// CompanyId 
+        /// </summary>
+        public string CompanyId { get; set; }
+
+    }
+}
