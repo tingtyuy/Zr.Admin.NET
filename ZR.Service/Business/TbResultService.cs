@@ -1,7 +1,9 @@
 using Infrastructure.Attribute;
 using Infrastructure.Extensions;
-using ZR.Model.Business.Dto;
+using Microsoft.IdentityModel.Tokens;
+using SqlSugar.Extensions;
 using ZR.Model.Business;
+using ZR.Model.Business.Dto;
 using ZR.Repository;
 using ZR.Service.Business.IBusinessService;
 
@@ -22,8 +24,18 @@ namespace ZR.Service.Business
         {
             var predicate = QueryExp(parm);
 
+            predicate.AndIF(!string.IsNullOrEmpty(parm.单号), m => m.单号.Contains(parm.单号));
+            predicate.AndIF(!string.IsNullOrEmpty(parm.商家名称), m => m.商家名称.Contains(parm.商家名称));
+            predicate.AndIF(!string.IsNullOrEmpty(parm.处理状态), m => m.处理状态 == parm.处理状态);
+            predicate.AndIF(parm.操作开始时间.HasValue, m => DateTime.Parse(m.操作时间) >= parm.操作开始时间);
+            predicate.AndIF(parm.操作结束时间.HasValue, m => DateTime.Parse(m.操作时间) <= parm.操作结束时间);
+            predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类别), m => m.问题件类别 == parm.问题件类别);
+            predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类型), m => m.问题件类型 == parm.问题件类型);
+            //predicate.And(w => DateTime.Parse(w.操作时间) >= DateTime.Now.AddDays(-7));
+
             var response = Queryable()
                 .Where(predicate.ToExpression())
+                .OrderByDescending(s=>s.操作时间)
                 .ToPage<TbResult, TbResultDto>(parm);
 
             return response;

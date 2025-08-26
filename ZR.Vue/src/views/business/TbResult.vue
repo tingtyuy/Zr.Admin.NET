@@ -8,30 +8,91 @@
 -->
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px" v-show="showSearch"
-      @submit.native.prevent>
+    <el-row :gutter="12" class="mb8">
+      <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
+        v-show="showSearch" @submit.native.prevent>
+        <el-col :span="6">
+          <el-form-item label="开始日期" prop="操作开始时间">
+            <el-date-picker v-model="queryParams.操作开始时间" type="date" placeholder="开始日期" value-format="yyyy-MM-dd"
+              clearable>
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="结束日期" prop="操作结束时间">
+            <el-date-picker v-model="queryParams.操作结束时间" type="date" placeholder="结束日期" value-format="yyyy-MM-dd"
+              clearable>
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="商家名称" prop="商家名称">
+            <el-input v-model="queryParams.商家名称" placeholder="请输入商家名称" clearable :style="{ width: '100%' }">
+            </el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="运单号" prop="单号">
+            <el-input v-model="queryParams.单号" placeholder="请输入运单号" clearable :style="{ width: '100%' }">
+            </el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="处理状态" prop="处理状态">
+            <el-select v-model="queryParams.处理状态" placeholder="请选择状态" clearable :style="{ width: '100%' }">
+              <el-option v-for="(item, index) in 处理状态Options" :key="index" :label="item.label" :value="item.value"
+                :disabled="item.disabled"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
 
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
+        <el-col :span="6">
+          <el-form-item label="问题件类型" prop="问题件类型">
+            <el-select v-model="queryParams.问题件类型" placeholder="请选择问题件类型" clearable :style="{ width: '100%' }">
+              <el-option v-for="(item, index) in 问题件类型Options" :key="index" :label="item.label" :value="item.value"
+                :disabled="item.disabled"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="问题件类别" prop="问题件类别">
+            <el-select v-model="queryParams.问题件类别" placeholder="请选择问题件类别" clearable :style="{ width: '100%' }">
+              <el-option v-for="(item, index) in 问题件类别Options" :key="index" :label="item.label" :value="item.value"
+                :disabled="item.disabled"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="4" :offset="2">
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+          <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        </el-col>
+
+      </el-form>
+    </el-row>
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" v-hasPermi="['tbresult:add']" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+        <el-button icon="el-icon-refresh" v-hasPermi="['tbresult:forward']" size="mini"
+          @click="handleForward">转发商户</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="success" :disabled="single" v-hasPermi="['tbresult:edit']" plain icon="el-icon-edit" size="mini" @click="handleUpdate">修改</el-button>
+        <el-button type="primary" v-hasPermi="['tbresult:add']" plain icon="el-icon-plus" size="mini"
+          @click="handleAdd">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="danger" :disabled="multiple" v-hasPermi="['tbresult:delete']" plain icon="el-icon-delete" size="mini" @click="handleDelete">删除</el-button>
+        <el-button type="success" :disabled="single" v-hasPermi="['tbresult:edit']" plain icon="el-icon-edit"
+          size="mini" @click="handleUpdate">修改</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button type="danger" :disabled="multiple" v-hasPermi="['tbresult:delete']" plain icon="el-icon-delete"
+          size="mini" @click="handleDelete">删除</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <!-- 数据区域 -->
-    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="50" align="center"/>
+    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
+      @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="50" align="center" />
       <el-table-column prop="问题件类型" label="问题件类型" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
@@ -50,10 +111,11 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination class="mt10" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    <pagination class="mt10" background :total="total" :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" >
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row :gutter="20">
 
@@ -129,7 +191,7 @@ export default {
   data() {
     return {
       labelWidth: "100px",
-      formLabelWidth:"100px",
+      formLabelWidth: "100px",
       // 选中id数组
       ids: [],
       // 非单个禁用
@@ -142,6 +204,13 @@ export default {
       showSearch: true,
       // 查询参数
       queryParams: {
+        操作开始时间: '',
+        操作结束时间: '',
+        商家名称: '',
+        单号: '',
+        处理状态: '',
+        问题件类型: '',
+        问题件类别: '',
         pageNum: 1,
         pageSize: 10,
         sort: undefined,
@@ -156,19 +225,61 @@ export default {
       // 表单参数
       form: {},
       columns: [
-        { index: 0, key: '问题件类型', label: `问题件类型`, checked:  true  },
-        { index: 1, key: '单号', label: `单号`, checked:  true  },
-        { index: 2, key: '商家名称', label: `商家名称`, checked:  true  },
-        { index: 3, key: '收件人信息', label: `收件人信息`, checked:  true  },
-        { index: 4, key: '结果', label: `结果`, checked:  true  },
-        { index: 5, key: '执行机器人', label: `执行机器人`, checked:  true  },
-        { index: 6, key: '操作时间', label: `操作时间`, checked:  true  },
-        { index: 7, key: 'companyId', label: `CompanyId`, checked:  true  },
+        { index: 0, key: '问题件类型', label: `问题件类型`, checked: true },
+        { index: 1, key: '单号', label: `单号`, checked: true },
+        { index: 2, key: '商家名称', label: `商家名称`, checked: true },
+        { index: 3, key: '收件人信息', label: `收件人信息`, checked: true },
+        { index: 4, key: '结果', label: `结果`, checked: true },
+        { index: 5, key: '执行机器人', label: `执行机器人`, checked: true },
+        { index: 6, key: '操作时间', label: `操作时间`, checked: true },
+        { index: 7, key: 'companyId', label: `CompanyId`, checked: true },
       ],
       dataList: [],
       total: 0,
       rules: {
       },
+      处理状态Options: [{
+        "label": "已处理",
+        "value": "已处理"
+      }, {
+        "label": "未处理",
+        "value": ""
+      }
+      ],
+      问题件类型Options: [{
+        "label": "拒收",
+        "value": "拒收"
+      }, {
+        "label": "破损件",
+        "value": "破损件"
+      }, {
+        "label": "信息有误",
+        "value": "信息有误"
+      }
+      ],
+      问题件类别Options: [{
+        "label": "面单详情与实际内件不符",
+        "value": "面单详情与实际内件不符"
+      }, {
+        "label": "地址错误",
+        "value": "地址错误"
+      }, {
+        "label": "电话错误",
+        "value": "电话错误"
+      }, {
+        "label": "空号",
+        "value": "空号"
+      }, {
+        "label": "停机",
+        "value": "停机"
+      }, {
+        "label": "双面单",
+        "value": "双面单"
+      }, {
+        "label": "有单无货",
+        "value": "有单无货"
+      }
+      ],
     };
   },
   created() {
@@ -179,16 +290,29 @@ export default {
     ];
   },
   methods: {
+    // 转发商户
+    handleForward() {
+      if (this.ids.length == 0) {
+        this.msgWarning("请至少选择一条数据进行操作");
+        return;
+      }
+      this.$confirm('是否确认转发选中的数据？')
+        .then(function () {
+          // 这里写转发的请求
+          this.msgSuccess("转发成功");
+        })
+        .catch(() => { });
+    },
     // 查询数据
     getList() {
       this.loading = true;
       listTbResult(this.queryParams).then(res => {
-         if (res.code == 200) {
-           this.dataList = res.data.result;
-           this.total = res.data.totalNum;
-           this.loading = false;
-         }
-       })
+        if (res.code == 200) {
+          this.dataList = res.data.result;
+          this.total = res.data.totalNum;
+          this.loading = false;
+        }
+      })
     },
     // 取消按钮
     cancel() {
@@ -197,23 +321,29 @@ export default {
     },
     // 重置数据表单
     reset() {
+
       this.form = {
-        问题件类型: undefined,
-        单号: undefined,
-        商家名称: undefined,
-        收件人信息: undefined,
-        结果: undefined,
-        执行机器人: undefined,
-        操作时间: undefined,
-        companyId: undefined,
+        操作开始时间: '',
+        操作结束时间: '',
+        商家名称: '',
+        单号: '',
+        处理状态: '',
+        问题件类型: '',
+        问题件类别: '',
+        收件人信息: '',
+        结果: '',
+        执行机器人: '',
+        companyId: '',
       };
       this.resetForm("form");
     },
     // 重置查询操作
     resetQuery() {
-      this.timeRange = [];
-      this.resetForm("queryForm");
-      this.handleQuery();
+      console.log(this.queryParams.商户名称);
+      console.log(this.queryParams.操作开始时间);
+      console.log(this.queryParams.操作结束时间);
+      // this.resetForm("queryForm");
+      // this.handleQuery();
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -221,7 +351,7 @@ export default {
       this.single = selection.length != 1
       this.multiple = !selection.length;
     },
-     // 自定义排序
+    // 自定义排序
     sortChange(column) {
       if (column.prop == null || column.order == null) {
         this.queryParams.sort = undefined;
@@ -257,7 +387,7 @@ export default {
           this.handleQuery();
           this.msgSuccess("删除成功");
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -286,14 +416,14 @@ export default {
                 this.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
-            })
+              })
           } else {
             addTbResult(this.form)
               .then((res) => {
                 this.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
-            })
+              })
           }
         }
       });

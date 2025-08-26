@@ -16,6 +16,15 @@ namespace ZR.Model.Business
         /// 问题件类型 
         /// </summary>
         public string 问题件类型 { get; set; }
+        /// <summary>
+        /// 问题件类别 
+        /// </summary>
+        public string 问题件类别 { get; set; }
+
+        /// <summary>
+        /// 处理状态 
+        /// </summary>
+        public string 处理状态 { get; set; }
 
         /// <summary>
         /// 单号 
