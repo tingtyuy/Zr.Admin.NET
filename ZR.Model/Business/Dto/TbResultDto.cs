@@ -4,7 +4,7 @@ namespace ZR.Model.Business.Dto
     /// <summary>
     /// 查询对象
     /// </summary>
-    public class TbResultQueryDto : PagerInfo 
+    public class TbResultQueryDto : PagerInfo
     {
         public string 问题件类型 { get; set; }
         public string 问题件类别 { get; set; }
@@ -47,7 +47,23 @@ namespace ZR.Model.Business.Dto
 
         public string CompanyId { get; set; }
 
+    }
 
+    /// <summary>
+    /// 反馈信息
+    /// </summary>
+    public class ReplyMessageDto
+    {
+        public string BussinessName { get; set; }
+        public string SendUser { get; set; }
+        public List<ReplyMessage> ReplyMessageList { get; set; }
+
+    }
+    public class ReplyMessage
+    {
+        public IList<string> OrderNo { get; set; }
+        public string Type { get; set; }
+        public string Message { get; set; }
 
     }
 }

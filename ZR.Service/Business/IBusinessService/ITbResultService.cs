@@ -15,7 +15,7 @@ namespace ZR.Service.Business.IBusinessService
 
         TbResult AddTbResult(TbResult parm);
         int UpdateTbResult(TbResult parm);
-
-
+        int UpdateTbResultStatus(long[] idArr);
+        ReplyMessageDto GetForwardMessageResult(long[] idArr);
     }
 }

@@ -46,7 +46,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
         public IActionResult GetTbResult(int Id)
         {
             var response = _TbResultService.GetInfo(Id);
-            
+
             var info = response.Adapt<TbResultDto>();
             return SUCCESS(info);
         }
@@ -89,11 +89,39 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [HttpPost("delete/{ids}")]
         [ActionPermissionFilter(Permission = "tbresult:delete")]
         [Log(Title = "", BusinessType = BusinessType.DELETE)]
-        public IActionResult DeleteTbResult([FromRoute]string ids)
+        public IActionResult DeleteTbResult([FromRoute] string ids)
         {
             var idArr = Tools.SplitAndConvert<int>(ids);
 
             return ToResponse(_TbResultService.Delete(idArr));
+        }
+
+        /// <summary>
+        /// 获取转发信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("forward/{ids}")]
+        [ActionPermissionFilter(Permission = "tbresult:forward")]
+        [Log(Title = "", BusinessType = BusinessType.UPDATE)]
+        public IActionResult GetForwardMessageResult([FromRoute] string ids)
+        {
+            var idArr = Tools.SplitAndConvert<long>(ids);
+            return SUCCESS(_TbResultService.GetForwardMessageResult(idArr));
+
+        }
+        /// <summary>
+        /// 复制信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("copy/{ids}")]
+        [ActionPermissionFilter(Permission = "tbresult:forward")]
+        [Log(Title = "", BusinessType = BusinessType.UPDATE)]
+        public IActionResult UpdateTbResultStatus([FromRoute] string ids)
+        {
+            var idArr = Tools.SplitAndConvert<long>(ids);
+            var updateNumber = _TbResultService.UpdateTbResultStatus(idArr);
+            return ToResponse(updateNumber);
+
         }
 
     }

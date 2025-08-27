@@ -35,7 +35,7 @@ namespace ZR.Service.Business
 
             var response = Queryable()
                 .Where(predicate.ToExpression())
-                .OrderByDescending(s=>s.操作时间)
+                .OrderByDescending(s => s.操作时间)
                 .ToPage<TbResult, TbResultDto>(parm);
 
             return response;
@@ -74,6 +74,30 @@ namespace ZR.Service.Business
         public int UpdateTbResult(TbResult model)
         {
             return Update(model, true);
+        }
+        /// <summary>
+        /// 复制信息
+        /// </summary>
+        /// <param name="idArr"></param>
+        /// <returns></returns>
+        public int UpdateTbResultStatus(long[] idArr)
+        {
+            return Update(w => idArr.Contains(w.Id), c => new TbResult() { 处理状态 = "已处理" });
+         
+        }
+        /// <summary>
+        /// 获取转发信息
+        /// </summary>
+        /// <param name="idArr"></param>
+        /// <returns></returns>
+
+        public ReplyMessageDto GetForwardMessageResult(long[] idArr)
+        {
+            var resultModel = new ReplyMessageDto();
+
+
+
+            return resultModel;
         }
 
         /// <summary>

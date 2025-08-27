@@ -175,6 +175,67 @@
       </div>
     </el-dialog>
 
+    <!-- 转发对话框 -->
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="forward">
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-row :gutter="20">
+
+          <el-col :lg="12">
+            <el-form-item label="问题件类型" prop="问题件类型">
+              <el-input v-model="form.问题件类型" placeholder="请输入问题件类型" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="单号" prop="单号">
+              <el-input v-model="form.单号" placeholder="请输入单号" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="商家名称" prop="商家名称">
+              <el-input v-model="form.商家名称" placeholder="请输入商家名称" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="收件人信息" prop="收件人信息">
+              <el-input v-model="form.收件人信息" placeholder="请输入收件人信息" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="结果" prop="结果">
+              <el-input v-model="form.结果" placeholder="请输入结果" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="执行机器人" prop="执行机器人">
+              <el-input v-model="form.执行机器人" placeholder="请输入执行机器人" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="操作时间" prop="操作时间">
+              <el-input v-model="form.操作时间" placeholder="请输入操作时间" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="CompanyId" prop="companyId">
+              <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
+            </el-form-item>
+          </el-col>
+
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="text" @click="cancel">取 消</el-button>
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 <script>
