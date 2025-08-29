@@ -68,7 +68,8 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="4" :offset="2">
+        <el-col :span="6" :offset="19">
+          <el-button size="mini"  @click="clearAllCheck">清空选中状态</el-button>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
         </el-col>
@@ -97,7 +98,7 @@
 
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
-      @selection-change="handleSelectionChange">
+      @selection-change="handleSelectionChange" @select-all="handleSelectAll">
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column prop="问题件类型" label="问题件类型" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" />
@@ -183,10 +184,10 @@
 
     <!-- 转发对话框 -->
     <el-dialog :title="forwardTitle" :lock-scroll="false" :visible.sync="forward" width="450px" :center="true">
-      <el-input v-model="forwardForm.replyMessage" type="textarea" size="medium"  rows="10" />
-      <div slot="footer" class="dialog-footer" >
+      <el-input v-model="forwardForm.replyMessage" type="textarea" size="medium" rows="10" />
+      <div slot="footer" class="dialog-footer">
         <el-button type="text" @click="forwardCancel">关 闭</el-button>
-        <el-button type="primary" v-clipboard="forwardForm.replyMessage" >复 制</el-button>
+        <el-button type="primary" v-clipboard="forwardForm.replyMessage">复 制</el-button>
       </div>
     </el-dialog>
 
@@ -315,7 +316,18 @@ export default {
     ];
   },
   methods: {
-  // 转发商户
+    // 清空选中状态
+    clearAllCheck() {
+      this.$refs.table.clearSelection();
+      this.ids = [];
+      this.single = true;
+      this.multiple = true;
+    },
+    handleSelectAll(selection) {
+      console.log(selection);
+
+    },
+    // 转发商户
     handleForward() {
       let page = this;
       if (page.ids.length == 0) {
@@ -389,8 +401,6 @@ export default {
     },
     // 表格选中时
     handleSelectionChange(selection) {
-      debugger
-
       this.ids = selection.map((item) => item.id);
       this.single = selection.length != 1
       this.multiple = !selection.length;
@@ -403,15 +413,6 @@ export default {
         needClearSelectDataList.forEach((item) => {
           this.$refs.table.toggleRowSelection(item, false);
         });
-      }
-    },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
       }
     },
     // 自定义排序
