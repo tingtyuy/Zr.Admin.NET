@@ -1,7 +1,10 @@
 using Infrastructure.Attribute;
 using Infrastructure.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using SqlSugar;
 using SqlSugar.Extensions;
+using System.Text;
+using System.Threading.Tasks;
 using ZR.Model.Business;
 using ZR.Model.Business.Dto;
 using ZR.Repository;
@@ -26,6 +29,7 @@ namespace ZR.Service.Business
 
             predicate.AndIF(!string.IsNullOrEmpty(parm.单号), m => m.单号.Contains(parm.单号));
             predicate.AndIF(!string.IsNullOrEmpty(parm.商家名称), m => m.商家名称.Contains(parm.商家名称));
+            predicate.AndIF(!string.IsNullOrEmpty(parm.收件人信息), m => m.收件人信息.Contains(parm.收件人信息));
             predicate.AndIF(!string.IsNullOrEmpty(parm.处理状态), m => m.处理状态 == parm.处理状态);
             predicate.AndIF(parm.操作开始时间.HasValue, m => DateTime.Parse(m.操作时间) >= parm.操作开始时间);
             predicate.AndIF(parm.操作结束时间.HasValue, m => DateTime.Parse(m.操作时间) <= parm.操作结束时间);
@@ -83,7 +87,7 @@ namespace ZR.Service.Business
         public int UpdateTbResultStatus(long[] idArr)
         {
             return Update(w => idArr.Contains(w.Id), c => new TbResult() { 处理状态 = "已处理" });
-         
+
         }
         /// <summary>
         /// 获取转发信息
@@ -91,12 +95,37 @@ namespace ZR.Service.Business
         /// <param name="idArr"></param>
         /// <returns></returns>
 
-        public ReplyMessageDto GetForwardMessageResult(long[] idArr)
+        public async Task<ReplyMessageDto> GetForwardMessageResult(long[] idArr)
         {
             var resultModel = new ReplyMessageDto();
+            var list = Queryable().Where(x => idArr.Contains(x.Id));
+            var ll = list.ToList();
+            var first = await list.FirstAsync();
+
+            resultModel.BussinessName = first.商家名称;
+            resultModel.SendUser = first.收件人信息;
 
 
+            var replyMessageList = ll.GroupBy(g => g.反馈信息).Select(s => new ReplyMessage
+            {
+                Message = s.Key,
+                OrderNo = s.ToList().Select(s => s.单号).ToList()
+            }
 
+            ).ToList();
+            resultModel.ReplyMessageList.AddRange(replyMessageList);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine($"{first.商家名称} {first.收件人信息}");
+            foreach (var item in replyMessageList)
+            {
+                stringBuilder.AppendLine(item.Message);
+                foreach (var id in item.OrderNo)
+                {
+                    stringBuilder.AppendLine(id);
+                }
+            }
+            resultModel.ReplyMessage = stringBuilder.ToString();
             return resultModel;
         }
 

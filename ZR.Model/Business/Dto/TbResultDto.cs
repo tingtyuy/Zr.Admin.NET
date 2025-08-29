@@ -6,6 +6,8 @@ namespace ZR.Model.Business.Dto
     /// </summary>
     public class TbResultQueryDto : PagerInfo
     {
+        public long Id { get; set; }
+
         public string 问题件类型 { get; set; }
         public string 问题件类别 { get; set; }
         public string 处理状态 { get; set; }
@@ -22,6 +24,8 @@ namespace ZR.Model.Business.Dto
         /// 操作结束时间 
         /// </summary>
         public DateTime? 操作结束时间 { get; set; }
+
+        public string 收件人信息 { get; set; }
     }
 
     /// <summary>
@@ -29,6 +33,8 @@ namespace ZR.Model.Business.Dto
     /// </summary>
     public class TbResultDto
     {
+        public long Id { get; set; }
+
         public string 问题件类型 { get; set; }
         public string 问题件类别 { get; set; }
         public string 处理状态 { get; set; }
@@ -56,13 +62,13 @@ namespace ZR.Model.Business.Dto
     {
         public string BussinessName { get; set; }
         public string SendUser { get; set; }
-        public List<ReplyMessage> ReplyMessageList { get; set; }
+        public string ReplyMessage { get; set; }
+        public List<ReplyMessage> ReplyMessageList { get; set; } = new List<ReplyMessage>();
 
     }
     public class ReplyMessage
     {
         public IList<string> OrderNo { get; set; }
-        public string Type { get; set; }
         public string Message { get; set; }
 
     }

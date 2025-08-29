@@ -20,6 +20,10 @@ namespace ZR.Model.Business
         /// 问题件类别 
         /// </summary>
         public string 问题件类别 { get; set; }
+        /// <summary>
+        /// 反馈信息 
+        /// </summary>
+        public string 反馈信息 { get; set; }
 
         /// <summary>
         /// 处理状态 

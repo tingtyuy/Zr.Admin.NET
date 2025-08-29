@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ZR.Model.Business.Dto;
 using ZR.Model.Business;
 using ZR.Service.Business.IBusinessService;
+using System.Threading.Tasks;
 
 //创建时间：2025-08-25
 namespace ZR.Admin.WebApi.Controllers.Business
@@ -102,11 +103,10 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// <returns></returns>
         [HttpPost("forward/{ids}")]
         [ActionPermissionFilter(Permission = "tbresult:forward")]
-        [Log(Title = "", BusinessType = BusinessType.UPDATE)]
-        public IActionResult GetForwardMessageResult([FromRoute] string ids)
+        public async Task<IActionResult> GetForwardMessageResult([FromRoute] string ids)
         {
             var idArr = Tools.SplitAndConvert<long>(ids);
-            return SUCCESS(_TbResultService.GetForwardMessageResult(idArr));
+            return SUCCESS(await _TbResultService.GetForwardMessageResult(idArr));
 
         }
         /// <summary>
@@ -114,7 +114,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// </summary>
         /// <returns></returns>
         [HttpPost("copy/{ids}")]
-        [ActionPermissionFilter(Permission = "tbresult:forward")]
+        [ActionPermissionFilter(Permission = "tbresult:copy")]
         [Log(Title = "", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateTbResultStatus([FromRoute] string ids)
         {

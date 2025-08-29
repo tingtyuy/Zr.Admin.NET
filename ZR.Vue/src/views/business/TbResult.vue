@@ -32,6 +32,12 @@
           </el-form-item>
         </el-col>
         <el-col :span="6">
+          <el-form-item label="收件人信息" prop="收件人信息">
+            <el-input v-model="queryParams.收件人信息" placeholder="请输入收件人信息" clearable :style="{ width: '100%' }">
+            </el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
           <el-form-item label="运单号" prop="单号">
             <el-input v-model="queryParams.单号" placeholder="请输入运单号" clearable :style="{ width: '100%' }">
             </el-input>
@@ -176,63 +182,11 @@
     </el-dialog>
 
     <!-- 转发对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="forward">
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row :gutter="20">
-
-          <el-col :lg="12">
-            <el-form-item label="问题件类型" prop="问题件类型">
-              <el-input v-model="form.问题件类型" placeholder="请输入问题件类型" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="单号" prop="单号">
-              <el-input v-model="form.单号" placeholder="请输入单号" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="商家名称" prop="商家名称">
-              <el-input v-model="form.商家名称" placeholder="请输入商家名称" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="收件人信息" prop="收件人信息">
-              <el-input v-model="form.收件人信息" placeholder="请输入收件人信息" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="结果" prop="结果">
-              <el-input v-model="form.结果" placeholder="请输入结果" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="执行机器人" prop="执行机器人">
-              <el-input v-model="form.执行机器人" placeholder="请输入执行机器人" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="操作时间" prop="操作时间">
-              <el-input v-model="form.操作时间" placeholder="请输入操作时间" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="CompanyId" prop="companyId">
-              <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
-            </el-form-item>
-          </el-col>
-
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="text" @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+    <el-dialog :title="forwardTitle" :lock-scroll="false" :visible.sync="forward" width="450px" :center="true">
+      <el-input v-model="forwardForm.replyMessage" type="textarea" size="medium"  rows="10" />
+      <div slot="footer" class="dialog-footer" >
+        <el-button type="text" @click="forwardCancel">关 闭</el-button>
+        <el-button type="primary" v-clipboard="forwardForm.replyMessage" >复 制</el-button>
       </div>
     </el-dialog>
 
@@ -245,12 +199,18 @@ import {
   delTbResult,
   updateTbResult,
   getTbResult,
+  forwardMessage,
+  copyMessage,
 } from '@/api/business/tbResult.js';
 
 export default {
   name: "tbresult",
   data() {
     return {
+      selectIdModel: {
+        name: '',
+        phone: ''
+      },
       labelWidth: "100px",
       formLabelWidth: "100px",
       // 选中id数组
@@ -272,6 +232,7 @@ export default {
         处理状态: '',
         问题件类型: '',
         问题件类别: '',
+        收件人信息: '',
         pageNum: 1,
         pageSize: 10,
         sort: undefined,
@@ -279,12 +240,15 @@ export default {
       },
       // 弹出层标题
       title: "",
+      forwardTitle: "",
       // 操作类型 1、add 2、edit
       opertype: 0,
       // 是否显示弹出层
       open: false,
+      forward: false,
       // 表单参数
       form: {},
+      forwardForm: {},
       columns: [
         { index: 0, key: '问题件类型', label: `问题件类型`, checked: true },
         { index: 1, key: '单号', label: `单号`, checked: true },
@@ -351,18 +315,33 @@ export default {
     ];
   },
   methods: {
-    // 转发商户
+  // 转发商户
     handleForward() {
-      if (this.ids.length == 0) {
-        this.msgWarning("请至少选择一条数据进行操作");
+      let page = this;
+      if (page.ids.length == 0) {
+        page.$message({
+          message: '警告，请至少选择一条数据进行操作',
+          type: 'warning'
+        });
         return;
       }
-      this.$confirm('是否确认转发选中的数据？')
+
+      page.$confirm('是否确认转发选中的数据？')
         .then(function () {
-          // 这里写转发的请求
-          this.msgSuccess("转发成功");
+
+          page.forward = true;
+
+          forwardMessage(page.ids.toString()).then(res => {
+            if (res.code == 200) {
+              page.forwardTitle = `${res.data.bussinessName} ${res.data.sendUser}`;
+              page.forwardForm = res.data;
+            }
+          })
+
+
+          // this.msgSuccess("转发成功");
         })
-        .catch(() => { });
+        .catch((e) => { console.log(e) });
     },
     // 查询数据
     getList() {
@@ -379,6 +358,10 @@ export default {
     cancel() {
       this.open = false;
       this.reset();
+    },
+    // 取消按钮
+    forwardCancel() {
+      this.forward = false;
     },
     // 重置数据表单
     reset() {
@@ -400,17 +383,36 @@ export default {
     },
     // 重置查询操作
     resetQuery() {
-      console.log(this.queryParams.商户名称);
-      console.log(this.queryParams.操作开始时间);
-      console.log(this.queryParams.操作结束时间);
-      // this.resetForm("queryForm");
-      // this.handleQuery();
+
+      this.resetForm("queryForm");
+      this.handleQuery();
     },
-    // 多选框选中数据
+    // 表格选中时
     handleSelectionChange(selection) {
+      debugger
+
       this.ids = selection.map((item) => item.id);
       this.single = selection.length != 1
       this.multiple = !selection.length;
+      if (selection.length > 0) {
+        let name = selection[0].商家名称;
+        let phone = selection[0].收件人信息;
+        this.queryParams.商家名称 = name;
+        this.queryParams.收件人信息 = phone;
+        let needClearSelectDataList = this.dataList.filter(item => item.商家名称 != name || item.收件人信息 != phone);
+        needClearSelectDataList.forEach((item) => {
+          this.$refs.table.toggleRowSelection(item, false);
+        });
+      }
+    },
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+      }
     },
     // 自定义排序
     sortChange(column) {

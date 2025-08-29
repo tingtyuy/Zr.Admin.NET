@@ -55,3 +55,25 @@ export function delTbResult(pid) {
     method: 'POST'
   })
 }
+
+/**
+ * 获取转发信息
+ * @param {主键} pid
+ */
+export function forwardMessage(pid) {
+  return request({
+    url: 'business/TbResult/forward/' + pid,
+    method: 'POST'
+  })
+}
+
+/**
+ * 复制
+ * @param {主键} pid
+ */
+export function copyMessage(pid) {
+  return request({
+    url: 'business/TbResult/copy/' + pid,
+    method: 'POST'
+  })
+}
