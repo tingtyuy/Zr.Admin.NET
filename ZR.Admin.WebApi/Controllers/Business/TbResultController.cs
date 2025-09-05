@@ -36,6 +36,20 @@ namespace ZR.Admin.WebApi.Controllers.Business
             return SUCCESS(response);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("distinctlist")]
+        [ActionPermissionFilter(Permission = "tbresult:distinctlist")]
+        public IActionResult QueryTbResultDistinctList([FromQuery] TbResultQueryDto parm)
+        {
+            var response = _TbResultService.GetDistinctList(parm);
+            return SUCCESS(response);
+        }
+
+
 
         /// <summary>
         /// 查询详情

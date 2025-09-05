@@ -151,7 +151,7 @@ import {
 } from '@/api/business/tbContact.js';
 
 export default {
-  name: "TbContact",
+  name: "TbContactFullComponent",
   data() {
     return {
       labelWidth: "100px",

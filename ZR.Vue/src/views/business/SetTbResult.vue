@@ -1,6 +1,6 @@
     <template>
       <div class="app-container">
-        <el-header class="bordered" style="min-height: 100px;">
+        <el-header class="bordered" style="min-height: 50px;">
           <el-row>
             <el-col :span="6">
               今天问题件处理总数
@@ -40,92 +40,43 @@
         <el-main class="bordered">
           <el-row>
             <el-col :span="6" class="bordered height">
-
-              <el-row :gutter="12" class="mb8">
-                <el-form :model="wxGroupQueryForm" size="small" label-position="right" inline ref="queryForm"
-                  label-width="100px" @submit.native.prevent>
-
-                  <el-col :span="14">
-                    <el-form-item label="" prop="name">
-                      <el-input v-model="wxGroupQueryForm.name" placeholder="请输入群名称" clearable
-                        :style="{ width: '100%' }">
-                      </el-input>
-                    </el-form-item>
-                  </el-col>
-
-                  <el-col :span="10">
-                    <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                    <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-                  </el-col>
-
-                </el-form>
-              </el-row>
-              <el-table :data="wxGroupList" v-loading="loading" ref="table" border highlight-current-row>
-                <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-                <el-table-column label="操作" align="center" width="140">
-                  <template slot-scope="scope">
-                    <el-button size="mini" type="success" icon="el-icon-edit" title="设置匹配规则"
-                      @click="handleSetMatchRule(scope.row)"></el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
-              <pagination class="mt10" background :total="total" :page.sync="wxGroupList.pageNum"
-                :limit.sync="wxGroupList.pageSize" @pagination="getList" />
-              <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="wxGroupDialogOpen">
-                <el-form ref="wxGroupDialogForm" :model="wxGroupDialogForm" label-width="100px">
-                  <el-row :gutter="20">
-                    <el-col :lg="12">
-                      <el-form-item label="问题件类型" prop="name">
-                        <el-input v-model="wxGroupDialogForm.name" placeholder="请输入问题件类型" />
-                      </el-form-item>
-                    </el-col>
-
-                  </el-row>
-                </el-form>
-                <div slot="footer" class="dialog-footer">
-                  <el-button type="text" @click="cancel">取 消</el-button>
-                  <el-button type="primary" @click="submitForm">确 定</el-button>
-                </div>
-              </el-dialog>
+              <TbContactComponent></TbContactComponent>
             </el-col>
             <el-col :span="18" class="bordered height">
-              <el-row :gutter="12" class="mb8">
-                <el-form :model="wxGroupQueryForm" size="small" label-position="right" inline ref="queryForm"
-                  label-width="100px" @submit.native.prevent>
-
-                  <el-col :span="14">
-                    <el-form-item label="" prop="name">
-                      <el-input v-model="wxGroupQueryForm.name" placeholder="请输入群名称" clearable
-                        :style="{ width: '100%' }">
-                      </el-input>
-                    </el-form-item>
-                  </el-col>
-
-                  <el-col :span="10">
-                    <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                    <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-                  </el-col>
-
-                </el-form>
-              </el-row>
-              <el-table :data="wxGroupList" v-loading="loading" ref="table" border highlight-current-row>
-                <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-                <el-table-column label="操作" align="center" width="140">
-                  <template slot-scope="scope">
-                    <el-button size="mini" type="success" icon="el-icon-edit" title="设置匹配规则"
-                      @click="handleUpdate(scope.row)"></el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
-              <pagination class="mt10" background :total="total" :page.sync="wxGroupList.pageNum"
-                :limit.sync="wxGroupList.pageSize" @pagination="getList" />
+              <TbResultComponent></TbResultComponent>
             </el-col>
           </el-row>
         </el-main>
       </div>
     </template>
 <script>
+import TbContactComponent from '@/views/business/TbContactComponent.vue';
+import TbResultComponent from '@/views/business/TbResultComponent.vue';
+import {
+  listTbResultdistinctlist,
+  listTbResult,
+  addTbResult,
+  delTbResult,
+  updateTbResult,
+  getTbResult,
+  forwardMessage,
+  copyMessage,
+} from '@/api/business/tbResult.js';
+import {
+  listTbContact,
+  addTbContact,
+  delTbContact,
+  updateTbContact,
+  getTbContact,
+} from '@/api/business/tbContact.js';
+
+
 export default {
+
+  components: {
+    TbContactComponent,
+    TbResultComponent
+  },
   data() {
     return {
       statisticForm: {
@@ -151,14 +102,24 @@ export default {
 
 
     }
+  }
+  ,
+  created() {
+    // 页面列表数据查询
+    this.getList();
   },
   methods: {
     getList() {
-      this.loading = true;
-      setTimeout(() => {
-        this.loading = false;
-        this.total = 1;
-      }, 500);
+      // this.loading = true;
+      // listTbContact(this.wxGroupQueryForm).then(response => {
+      //   this.loading = false;
+      //   const { data } = response;
+      //   this.wxGroupList = data.rows;
+      //   this.total = data.total;
+      // }).catch(() => {
+      //   this.loading = false;
+      // });
+
     },
     handleQuery() {
       this.wxGroupQueryForm.pageNum = 1;
@@ -207,6 +168,7 @@ export default {
 }
 
 .height {
-  min-height: 550px;
+ max-height: 660px;
+ overflow: scroll;
 }
 </style>

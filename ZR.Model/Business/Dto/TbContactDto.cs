@@ -21,7 +21,7 @@ namespace ZR.Model.Business.Dto
 
         public string 群名称 { get; set; }
 
-        public string @联系人 { get; set; }
+        public string 联系人 { get; set; }
 
         public string 是否直接退回 { get; set; }
 

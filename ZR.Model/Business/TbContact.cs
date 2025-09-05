@@ -33,9 +33,9 @@ namespace ZR.Model.Business
         public string 群名称 { get; set; }
 
         /// <summary>
-        /// @联系人 
+        /// 联系人 
         /// </summary>
-        public string @联系人 { get; set; }
+        public string 联系人 { get; set; }
 
         /// <summary>
         /// 是否直接退回 

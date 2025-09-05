@@ -45,6 +45,50 @@ namespace ZR.Service.Business
             return response;
         }
 
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public PagedInfo<TbResultDistinctDto> GetDistinctList(TbResultQueryDto parm)
+        {
+            var predicate = QueryExp(parm);
+
+            //predicate.AndIF(!string.IsNullOrEmpty(parm.单号), m => m.单号.Contains(parm.单号));
+            //predicate.AndIF(!string.IsNullOrEmpty(parm.商家名称), m => m.商家名称.Contains(parm.商家名称));
+            //predicate.AndIF(!string.IsNullOrEmpty(parm.收件人信息), m => m.收件人信息.Contains(parm.收件人信息));
+            //predicate.AndIF(!string.IsNullOrEmpty(parm.处理状态), m => m.处理状态 == parm.处理状态);
+            //predicate.AndIF(parm.操作开始时间.HasValue, m => DateTime.Parse(m.操作时间) >= parm.操作开始时间);
+            //predicate.AndIF(parm.操作结束时间.HasValue, m => DateTime.Parse(m.操作时间) <= parm.操作结束时间);
+            //predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类别), m => m.问题件类别 == parm.问题件类别);
+            //predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类型), m => m.问题件类型 == parm.问题件类型);
+            //predicate.And(w => DateTime.Parse(w.操作时间) >= DateTime.Now.AddDays(-7));
+
+            var list = Queryable()
+                .Where(predicate.ToExpression());
+
+            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息 }).Select(s => new TbResultDistinctDto
+            {
+                商家名称 = s.商家名称,
+                收件人信息 = s.收件人信息,
+                count = SqlFunc.AggregateCount(s.单号)
+
+            });
+            //var resultList = groupList.Select(s => new TbResultDistinctDto
+            //{
+            //    商家名称 = s.商家名称,
+            //    收件人信息 = s.收件人信息,
+            //    count = s.count,
+            //    ReplyMessage = GetForwardMessage(s.商家名称, s.收件人信息)
+
+            //}).AsQueryable();
+
+            //var l = resultList as ISugarQueryable<TbResultDistinctDto>;
+            var response = groupList.ToPage(parm);
+
+            return response;
+        }
+
 
         /// <summary>
         /// 获取详情
@@ -96,6 +140,16 @@ namespace ZR.Service.Business
         /// <returns></returns>
 
         public async Task<ReplyMessageDto> GetForwardMessageResult(long[] idArr)
+        {
+            ReplyMessageDto resultModel = await GetForwardMessageDto(idArr);
+            return resultModel;
+        }
+
+        private string GetForwardMessage(string name, string phone)
+        {
+            return "dd";
+        }
+        private async Task<ReplyMessageDto> GetForwardMessageDto(long[] idArr)
         {
             var resultModel = new ReplyMessageDto();
             var list = Queryable().Where(x => idArr.Contains(x.Id));

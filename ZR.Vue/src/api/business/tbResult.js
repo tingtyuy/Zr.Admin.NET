@@ -12,6 +12,19 @@ export function listTbResult(query) {
   })
 }
 
+
+/**
+ * 分页查询分组列表
+ * @param {查询条件} data
+ */
+export function listTbResultdistinctlist(query) {
+  return request({
+    url: 'business/TbResult/distinctlist',
+    method: 'get',
+    params: query,
+  })
+}
+
 /**
  * 新增
  * @param data
