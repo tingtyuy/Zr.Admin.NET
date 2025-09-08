@@ -42,10 +42,10 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet("distinctlist")]
-        [ActionPermissionFilter(Permission = "tbresult:distinctlist")]
-        public IActionResult QueryTbResultDistinctList([FromQuery] TbResultQueryDto parm)
+        //[ActionPermissionFilter(Permission = "tbresult:distinctlist")]
+        public async Task<IActionResult> QueryTbResultDistinctList([FromQuery] TbResultQueryDto parm)
         {
-            var response = _TbResultService.GetDistinctList(parm);
+            var response = await _TbResultService.GetDistinctList(parm);
             return SUCCESS(response);
         }
 

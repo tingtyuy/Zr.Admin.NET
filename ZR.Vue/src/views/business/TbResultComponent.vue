@@ -52,14 +52,14 @@
           </el-form-item>
         </el-col> -->
 
-        <el-col :span="6">
+        <!-- <el-col :span="6">
           <el-form-item label="问题件类型" prop="问题件类型">
             <el-select v-model="queryParams.问题件类型" placeholder="请选择问题件类型" clearable :style="{ width: '100%' }">
               <el-option v-for="(item, index) in 问题件类型Options" :key="index" :label="item.label" :value="item.value"
                 :disabled="item.disabled"></el-option>
             </el-select>
           </el-form-item>
-        </el-col>
+        </el-col> -->
         <!-- <el-col :span="6">
           <el-form-item label="问题件类别" prop="问题件类别">
             <el-select v-model="queryParams.问题件类别" placeholder="请选择问题件类别" clearable :style="{ width: '100%' }">
@@ -85,14 +85,14 @@
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="count" label="数量" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="ReplyMessage" label="数量" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="replyMessage" label="数量" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="操作时间" label="操作时间" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
-          <el-button size="mini" v-hasPermi="['tbresult:edit']" type="success" icon="el-icon-edit" title="编辑"
-            @click="handleUpdate(scope.row)"></el-button>
+          <el-button size="mini"  type="success" icon="el-icon-edit" title="匹配客户群"
+            @click="handleAdd(scope.row)"></el-button>
           <!-- <el-button size="mini" v-hasPermi="['tbresult:delete']" type="danger" icon="el-icon-delete" title="删除"
             @click="handleDelete(scope.row)"></el-button> -->
         </template>
@@ -103,73 +103,11 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :lock-scroll="false" :visible.sync="open">
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row :gutter="20">
+      <TbContactFullComponent></TbContactFullComponent>
 
-          <el-col :lg="12">
-            <el-form-item label="问题件类型" prop="问题件类型">
-              <el-input v-model="form.问题件类型" placeholder="请输入问题件类型" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="单号" prop="单号">
-              <el-input v-model="form.单号" placeholder="请输入单号" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="商家名称" prop="商家名称">
-              <el-input v-model="form.商家名称" placeholder="请输入商家名称" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="收件人信息" prop="收件人信息">
-              <el-input v-model="form.收件人信息" placeholder="请输入收件人信息" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="结果" prop="结果">
-              <el-input v-model="form.结果" placeholder="请输入结果" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="执行机器人" prop="执行机器人">
-              <el-input v-model="form.执行机器人" placeholder="请输入执行机器人" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="操作时间" prop="操作时间">
-              <el-input v-model="form.操作时间" placeholder="请输入操作时间" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="CompanyId" prop="companyId">
-              <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
-            </el-form-item>
-          </el-col>
-
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="text" @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-      </div>
     </el-dialog>
 
-    <!-- 转发对话框 -->
-    <el-dialog :title="forwardTitle" :lock-scroll="false" :visible.sync="forward" width="450px" :center="true">
-      <el-input v-model="forwardForm.replyMessage" type="textarea" size="medium" rows="10" />
-      <div slot="footer" class="dialog-footer">
-        <el-button type="text" @click="forwardCancel">关 闭</el-button>
-        <el-button type="primary" v-clipboard="forwardForm.replyMessage">复 制</el-button>
-      </div>
-    </el-dialog>
+
 
   </div>
 </template>
@@ -183,9 +121,12 @@ import {
   forwardMessage,
   copyMessage,
 } from '@/api/business/tbResult.js';
-
+import TbContactFullComponent from '@/views/business/TbContactFullComponent.vue';
 export default {
   name: "TbResultComponent",
+  components: {
+    TbContactFullComponent
+  },
   data() {
     return {
       selectIdModel: {

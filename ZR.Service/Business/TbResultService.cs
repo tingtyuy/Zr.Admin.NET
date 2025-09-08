@@ -50,7 +50,7 @@ namespace ZR.Service.Business
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public PagedInfo<TbResultDistinctDto> GetDistinctList(TbResultQueryDto parm)
+        public async Task<PagedInfo<TbResultDistinctDto>> GetDistinctList(TbResultQueryDto parm)
         {
             var predicate = QueryExp(parm);
 
@@ -74,18 +74,12 @@ namespace ZR.Service.Business
                 count = SqlFunc.AggregateCount(s.单号)
 
             });
-            //var resultList = groupList.Select(s => new TbResultDistinctDto
-            //{
-            //    商家名称 = s.商家名称,
-            //    收件人信息 = s.收件人信息,
-            //    count = s.count,
-            //    ReplyMessage = GetForwardMessage(s.商家名称, s.收件人信息)
 
-            //}).AsQueryable();
-
-            //var l = resultList as ISugarQueryable<TbResultDistinctDto>;
             var response = groupList.ToPage(parm);
-
+            foreach (var item in response.Result)
+            {
+                item.ReplyMessage =await GetForwardMessage(item.商家名称, item.收件人信息);
+            }
             return response;
         }
 
@@ -145,9 +139,11 @@ namespace ZR.Service.Business
             return resultModel;
         }
 
-        private string GetForwardMessage(string name, string phone)
+        private async Task<string> GetForwardMessage(string name, string phone)
         {
-            return "dd";
+            long[] ids = Queryable().Where(w => w.商家名称 == name && w.收件人信息 == phone).Select(s => s.Id).ToArray();
+            var dto = await GetForwardMessageDto(ids);
+            return dto.ReplyMessage;
         }
         private async Task<ReplyMessageDto> GetForwardMessageDto(long[] idArr)
         {
