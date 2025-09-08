@@ -23,6 +23,17 @@ namespace ZR.Admin.WebApi.Controllers.Business
         }
 
         /// <summary>
+        /// 查询Options
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("options")]
+        public IActionResult QueryTbWxGroupMemberOptions()
+        {
+            var response = _TbWxGroupMemberService.GetAll();
+            return SUCCESS(response);
+        }
+
+        /// <summary>
         /// 查询列表
         /// </summary>
         /// <param name="parm"></param>
@@ -34,6 +45,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
             var response = _TbWxGroupMemberService.GetList(parm);
             return SUCCESS(response);
         }
+
 
 
         /// <summary>

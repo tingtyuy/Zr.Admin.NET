@@ -13,6 +13,17 @@ export function listTbWxGroupMember(query) {
 }
 
 /**
+ * Opitons
+ */
+export function listTbWxGroupMemberOptions() {
+  return request({
+    url: 'business/TbWxGroupMember/options',
+    method: 'get'
+  })
+}
+
+
+/**
  * 新增
  * @param data
  */

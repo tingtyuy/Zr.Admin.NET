@@ -44,77 +44,35 @@
     <!-- <pagination small class="mt2" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" /> -->
 
     <!-- 添加或修改对话框 -->
-    <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="open">
+    <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="open" width="30%">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row :gutter="20">
-
-          <el-col :lg="12">
-            <el-form-item label="客户" prop="客户">
-              <el-input v-model="form.客户" placeholder="请输入客户" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="客户商家名称" prop="客户商家名称">
-              <el-input v-model="form.客户商家名称" placeholder="请输入客户商家名称" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="对接方式" prop="对接方式">
-              <el-input v-model="form.对接方式" placeholder="请输入对接方式" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
+        <el-row :span="24">
+          <el-col :span="12">
             <el-form-item label="群名称" prop="群名称">
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
           </el-col>
-
           <el-col :lg="12">
-            <el-form-item label="联系人" prop="联系人">
-              <el-input v-model="form.联系人" placeholder="请输入联系人" />
+            <el-form-item label="私人群" prop="isEnable">
+              <el-checkbox v-model="form.isEnable" label="是" true-label="0" false-label="1" />
             </el-form-item>
           </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="是否直接退回" prop="是否直接退回">
-              <el-input v-model="form.是否直接退回" placeholder="请输入是否直接退回" />
+          <el-col :lg="24">
+            <el-form-item label="勾选我方人员" prop="members">
+              <el-select v-model="form.members" placeholder="请选择" style="width: 100%;" :multiple="true" :clearable="true">
+                <el-option v-for="item in WxGroupMemberOptions" :key="item.id" :label="item.nickName"
+                  :value="item.id" />
+              </el-select>
             </el-form-item>
           </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="CompanyId" prop="companyId">
-              <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="启用状态：0启用，1禁用" prop="isEnable">
-              <el-radio-group v-model="form.isEnable">
-                <el-radio v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictValue">{{
-                  item.dictLabel
-                  }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
+          <el-col :lg="24">
             <el-form-item label="匹配参数" prop="matchParam">
-              <el-input v-model="form.matchParam" placeholder="请输入匹配参数" />
+              <el-select v-model="form.matchParam" placeholder="请选择" style="width: 100%;" :multiple="true" :clearable="true">
+                <el-option v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictLabel"
+                  :value="item.dictValue" />
+              </el-select>
             </el-form-item>
           </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="是否匹配：0启用，1禁用" prop="isMatch">
-              <el-radio-group v-model="form.isMatch">
-                <el-radio v-for="item in isMatchOptions" :key="item.dictValue" :label="item.dictValue">{{ item.dictLabel
-                  }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -133,9 +91,20 @@ import {
   updateTbContact,
   getTbContact,
 } from '@/api/business/tbContact.js';
-
+import {
+  listTbWxGroupMemberOptions,
+  listTbWxGroupMember,
+  addTbWxGroupMember,
+  delTbWxGroupMember,
+  updateTbWxGroupMember,
+  getTbWxGroupMember,
+} from '@/api/business/tbWxGroupMember.js';
+import TbWxGroupMemberComponent from '@/views/business/TbWxGroupMemberComponent.vue';
+// import dictData from '@/views/components/dictData'
+import { getDicts } from "@/api/system/dict/data";
 export default {
   name: "TbContactComponent",
+  components: { TbWxGroupMemberComponent },
   data() {
     return {
       labelWidth: "100px",
@@ -181,6 +150,7 @@ export default {
       isEnableOptions: [],
       // 是否匹配：0启用，1禁用选项列表 格式 eg:{ dictLabel: '标签', dictValue: '0'}
       isMatchOptions: [],
+      WxGroupMemberOptions: [],
       dataList: [],
       total: 0,
       rules: {
@@ -188,13 +158,25 @@ export default {
     };
   },
   created() {
-    // 列表数据查询
+    this.loadDataSource();
     this.getList();
 
-    var dictParams = [
-    ];
   },
   methods: {
+    loadDataSource() {
+      getDicts("wx_group_match_param").then((response) => {
+        if (response.code == 200) {
+          this.isEnableOptions = response.data;
+          // this.isEnableOptions = dictData.filter(item => item.dictType === 'is_enable');
+          // this.isMatchOptions = dictData.filter(item => item.dictType === 'is_match');
+        }
+      });
+      listTbWxGroupMemberOptions().then((response) => {
+        if (response.code == 200) {
+          this.WxGroupMemberOptions = response.data;
+        }
+      });
+    },
     // 查询数据
     getList() {
       this.loading = true;
