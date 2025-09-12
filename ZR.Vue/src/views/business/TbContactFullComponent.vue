@@ -26,7 +26,7 @@
     </el-form>
 
     <!-- 数据区域 -->
-    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row>
+    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row  @row-click="handleRowClick">
       <!-- <el-table-column type="selection" width="50" align="center"  /> -->
       <!-- <el-table-column prop="客户" label="客户" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="客户商家名称" label="客户商家名称" align="center" :show-overflow-tooltip="true" /> -->
@@ -211,6 +211,9 @@ export default {
     ];
   },
   methods: {
+    handleRowClick(row) {
+      this.$emit('rowClick',row);
+    },
     // 查询数据
     getList() {
       this.loading = true;

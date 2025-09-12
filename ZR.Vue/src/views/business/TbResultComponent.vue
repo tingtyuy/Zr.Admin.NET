@@ -91,7 +91,7 @@
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
-          <el-button size="mini"  type="success" icon="el-icon-edit" title="匹配客户群"
+          <el-button size="mini" type="success" icon="el-icon-edit" title="匹配客户群"
             @click="handleAdd(scope.row)"></el-button>
           <!-- <el-button size="mini" v-hasPermi="['tbresult:delete']" type="danger" icon="el-icon-delete" title="删除"
             @click="handleDelete(scope.row)"></el-button> -->
@@ -103,7 +103,7 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :lock-scroll="false" :visible.sync="open">
-      <TbContactFullComponent></TbContactFullComponent>
+      <TbContactFullComponent @rowClick="rowClickCallBack"></TbContactFullComponent>
 
     </el-dialog>
 
@@ -239,6 +239,9 @@ export default {
     ];
   },
   methods: {
+    rowClickCallBack(row) {
+      console.log(row);
+    },
     // 清空选中状态
     clearAllCheck() {
       this.$refs.table.clearSelection();
