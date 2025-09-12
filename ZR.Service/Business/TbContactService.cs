@@ -4,8 +4,10 @@ using Infrastructure.Extensions;
 using System.Text.RegularExpressions;
 using ZR.Model.Business;
 using ZR.Model.Business.Dto;
+using ZR.Model.System;
 using ZR.Repository;
 using ZR.Service.Business.IBusinessService;
+using ZR.ServiceCore.Services;
 
 namespace ZR.Service.Business
 {
@@ -15,6 +17,11 @@ namespace ZR.Service.Business
     [AppService(ServiceType = typeof(ITbContactService), ServiceLifetime = LifeTime.Transient)]
     public class TbContactService : BaseService<TbContact>, ITbContactService
     {
+        private readonly ISysDictDataService _sysDictDataService;
+        public TbContactService(ISysDictDataService sysDictDataService)
+        {
+            _sysDictDataService = sysDictDataService;
+        }
 
         /// <summary>
         /// 查询列表
@@ -42,8 +49,24 @@ namespace ZR.Service.Business
                 .Includes(a => a.TbWxGroupMembers) // 正确位置：在 Select 之前
                 .Where(t => minIds.Select(x => x.MinId).Contains(t.Id))
                 ;
-            ;
+
             var response = list.ToPage<TbContact, TbContactDto>(parm);
+            foreach (var result in response.Result)
+            {
+                if (!string.IsNullOrEmpty(result.MatchParam))
+                {
+                    var arr = result.MatchParam.Split(',');
+                    var num = 1;
+                    foreach (var item in arr)
+                    {
+
+                        result.MatchParamDes += num+ ". "+ _sysDictDataService.GetSingle(w => w.DictType == "wx_group_match_param" && w.DictValue == item).DictLabel+" ";
+                        num++;
+                    }
+                    //result.MatchParamDes= result.MatchParamDes.Remove(result.MatchParamDes.Length - 1, 1);
+                }
+            }
+
 
             return response;
         }
@@ -109,7 +132,7 @@ namespace ZR.Service.Business
         {
             var predicate = Expressionable.Create<TbContact>();
             predicate.AndIF(!string.IsNullOrEmpty(parm.群名称), m => m.群名称.Contains(parm.群名称));
-            predicate.AndIF(parm.IsMatch.HasValue, m => m.IsMatch== parm.IsMatch);
+            predicate.AndIF(parm.IsMatch.HasValue, m => m.IsMatch == parm.IsMatch);
             return predicate;
         }
     }

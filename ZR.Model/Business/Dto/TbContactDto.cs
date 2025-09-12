@@ -64,8 +64,8 @@ namespace ZR.Model.Business.Dto
 
         public bool IsMatch { get; set; }
 
-
-
+        public string MatchParamDes { get; set; } 
+            
 
         [ExcelColumn(Name = "启用状态：0启用，1禁用")]
         public string IsEnableLabel { get; set; }

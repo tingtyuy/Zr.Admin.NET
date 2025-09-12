@@ -31,6 +31,7 @@
       <!-- <el-table-column prop="客户" label="客户" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="客户商家名称" label="客户商家名称" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="matchParamDes" label="匹配参数" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="companyId" label="公司Id" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="isEnable" label="启用状态" align="center"> -->
         <!-- <template slot-scope="scope">
