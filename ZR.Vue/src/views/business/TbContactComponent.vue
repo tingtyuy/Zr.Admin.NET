@@ -10,11 +10,19 @@
   <div class="app-container">
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
-
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
+      <el-row :gutter="10" class="mb16">
+        <el-col :span="12">
+          <el-form-item>
+            <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
 
     <!-- 数据区域 -->
@@ -149,7 +157,8 @@
           </el-col>
           <el-col :lg="24">
             <el-form-item label="匹配参数" prop="matchParam">
-              <el-select v-model="matchForm.matchParam" placeholder="请选择" style="width: 100%;" :clearable="true" :multiple="true">
+              <el-select v-model="matchForm.matchParam" placeholder="请选择" style="width: 100%;" :clearable="true"
+                :multiple="true">
                 <el-option v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictLabel"
                   :value="item.dictValue" />
               </el-select>
@@ -323,7 +332,7 @@ export default {
     /** 设定匹配规则操作 */
     handleMatch(row) {
       // this.matchForm={...row};
-      this.matchForm.mIds = row.tbWxGroupMembers?.map(f => f.id) ?? [];
+      this.matchForm.mIds = row.tbWxGroupMembers?.filter(f=>f.isInternal==true).map(f => f.id) ?? [];
       this.matchForm.isEnable = row.isEnable;
       this.matchForm.isMatch = row.isMatch;
       this.matchForm.matchParam = row.matchParam?.split(',') ?? [];

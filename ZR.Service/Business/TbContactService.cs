@@ -14,7 +14,7 @@ namespace ZR.Service.Business
     [AppService(ServiceType = typeof(ITbContactService), ServiceLifetime = LifeTime.Transient)]
     public class TbContactService : BaseService<TbContact>, ITbContactService
     {
-        
+
         /// <summary>
         /// 查询列表
         /// </summary>
@@ -24,9 +24,25 @@ namespace ZR.Service.Business
         {
             var predicate = QueryExp(parm);
 
-            var response = Queryable()
+            // 1. 先查询每个 CompanyId 的最小 Id
+            var minIds = Queryable()
                 .Where(predicate.ToExpression())
-                .ToPage<TbContact, TbContactDto>(parm);
+                .GroupBy(g => new { g.CompanyId, g.群名称 })
+                .Select(g => new
+                {
+                    CompanyId = g.CompanyId,
+                    群名称 = g.群名称,
+                    MinId = SqlFunc.AggregateMin(g.Id)
+                })
+                .ToList();
+
+            // 2. 根据最小 Id 查询完整记录（包括导航属性）
+            var list = Queryable()
+                .Includes(a => a.TbWxGroupMembers) // 正确位置：在 Select 之前
+                .Where(t => minIds.Select(x => x.MinId).Contains(t.Id))
+                ;
+            ;
+            var response = list.ToPage<TbContact, TbContactDto>(parm);
 
             return response;
         }
@@ -55,7 +71,7 @@ namespace ZR.Service.Business
         {
             return Insertable(model).ExecuteReturnEntity();
         }
-         
+
 
 
         //            /// <summary>

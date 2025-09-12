@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Model.Business.Dto;
 using ZR.Model.Business;
+using ZR.Model.Business.Dto;
+using ZR.Service.Business;
 using ZR.Service.Business.IBusinessService;
 
 //创建时间：2025-09-03
@@ -93,8 +94,14 @@ namespace ZR.Admin.WebApi.Controllers.Business
         public IActionResult MatchTbContact([FromBody] TbContactMatchDto parm)
         {
             //var modal = parm.Adapt<TbContact>().ToUpdate(HttpContext);
+            _tbWxGroupMemberService.Update(w => w.ContactId == parm.Id, a => new TbWxGroupMember
+            {
+                IsInternal = false
+            });
+
             if (parm.MIds is not null && parm.MIds.Any())
             {
+             
                 _tbWxGroupMemberService.Update(w => parm.MIds.Contains(w.Id), a => new TbWxGroupMember
                 {
                     IsInternal = true
@@ -104,8 +111,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
             {
                 IsEnable = parm.IsEnable
                  ,
-                IsMatch=true,
-                MatchParam=string.Join(',',parm.MatchParam) 
+                IsMatch = true,
+                MatchParam = string.Join(',', parm.MatchParam)
 
             });
 

@@ -62,7 +62,7 @@ namespace ZR.Model.Business
         /// </summary>
         public bool IsMatch { get; set; }
 
-        [Navigate(NavigateType.OneToMany,nameof(Id),nameof(TbWxGroupMember.ContactId))]
+        [Navigate(NavigateType.OneToMany,nameof(TbWxGroupMember.ContactId), nameof(Id))]
         public List<TbWxGroupMember> TbWxGroupMembers { get; set; }
 
     }

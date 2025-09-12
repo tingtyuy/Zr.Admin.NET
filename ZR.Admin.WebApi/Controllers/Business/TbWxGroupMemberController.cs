@@ -32,8 +32,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
         {
             var response = _TbWxGroupMemberService.Queryable()
                 .WhereIF(parm.ContactId.HasValue, w => w.ContactId == parm.ContactId)
-                .WhereIF(string.IsNullOrEmpty(parm.GroupName), w => w.GroupName == parm.GroupName)
-                .WhereIF(parm.IsInternal.HasValue, w=>w.IsInternal == parm.IsInternal).ToList();
+                .WhereIF(!string.IsNullOrEmpty(parm.GroupName), w => w.GroupName == parm.GroupName)
+                .WhereIF(parm.IsInternal.HasValue && parm.IsInternal==true, w=>w.IsInternal == parm.IsInternal).ToList();
             return SUCCESS(response);
         }
 
