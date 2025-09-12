@@ -55,12 +55,15 @@ namespace ZR.Model.Business
         /// <summary>
         /// 匹配参数 
         /// </summary>
-        public int? MatchParam { get; set; }
+        public string MatchParam { get; set; }
 
         /// <summary>
         /// 是否匹配：0启用，1禁用 
         /// </summary>
         public bool IsMatch { get; set; }
+
+        [Navigate(NavigateType.OneToMany,nameof(Id),nameof(TbWxGroupMember.ContactId))]
+        public List<TbWxGroupMember> TbWxGroupMembers { get; set; }
 
     }
 }

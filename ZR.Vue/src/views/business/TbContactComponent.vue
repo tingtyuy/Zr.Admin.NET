@@ -20,7 +20,7 @@
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row>
 
-      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" width="240" />
+      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" width="180" />
       <!-- <el-table-column prop="isEnable" label="启用状态" align="center" width="50" >
         <template slot-scope="scope">
           <dict-tag :options=" isEnableOptions" :value="scope.row.isEnable" />
@@ -34,32 +34,114 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" align="center" width="60">
+      <el-table-column label="操作" align="center" width="120">
         <template slot-scope="scope">
+          <el-button size="mini" type="success" icon="el-icon-edit" title="匹配"
+            @click="handleMatch(scope.row)"></el-button>
+
           <el-button size="mini" type="success" icon="el-icon-edit" title="编辑"
             @click="handleAdd(scope.row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- <pagination small class="mt2" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" /> -->
-
     <!-- 添加或修改对话框 -->
-    <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="open" width="30%">
+    <!-- <el-dialog :title="title" :lock-scroll="false" :visible.sync="open">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row :span="24">
-          <el-col :span="12">
+        <el-row :gutter="20">
+
+          <el-col :lg="12">
+            <el-form-item label="客户" prop="客户">
+              <el-input v-model="form.客户" placeholder="请输入客户" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="客户商家名称" prop="客户商家名称">
+              <el-input v-model="form.客户商家名称" placeholder="请输入客户商家名称" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="对接方式" prop="对接方式">
+              <el-input v-model="form.对接方式" placeholder="请输入对接方式" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
             <el-form-item label="群名称" prop="群名称">
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
           </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="联系人" prop="联系人">
+              <el-input v-model="form.联系人" placeholder="请输入联系人" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="是否直接退回" prop="是否直接退回">
+              <el-input v-model="form.是否直接退回" placeholder="请输入是否直接退回" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="CompanyId" prop="companyId">
+              <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="启用状态：0启用，1禁用" prop="isEnable">
+              <el-radio-group v-model="form.isEnable">
+                <el-radio v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictValue">{{
+                  item.dictLabel
+                }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="匹配参数" prop="matchParam">
+              <el-input v-model="form.matchParam" placeholder="请输入匹配参数" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="12">
+            <el-form-item label="是否匹配：0启用，1禁用" prop="isMatch">
+              <el-radio-group v-model="form.isMatch">
+                <el-radio v-for="item in isMatchOptions" :key="item.dictValue" :label="item.dictValue">{{ item.dictLabel
+                }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="text" @click="cancel">取 消</el-button>
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+      </div>
+    </el-dialog> -->
+    <!-- 添加或修改对话框 -->
+    <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="matchOpen" width="30%">
+      <el-form ref="matchForm2" :model="matchForm" label-width="100px">
+        <el-row :span="24">
+          <el-col :span="12">
+            <el-form-item label="群名称" prop="群名称">
+              <el-input v-model="matchForm.群名称" placeholder="请输入群名称" />
+            </el-form-item>
+          </el-col>
           <el-col :lg="12">
             <el-form-item label="私人群" prop="isEnable">
-              <el-checkbox v-model="form.isEnable" label="是" true-label="0" false-label="1" />
+              <el-checkbox v-model="matchForm.isEnable" label="是" />
             </el-form-item>
           </el-col>
           <el-col :lg="24">
-            <el-form-item label="勾选我方人员" prop="members">
-              <el-select v-model="form.members" placeholder="请选择" style="width: 100%;" :multiple="true" :clearable="true">
+            <el-form-item label="勾选我方人员" prop="mIds">
+              <el-select v-model="matchForm.mIds" placeholder="请选择" style="width: 100%;" :multiple="true"
+                :clearable="true">
                 <el-option v-for="item in WxGroupMemberOptions" :key="item.id" :label="item.nickName"
                   :value="item.id" />
               </el-select>
@@ -67,7 +149,7 @@
           </el-col>
           <el-col :lg="24">
             <el-form-item label="匹配参数" prop="matchParam">
-              <el-select v-model="form.matchParam" placeholder="请选择" style="width: 100%;" :multiple="true" :clearable="true">
+              <el-select v-model="matchForm.matchParam" placeholder="请选择" style="width: 100%;" :clearable="true" :multiple="true">
                 <el-option v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictLabel"
                   :value="item.dictValue" />
               </el-select>
@@ -76,8 +158,8 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="text" @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="text" @click="matchCancel">取 消</el-button>
+        <el-button type="primary" @click="submitMatchForm">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -85,6 +167,7 @@
 </template>
 <script>
 import {
+  matchTbContact,
   listTbContact,
   addTbContact,
   delTbContact,
@@ -132,8 +215,16 @@ export default {
       opertype: 0,
       // 是否显示弹出层
       open: false,
+      matchOpen: false,
       // 表单参数
       form: {},
+      matchForm: {
+        mIds: [],
+        isEnable: false,
+        matchParam: '',
+        id: '',
+        群名称: '',
+      },
       columns: [
         { index: 0, key: '客户', label: `客户`, checked: true },
         { index: 1, key: '客户商家名称', label: `客户商家名称`, checked: true },
@@ -171,11 +262,7 @@ export default {
           // this.isMatchOptions = dictData.filter(item => item.dictType === 'is_match');
         }
       });
-      listTbWxGroupMemberOptions().then((response) => {
-        if (response.code == 200) {
-          this.WxGroupMemberOptions = response.data;
-        }
-      });
+
     },
     // 查询数据
     getList() {
@@ -193,6 +280,11 @@ export default {
       this.open = false;
       this.reset();
     },
+    matchCancel() {
+      this.matchOpen = false;
+      this.WxGroupMemberOptions = [];
+      this.matchReset();
+    },
     // 重置数据表单
     reset() {
       this.form = {
@@ -209,6 +301,13 @@ export default {
       };
       this.resetForm("form");
     },
+    matchReset() {
+      // this.matchForm = {
+      //   群名称: undefined,
+      //   matchParam: undefined,
+      // };
+      this.resetForm("matchForm2");
+    },
     // 重置查询操作
     resetQuery() {
       this.timeRange = [];
@@ -221,6 +320,28 @@ export default {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    /** 设定匹配规则操作 */
+    handleMatch(row) {
+      // this.matchForm={...row};
+      this.matchForm.mIds = row.tbWxGroupMembers?.map(f => f.id) ?? [];
+      this.matchForm.isEnable = row.isEnable;
+      this.matchForm.isMatch = row.isMatch;
+      this.matchForm.matchParam = row.matchParam?.split(',') ?? [];
+      this.matchForm.id = row.id;
+      this.matchForm.群名称 = row.群名称;
+      this.matchOpen = true;
+      listTbWxGroupMemberOptions({
+        groupName: row.群名称,
+        ContactId: row.id,
+        IsInternal: false,
+      }).then((response) => {
+        if (response.code == 200) {
+          this.WxGroupMemberOptions = response.data;
+        }
+      });
+    },
+
+
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -244,6 +365,24 @@ export default {
           };
         }
       });
+    },
+    /** 设置匹配规则按钮 */
+    submitMatchForm: function () {
+      var t = this;
+      console.log("matchForm data:", JSON.stringify(t.matchForm));
+      try {
+        matchTbContact(t.matchForm)
+          .then((res) => {
+            t.msgSuccess("设置匹配规则成功");
+            t.matchOpen = false;
+            t.getList();
+          })
+
+      } catch (error) {
+        console.error("Error in matchTbContact:", error);
+        t.msgError("设置匹配规则失败");
+
+      }
     },
     /** 提交按钮 */
     submitForm: function () {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Model.Business.Dto;
+using Microsoft.IdentityModel.Tokens;
 using ZR.Model.Business;
+using ZR.Model.Business.Dto;
 using ZR.Service.Business.IBusinessService;
 
 //创建时间：2025-09-03
@@ -27,9 +28,12 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// </summary>
         /// <returns></returns>
         [HttpGet("options")]
-        public IActionResult QueryTbWxGroupMemberOptions()
+        public IActionResult QueryTbWxGroupMemberOptions([FromQuery] TbWxGroupMemberQueryDto parm)
         {
-            var response = _TbWxGroupMemberService.GetAll();
+            var response = _TbWxGroupMemberService.Queryable()
+                .WhereIF(parm.ContactId.HasValue, w => w.ContactId == parm.ContactId)
+                .WhereIF(string.IsNullOrEmpty(parm.GroupName), w => w.GroupName == parm.GroupName)
+                .WhereIF(parm.IsInternal.HasValue, w=>w.IsInternal == parm.IsInternal).ToList();
             return SUCCESS(response);
         }
 

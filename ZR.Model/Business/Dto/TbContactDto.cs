@@ -22,7 +22,7 @@ namespace ZR.Model.Business.Dto
 
         public bool IsEnable { get; set; }
 
-        public int? MatchParam { get; set; }
+        public string MatchParam { get; set; }
 
         public bool IsMatch { get; set; }
 
@@ -37,6 +37,8 @@ namespace ZR.Model.Business.Dto
     /// </summary>
     public class TbContactDto
     {
+        public int Id { get; set; }
+
         public string 客户 { get; set; }
 
         public string 客户商家名称 { get; set; }
@@ -53,13 +55,30 @@ namespace ZR.Model.Business.Dto
 
         public bool IsEnable { get; set; }
 
-        public int? MatchParam { get; set; }
+        public string MatchParam { get; set; }
 
         public bool IsMatch { get; set; }
 
 
 
+
         [ExcelColumn(Name = "启用状态：0启用，1禁用")]
         public string IsEnableLabel { get; set; }
+
+        public List<TbWxGroupMember>? TbWxGroupMembers { get; set; } 
+    }
+
+    /// <summary>
+    /// 设置匹配规则传入对象
+    /// </summary>
+    public class TbContactMatchDto
+    {
+        public long Id { get; set; }
+              
+        public bool IsEnable { get; set; }
+
+        public string[] MatchParam { get; set; }
+
+        public List<int>? MIds { get; set; }
     }
 }

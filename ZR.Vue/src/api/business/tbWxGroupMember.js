@@ -14,11 +14,13 @@ export function listTbWxGroupMember(query) {
 
 /**
  * Opitons
+ *  @param {查询条件} data
  */
-export function listTbWxGroupMemberOptions() {
+export function listTbWxGroupMemberOptions(query) {
   return request({
     url: 'business/TbWxGroupMember/options',
-    method: 'get'
+    method: 'get',
+    params: query,
   })
 }
 

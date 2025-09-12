@@ -34,9 +34,9 @@ namespace ZR.Model.Business
         public string GroupName { get; set; }
 
         /// <summary>
-        /// 公司ID 
+        /// ContactId 
         /// </summary>
-        public string CompanyId { get; set; }
+        public int ContactId { get; set; }
 
         /// <summary>
         /// 是否是内部人员 

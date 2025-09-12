@@ -1,7 +1,8 @@
+using Aliyun.OSS;
 using Infrastructure.Attribute;
 using Infrastructure.Extensions;
-using ZR.Model.Business.Dto;
 using ZR.Model.Business;
+using ZR.Model.Business.Dto;
 using ZR.Repository;
 using ZR.Service.Business.IBusinessService;
 
@@ -13,6 +14,7 @@ namespace ZR.Service.Business
     [AppService(ServiceType = typeof(ITbContactService), ServiceLifetime = LifeTime.Transient)]
     public class TbContactService : BaseService<TbContact>, ITbContactService
     {
+        
         /// <summary>
         /// 查询列表
         /// </summary>
@@ -53,6 +55,23 @@ namespace ZR.Service.Business
         {
             return Insertable(model).ExecuteReturnEntity();
         }
+         
+
+
+        //            /// <summary>
+        ///// 修改
+        ///// </summary>
+        ///// <param name="model"></param>
+        ///// <returns></returns>
+        //public int MatchTbContact(TbContact model)
+        //{
+        //    if (model.TbWxGroupMembers is not null && model.TbWxGroupMembers.Any())
+        //    {
+        //        Update(w=>)
+        //        Queryable<TbWxGroupMember>().Where(m => m.ContactId == model.Id).ToDelete();
+        //    }
+        //    return Update(model, true);
+        //}
 
         /// <summary>
         /// 修改

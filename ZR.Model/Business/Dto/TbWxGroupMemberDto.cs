@@ -6,6 +6,10 @@ namespace ZR.Model.Business.Dto
     /// </summary>
     public class TbWxGroupMemberQueryDto : PagerInfo 
     {
+
+        public string GroupName { get; set; }
+        public int? ContactId { get; set; }
+        public bool? IsInternal { get; set; }
     }
 
     /// <summary>
@@ -24,11 +28,9 @@ namespace ZR.Model.Business.Dto
 
         public string GroupName { get; set; }
 
-        public string CompanyId { get; set; }
+        public int? ContactId { get; set; }
 
         public bool IsInternal { get; set; }
-
-
 
         [ExcelColumn(Name = "是否是内部人员")]
         public string IsInternalLabel { get; set; }

@@ -23,13 +23,25 @@ export function addTbContact(data) {
     data: data,
   })
 }
+
 /**
  * 修改
  * @param data
- */
+*/
 export function updateTbContact(data) {
   return request({
     url: 'business/TbContact',
+    method: 'PUT',
+    data: data,
+  })
+}
+/**
+ * 设定匹配规则
+ * @param data
+ */
+export function matchTbContact(data) {
+  return request({
+    url: 'business/TbContact/match',
     method: 'PUT',
     data: data,
   })
