@@ -1,6 +1,7 @@
 using Aliyun.OSS;
 using Infrastructure.Attribute;
 using Infrastructure.Extensions;
+using System.Text.RegularExpressions;
 using ZR.Model.Business;
 using ZR.Model.Business.Dto;
 using ZR.Repository;
@@ -107,10 +108,8 @@ namespace ZR.Service.Business
         private static Expressionable<TbContact> QueryExp(TbContactQueryDto parm)
         {
             var predicate = Expressionable.Create<TbContact>();
-            predicate.AndIF(!string.IsNullOrEmpty(parm.客户), m => m.客户.Contains(parm.客户));
-            predicate.AndIF(!string.IsNullOrEmpty(parm.客户商家名称), m => m.客户商家名称.Contains(parm.客户商家名称));
             predicate.AndIF(!string.IsNullOrEmpty(parm.群名称), m => m.群名称.Contains(parm.群名称));
-
+            predicate.AndIF(parm.IsMatch.HasValue, m => m.IsMatch== parm.IsMatch);
             return predicate;
         }
     }

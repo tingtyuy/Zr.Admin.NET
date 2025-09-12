@@ -6,6 +6,7 @@ namespace ZR.Model.Business.Dto
     /// </summary>
     public class TbContactQueryDto : PagerInfo 
     {
+
         public string 客户 { get; set; }
 
         public string 客户商家名称 { get; set; }
@@ -24,13 +25,17 @@ namespace ZR.Model.Business.Dto
 
         public string MatchParam { get; set; }
 
-        public bool IsMatch { get; set; }
+        public bool? IsMatch { get; set; }
 
 
 
         [ExcelColumn(Name = "启用状态：0启用，1禁用")]
         public string IsEnableLabel { get; set; }
+
     }
+
+
+   
 
     /// <summary>
     /// 输入输出对象

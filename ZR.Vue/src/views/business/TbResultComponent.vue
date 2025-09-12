@@ -122,10 +122,12 @@ import {
   copyMessage,
 } from '@/api/business/tbResult.js';
 import TbContactFullComponent from '@/views/business/TbContactFullComponent.vue';
+import TbContactComponent2 from '@/views/business/TbContactComponent2.vue';
 export default {
   name: "TbResultComponent",
   components: {
-    TbContactFullComponent
+    TbContactFullComponent,
+    TbContactComponent2
   },
   data() {
     return {

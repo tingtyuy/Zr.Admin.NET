@@ -11,15 +11,23 @@
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
       <el-row :gutter="10" class="mb16">
-        <el-col :span="12">
+        <el-col :span="9">
           <el-form-item>
             <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable />
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+            <el-col :span="9">
+          <el-form-item>
+            <el-select v-model="queryParams.isMatch" placeholder="匹配状态" clearable style="width: 100px;">
+              <el-option :key="0" :label="'未匹配'" :value="false" />
+              <el-option :key="1" :label="'已匹配'" :value="true" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
           <el-form-item>
             <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+            <!-- <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button> -->
           </el-form-item>
         </el-col>
       </el-row>
@@ -213,6 +221,8 @@ export default {
       showSearch: true,
       // 查询参数
       queryParams: {
+        群名称: undefined,
+        isMatch: undefined,
         pageNum: 1,
         pageSize: 9999,
         sort: undefined,
