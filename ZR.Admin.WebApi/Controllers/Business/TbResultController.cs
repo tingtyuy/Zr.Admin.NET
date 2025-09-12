@@ -83,6 +83,22 @@ namespace ZR.Admin.WebApi.Controllers.Business
         }
 
         /// <summary>
+        /// 问题件匹配
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Log(Title = "", BusinessType = BusinessType.INSERT)]
+        public IActionResult Match([FromBody] TbResultDto parm)
+        {
+            var modal = parm.Adapt<TbResult>().ToCreate(HttpContext);
+
+            var response = _TbResultService.AddTbResult(modal);
+
+            return SUCCESS(response);
+        }
+
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <returns></returns>

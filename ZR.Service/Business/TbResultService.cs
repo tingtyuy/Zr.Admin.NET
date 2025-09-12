@@ -1,8 +1,10 @@
 using Infrastructure.Attribute;
 using Infrastructure.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using ZR.Model.Business;
@@ -67,10 +69,13 @@ namespace ZR.Service.Business
             var list = Queryable()
                 .Where(predicate.ToExpression());
 
-            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息 }).Select(s => new TbResultDistinctDto
+            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息,g.CompanyId,g.执行机器人 }).Select(s => new TbResultDistinctDto
             {
+                //ids= SqlFunc.Subqueryable<TbResult>().Where(w=>w.商家名称==),
                 商家名称 = s.商家名称,
                 收件人信息 = s.收件人信息,
+                CompanyId=s.CompanyId,
+                执行机器人 = s.执行机器人,
                 count = SqlFunc.AggregateCount(s.单号)
 
             });
@@ -78,6 +83,7 @@ namespace ZR.Service.Business
             var response = groupList.ToPage(parm);
             foreach (var item in response.Result)
             {
+                item.ids = GetIds(item.商家名称, item.收件人信息).ToList();
                 item.ReplyMessage =await GetForwardMessage(item.商家名称, item.收件人信息);
             }
             return response;
@@ -104,6 +110,16 @@ namespace ZR.Service.Business
         /// <param name="model"></param>
         /// <returns></returns>
         public TbResult AddTbResult(TbResult model)
+        {
+            return Insertable(model).ExecuteReturnEntity();
+        }
+
+        /// <summary>
+        /// 问题件匹配
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public TbResult Match(TbResult model)
         {
             return Insertable(model).ExecuteReturnEntity();
         }
@@ -141,10 +157,16 @@ namespace ZR.Service.Business
 
         private async Task<string> GetForwardMessage(string name, string phone)
         {
-            long[] ids = Queryable().Where(w => w.商家名称 == name && w.收件人信息 == phone).Select(s => s.Id).ToArray();
+            long[] ids = GetIds(name, phone);
             var dto = await GetForwardMessageDto(ids);
             return dto.ReplyMessage;
         }
+
+        private long[] GetIds(string name, string phone)
+        {
+            return Queryable().Where(w => w.商家名称 == name && w.收件人信息 == phone).Select(s => s.Id).ToArray();
+        }
+
         private async Task<ReplyMessageDto> GetForwardMessageDto(long[] idArr)
         {
             var resultModel = new ReplyMessageDto();

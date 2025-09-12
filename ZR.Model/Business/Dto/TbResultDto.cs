@@ -57,8 +57,11 @@ namespace ZR.Model.Business.Dto
 
     public class TbResultDistinctDto
     {
+        public List<long> ids { get; set; }
         public string 商家名称 { get; set; }
         public string 收件人信息 { get; set; }
+        public string CompanyId { get; set; }
+        public string 执行机器人 { get; set; }
         public int count { get; set; }
         public string ReplyMessage { get; set; }
     }

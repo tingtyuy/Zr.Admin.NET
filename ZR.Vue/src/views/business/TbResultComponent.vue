@@ -78,7 +78,7 @@
     </el-row>
 
     <!-- 数据区域 -->
-    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row>
+    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick">
       <!-- <el-table-column type="selection" width="50" align="center" /> -->
       <!-- <el-table-column prop="问题件类型" label="问题件类型" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" /> -->
@@ -104,7 +104,7 @@
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :lock-scroll="false" :visible.sync="open">
       <TbContactFullComponent @rowClick="rowClickCallBack"></TbContactFullComponent>
-
+      <el-button type="primary" @click="matchForm">确 定</el-button>
     </el-dialog>
 
 
@@ -122,15 +122,17 @@ import {
   copyMessage,
 } from '@/api/business/tbResult.js';
 import TbContactFullComponent from '@/views/business/TbContactFullComponent.vue';
-import TbContactComponent2 from '@/views/business/TbContactComponent2.vue';
+// import TbContactComponent2 from '@/views/business/TbContactComponent2.vue';
 export default {
   name: "TbResultComponent",
   components: {
     TbContactFullComponent,
-    TbContactComponent2
+    // TbContactComponent2
   },
   data() {
     return {
+      row: {},
+      row2: {},
       selectIdModel: {
         name: '',
         phone: ''
@@ -239,7 +241,12 @@ export default {
     ];
   },
   methods: {
+    handleRowClick(row) {
+      this.row = row;
+      console.log(row);
+    },
     rowClickCallBack(row) {
+      this.row2 = row;
       console.log(row);
     },
     // 清空选中状态
