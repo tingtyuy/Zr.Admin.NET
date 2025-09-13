@@ -16,7 +16,7 @@
             <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable />
           </el-form-item>
         </el-col>
-            <el-col :span="9">
+        <el-col :span="9">
           <el-form-item>
             <el-select v-model="queryParams.isMatch" placeholder="匹配状态" clearable style="width: 100px;">
               <el-option :key="0" :label="'未匹配'" :value="false" />
@@ -49,14 +49,21 @@
           <!-- <dict-tag :options=" isMatchOptions" :value="scope.row.isMatch" /> -->
         </template>
       </el-table-column>
+      <el-table-column prop="isEnable" label="是否私人群" align="center" width="60">
 
-      <el-table-column label="操作" align="center" width="120">
+        <template slot-scope="scope">
+          {{ scope.row.isEnable == 0 ? '客服群' : '私人群' }}
+          <!-- <dict-tag :options=" isMatchOptions" :value="scope.row.isMatch" /> -->
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" align="center" width="60">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="匹配"
             @click="handleMatch(scope.row)"></el-button>
 
-          <el-button size="mini" type="success" icon="el-icon-edit" title="编辑"
-            @click="handleAdd(scope.row)"></el-button>
+          <!-- <el-button size="mini" type="success" icon="el-icon-edit" title="编辑"
+            @click="handleAdd(scope.row)"></el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -342,7 +349,7 @@ export default {
     /** 设定匹配规则操作 */
     handleMatch(row) {
       // this.matchForm={...row};
-      this.matchForm.mIds = row.tbWxGroupMembers?.filter(f=>f.isInternal==true).map(f => f.id) ?? [];
+      this.matchForm.mIds = row.tbWxGroupMembers?.filter(f => f.isInternal == true).map(f => f.id) ?? [];
       this.matchForm.isEnable = row.isEnable;
       this.matchForm.isMatch = row.isMatch;
       this.matchForm.matchParam = row.matchParam?.split(',') ?? [];
