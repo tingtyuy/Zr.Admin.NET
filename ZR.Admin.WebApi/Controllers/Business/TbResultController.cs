@@ -97,7 +97,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 foreach (var item in parm.Ids)
                 {
                     var model = _TbResultService.GetById(item);
-                    model.处理状态 = "1";
+                    model.处理状态 = "已处理";
                     _TbResultService.Update(model);
                 }
             }

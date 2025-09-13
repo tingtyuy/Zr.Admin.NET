@@ -59,7 +59,7 @@ namespace ZR.Service.Business
             //predicate.AndIF(!string.IsNullOrEmpty(parm.单号), m => m.单号.Contains(parm.单号));
             //predicate.AndIF(!string.IsNullOrEmpty(parm.商家名称), m => m.商家名称.Contains(parm.商家名称));
             //predicate.AndIF(!string.IsNullOrEmpty(parm.收件人信息), m => m.收件人信息.Contains(parm.收件人信息));
-            predicate.And( m => m.处理状态 == "0");
+            //predicate.And( m => m.处理状态 == "0");
             //predicate.AndIF(parm.操作开始时间.HasValue, m => DateTime.Parse(m.操作时间) >= parm.操作开始时间);
             //predicate.AndIF(parm.操作结束时间.HasValue, m => DateTime.Parse(m.操作时间) <= parm.操作结束时间);
             //predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类别), m => m.问题件类别 == parm.问题件类别);
@@ -69,22 +69,23 @@ namespace ZR.Service.Business
             var list = Queryable()
                 .Where(predicate.ToExpression());
 
-            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息,g.CompanyId,g.执行机器人 }).Select(s => new TbResultDistinctDto
+            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息, g.CompanyId, g.执行机器人, g.处理状态 }).Select(s => new TbResultDistinctDto
             {
                 //ids= SqlFunc.Subqueryable<TbResult>().Where(w=>w.商家名称==),
                 商家名称 = s.商家名称,
                 收件人信息 = s.收件人信息,
-                CompanyId=s.CompanyId,
+                CompanyId = s.CompanyId,
                 执行机器人 = s.执行机器人,
+                处理状态 = s.处理状态,
                 count = SqlFunc.AggregateCount(s.单号)
 
-            });
+            }).OrderBy(o=>o.处理状态);
 
             var response = groupList.ToPage(parm);
             foreach (var item in response.Result)
             {
                 item.ids = GetIds(item.商家名称, item.收件人信息).ToList();
-                item.ReplyMessage =await GetForwardMessage(item.商家名称, item.收件人信息);
+                item.ReplyMessage = await GetForwardMessage(item.商家名称, item.收件人信息);
             }
             return response;
         }
