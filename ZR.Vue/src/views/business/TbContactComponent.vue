@@ -32,7 +32,18 @@
         </el-col>
       </el-row>
     </el-form>
-
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+      </el-col>
+      <!-- <el-col :span="1.5">
+        <el-button type="success" :disabled="single" v-hasPermi="['tbcontact:edit']" plain icon="el-icon-edit" size="mini" @click="handleUpdate">修改</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button type="danger" :disabled="multiple" v-hasPermi="['tbcontact:delete']" plain icon="el-icon-delete" size="mini" @click="handleDelete">删除</el-button>
+      </el-col> -->
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row>
 
@@ -68,86 +79,23 @@
       </el-table-column>
     </el-table>
     <!-- <pagination small class="mt2" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" /> -->
-    <!-- 添加或修改对话框 -->
-    <!-- <el-dialog :title="title" :lock-scroll="false" :visible.sync="open">
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row :gutter="20">
 
-          <el-col :lg="12">
-            <el-form-item label="客户" prop="客户">
-              <el-input v-model="form.客户" placeholder="请输入客户" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="客户商家名称" prop="客户商家名称">
-              <el-input v-model="form.客户商家名称" placeholder="请输入客户商家名称" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="对接方式" prop="对接方式">
-              <el-input v-model="form.对接方式" placeholder="请输入对接方式" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="20%">
+      <el-form ref="form" :model="form" :rules="rules" >
+        <el-row :span="24">
+          <el-col :lg="24">
             <el-form-item label="群名称" prop="群名称">
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
           </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="联系人" prop="联系人">
-              <el-input v-model="form.联系人" placeholder="请输入联系人" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="是否直接退回" prop="是否直接退回">
-              <el-input v-model="form.是否直接退回" placeholder="请输入是否直接退回" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="CompanyId" prop="companyId">
-              <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="启用状态：0启用，1禁用" prop="isEnable">
-              <el-radio-group v-model="form.isEnable">
-                <el-radio v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictValue">{{
-                  item.dictLabel
-                }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="匹配参数" prop="matchParam">
-              <el-input v-model="form.matchParam" placeholder="请输入匹配参数" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="是否匹配：0启用，1禁用" prop="isMatch">
-              <el-radio-group v-model="form.isMatch">
-                <el-radio v-for="item in isMatchOptions" :key="item.dictValue" :label="item.dictValue">{{ item.dictLabel
-                }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="text" @click="cancel">取 消</el-button>
         <el-button type="primary" @click="submitForm">确 定</el-button>
       </div>
-    </el-dialog> -->
-    <!-- 添加或修改对话框 -->
+    </el-dialog>
+
     <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="matchOpen" width="30%">
       <el-form ref="matchForm2" :model="matchForm" label-width="100px">
         <el-row :span="24">

@@ -242,8 +242,8 @@ export default {
     ];
   },
   methods: {
-  matchForm() {
-    var paramObj = {...this.row,...this.row2};
+    matchForm() {
+      var paramObj = { ...this.row, ...this.row2 };
       matchResult(paramObj).then(res => {
         if (res.code == 200) {
           this.$message({
