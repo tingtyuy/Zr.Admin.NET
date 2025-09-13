@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using ZR.Model.Business.Dto;
-using ZR.Model.Business;
-using ZR.Service.Business.IBusinessService;
 using System.Threading.Tasks;
+using ZR.Model.Business;
+using ZR.Model.Business.Dto;
+using ZR.Service.Business;
+using ZR.Service.Business.IBusinessService;
 
 //创建时间：2025-08-25
 namespace ZR.Admin.WebApi.Controllers.Business
@@ -17,10 +18,11 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// 接口
         /// </summary>
         private readonly ITbResultService _TbResultService;
-
-        public TbResultController(ITbResultService TbResultService)
+        private readonly ITbContactService _tbContactService;
+        public TbResultController(ITbResultService TbResultService, ITbContactService tbContactService)
         {
             _TbResultService = TbResultService;
+            _tbContactService = tbContactService;
         }
 
         /// <summary>
@@ -86,17 +88,31 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// 问题件匹配
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost("match")]
         [Log(Title = "", BusinessType = BusinessType.INSERT)]
-        public IActionResult Match([FromBody] TbResultDto parm)
+        public IActionResult Match([FromBody] TbResultMatchDto parm)
         {
-            var modal = parm.Adapt<TbResult>().ToCreate(HttpContext);
-
-            var response = _TbResultService.AddTbResult(modal);
-
+            if (parm.Ids.Any())
+            {
+                foreach (var item in parm.Ids)
+                {
+                    var model = _TbResultService.GetById(item);
+                    model.处理状态 = "1";
+                    _TbResultService.Update(model);
+                }
+            }
+            var tbContactModel = new TbContact();
+            tbContactModel.CompanyId = parm.CompanyId;
+            tbContactModel.IsEnable = false;
+            //tbContactModel.IsMatch = true;
+            //tbContactModel.MatchParam = "";
+            tbContactModel.客户 = parm.收件人信息;
+            tbContactModel.客户商家名称 = parm.商家名称;
+            tbContactModel.对接方式 = "微信";
+            tbContactModel.群名称 = parm.群名称;
+            var response = _tbContactService.AddTbContact(tbContactModel);
             return SUCCESS(response);
         }
-
 
         /// <summary>
         /// 更新

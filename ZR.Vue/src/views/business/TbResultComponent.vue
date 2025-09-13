@@ -85,7 +85,7 @@
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="count" label="数量" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="replyMessage" label="数量" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="replyMessage" label="反馈信息" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="操作时间" label="操作时间" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
@@ -113,6 +113,7 @@
 </template>
 <script>
 import {
+  matchResult,
   listTbResultdistinctlist,
   addTbResult,
   delTbResult,
@@ -241,6 +242,19 @@ export default {
     ];
   },
   methods: {
+  matchForm() {
+    var paramObj = {...this.row,...this.row2};
+      matchResult(paramObj).then(res => {
+        if (res.code == 200) {
+          this.$message({
+            message: '匹配成功',
+            type: 'success'
+          });
+          this.open = false;
+          this.getList();
+        }
+      })
+    },
     handleRowClick(row) {
       this.row = row;
       console.log(row);

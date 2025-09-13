@@ -59,7 +59,7 @@ namespace ZR.Service.Business
             //predicate.AndIF(!string.IsNullOrEmpty(parm.单号), m => m.单号.Contains(parm.单号));
             //predicate.AndIF(!string.IsNullOrEmpty(parm.商家名称), m => m.商家名称.Contains(parm.商家名称));
             //predicate.AndIF(!string.IsNullOrEmpty(parm.收件人信息), m => m.收件人信息.Contains(parm.收件人信息));
-            //predicate.AndIF(!string.IsNullOrEmpty(parm.处理状态), m => m.处理状态 == parm.处理状态);
+            predicate.And( m => m.处理状态 == "0");
             //predicate.AndIF(parm.操作开始时间.HasValue, m => DateTime.Parse(m.操作时间) >= parm.操作开始时间);
             //predicate.AndIF(parm.操作结束时间.HasValue, m => DateTime.Parse(m.操作时间) <= parm.操作结束时间);
             //predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类别), m => m.问题件类别 == parm.问题件类别);

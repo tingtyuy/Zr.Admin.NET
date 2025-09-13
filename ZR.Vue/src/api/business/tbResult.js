@@ -90,3 +90,15 @@ export function copyMessage(pid) {
     method: 'POST'
   })
 }
+
+/**
+ * 问题件匹配
+ * @param data
+ */
+export function matchResult(data) {
+  return request({
+    url: 'business/TbResult/match',
+    method: 'post',
+    data: data,
+  })
+}
