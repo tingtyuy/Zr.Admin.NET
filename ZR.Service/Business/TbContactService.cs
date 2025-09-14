@@ -31,25 +31,27 @@ namespace ZR.Service.Business
         public PagedInfo<TbContactDto> GetList(TbContactQueryDto parm)
         {
             var predicate = QueryExp(parm);
+            predicate.And(w => string.IsNullOrEmpty(w.客户));
+            predicate.And(w => string.IsNullOrEmpty(w.CompanyId));
 
-            // 1. 先查询每个 CompanyId 的最小 Id
-            var minIds = Queryable()
-                .Where(predicate.ToExpression())
-                .GroupBy(g => new { g.CompanyId, g.群名称 })
-                .Select(g => new
-                {
-                    CompanyId = g.CompanyId,
-                    群名称 = g.群名称,
-                    MinId = SqlFunc.AggregateMin(g.Id)
-                })
-                .ToList();
+            //// 1. 先查询每个 CompanyId 的最小 Id
+            //var minIds = Queryable()
+            //    .Where(predicate.ToExpression())
+            //    .GroupBy(g => new { g.CompanyId, g.群名称 })
+            //    .Select(g => new
+            //    {
+            //        CompanyId = g.CompanyId,
+            //        群名称 = g.群名称,
+            //        MinId = SqlFunc.AggregateMin(g.Id)
+            //    })
+            //    .ToList();
 
-            // 2. 根据最小 Id 查询完整记录（包括导航属性）
-            var list = Queryable()
-                .Includes(a => a.TbWxGroupMembers) // 正确位置：在 Select 之前
-                .Where(t => minIds.Select(x => x.MinId).Contains(t.Id))
-                ;
-
+            //// 2. 根据最小 Id 查询完整记录（包括导航属性）
+            //var list = Queryable()
+            //    .Includes(a => a.TbWxGroupMembers) // 正确位置：在 Select 之前
+            //    .Where(t => minIds.Select(x => x.MinId).Contains(t.Id))
+            //    ;
+            var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression());
             var response = list.ToPage<TbContact, TbContactDto>(parm);
             foreach (var result in response.Result)
             {

@@ -69,7 +69,7 @@ namespace ZR.Service.Business
             var list = Queryable()
                 .Where(predicate.ToExpression());
 
-            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息, g.CompanyId, g.执行机器人, g.处理状态 }).Select(s => new TbResultDistinctDto
+            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息, g.CompanyId, g.执行机器人, g.处理状态 ,g.反馈信息}).Select(s => new TbResultDistinctDto
             {
                 //ids= SqlFunc.Subqueryable<TbResult>().Where(w=>w.商家名称==),
                 商家名称 = s.商家名称,
@@ -77,7 +77,10 @@ namespace ZR.Service.Business
                 CompanyId = s.CompanyId,
                 执行机器人 = s.执行机器人,
                 处理状态 = s.处理状态,
-                count = SqlFunc.AggregateCount(s.单号)
+                count = SqlFunc.AggregateCount(s.单号),
+                ReplyMessage= s.反馈信息
+
+
 
             }).OrderBy(o=>o.处理状态);
 
@@ -85,7 +88,7 @@ namespace ZR.Service.Business
             foreach (var item in response.Result)
             {
                 item.ids = GetIds(item.商家名称, item.收件人信息).ToList();
-                item.ReplyMessage = await GetForwardMessage(item.商家名称, item.收件人信息);
+                //item.ReplyMessage = await GetForwardMessage(item.商家名称, item.收件人信息);
             }
             return response;
         }

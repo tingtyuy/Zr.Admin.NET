@@ -82,11 +82,11 @@
       <!-- <el-table-column type="selection" width="50" align="center" /> -->
       <!-- <el-table-column prop="问题件类型" label="问题件类型" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" />
+      <!-- <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="count" label="数量" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="replyMessage" label="反馈信息" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="操作时间" label="操作时间" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
