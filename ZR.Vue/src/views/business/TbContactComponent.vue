@@ -11,9 +11,9 @@
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
       <el-row>
-        <el-col  :span="16">
+        <el-col :span="16">
           <el-form-item>
-            <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable style="width: 100%;"/>
+            <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable style="width: 100%;" />
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -26,9 +26,9 @@
         </el-col>
       </el-row>
     </el-form>
-    <el-row  class="mb8">
-         <el-col :offset="14":span="5">
-            <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+    <el-row class="mb8">
+      <el-col :offset="14" :span="5">
+        <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
       </el-col>
       <el-col :span="5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
@@ -48,7 +48,7 @@
     <!-- </el-row> -->
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row
-      :row-class-name="tableRowClassName">
+      :row-class-name="tableRowClassName"  @row-click="handleRowClick">
 
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" width="320" />
       <!-- <el-table-column prop="isEnable" label="启用状态" align="center" width="50" >
@@ -81,7 +81,7 @@
     </el-table>
     <!-- <pagination small class="mt2" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" /> -->
 
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="20%">
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="20%" :modal="false">
       <el-form ref="form" :model="form" :rules="rules">
         <el-row :span="24">
           <el-col :lg="24">
@@ -97,7 +97,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="matchOpen" width="30%">
+    <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="matchOpen" width="30%" :modal="false">
       <el-form ref="matchForm2" :model="matchForm" label-width="100px">
         <el-row :span="24">
           <el-col :span="12">
@@ -234,6 +234,10 @@ export default {
 
   },
   methods: {
+    handleRowClick(row) {
+      this.$emit('rowClick', row);
+    },
+
     tableRowClassName({ row, rowIndex }) {
       if (row.isMatch == 1) {
         return 'success-row';

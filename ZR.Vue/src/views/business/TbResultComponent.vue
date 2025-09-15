@@ -8,9 +8,9 @@
 -->
 <template>
   <div class="app-container">
-    <el-row :gutter="12" class="mb8">
+    <!-- <el-row :gutter="12" class="mb8">
       <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
-        v-show="showSearch" @submit.native.prevent>
+        v-show="showSearch" @submit.native.prevent> -->
         <!--<el-col :span="6">
          <el-form-item label="开始日期" prop="操作开始时间">
             <el-date-picker v-model="queryParams.操作开始时间" type="date" placeholder="开始日期" value-format="yyyy-MM-dd"
@@ -25,7 +25,7 @@
             </el-date-picker>
           </el-form-item>
         </el-col>-->
-        <el-col :span="6">
+        <!-- <el-col :span="6">
           <el-form-item label="商家名称" prop="商家名称">
             <el-input v-model="queryParams.商家名称" placeholder="请输入商家名称" clearable :style="{ width: '100%' }">
             </el-input>
@@ -36,7 +36,7 @@
             <el-input v-model="queryParams.收件人信息" placeholder="请输入收件人信息" clearable :style="{ width: '100%' }">
             </el-input>
           </el-form-item>
-        </el-col>
+        </el-col> -->
         <!-- <el-col :span="6">
           <el-form-item label="运单号" prop="单号">
             <el-input v-model="queryParams.单号" placeholder="请输入运单号" clearable :style="{ width: '100%' }">
@@ -68,14 +68,14 @@
             </el-select>
           </el-form-item>
         </el-col> -->
-        <el-col :span="6">
+        <!-- <el-col :span="6">
 
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
         </el-col>
 
-      </el-form>
-    </el-row>
+      </el-form> -->
+    <!-- </el-row> -->
 
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick">
@@ -84,13 +84,13 @@
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="count" label="数量" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="replyMessage" label="反馈信息" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="count" label="问题件数量" align="center" :show-overflow-tooltip="true" width="100" />
+      <el-table-column prop="replyMessage" label="待转发信息" align="center" :show-overflow-tooltip="true" width="300"  />
+      <!-- <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="操作时间" label="操作时间" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column label="操作" align="center" width="140">
+      <el-table-column label="匹配" align="center" width="140">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="匹配客户群"
             @click="handleAdd(scope.row)"></el-button>
@@ -103,8 +103,9 @@
       :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open">
-      <TbContactFullComponent @rowClick="rowClickCallBack"></TbContactFullComponent>
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="25%" >
+      <!-- <TbContactFullComponent @rowClick="rowClickCallBack"></TbContactFullComponent> -->
+      <TbContactComponent @rowClick="rowClickCallBack"></TbContactComponent>
       <el-button type="primary" @click="matchForm">确 定</el-button>
     </el-dialog>
 
@@ -124,12 +125,12 @@ import {
   copyMessage,
 } from '@/api/business/tbResult.js';
 import TbContactFullComponent from '@/views/business/TbContactFullComponent.vue';
-// import TbContactComponent2 from '@/views/business/TbContactComponent2.vue';
+import TbContactComponent from '@/views/business/TbContactComponent.vue';
 export default {
   name: "TbResultComponent",
   components: {
     TbContactFullComponent,
-    // TbContactComponent2
+    TbContactComponent
   },
   data() {
     return {
@@ -162,7 +163,7 @@ export default {
         问题件类别: '',
         收件人信息: '',
         pageNum: 1,
-        pageSize: 8,
+        pageSize: 12,
         sort: undefined,
         sortType: undefined,
       },
@@ -384,7 +385,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加";
+      this.title = "匹配";
       this.opertype = 1;
     },
     /** 删除按钮操作 */

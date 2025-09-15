@@ -97,9 +97,22 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 foreach (var item in parm.Ids)
                 {
                     var model = _TbResultService.GetById(item);
-                    model.处理状态 = "已处理";
+                    model.处理状态 = "已匹配";
                     _TbResultService.Update(model);
                 }
+            }
+
+            var model2 = _tbContactService.GetFirst(w => w.CompanyId == parm.CompanyId
+              && w.IsEnable == false
+              && w.客户 == parm.收件人信息
+              && w.客户商家名称 == parm.商家名称
+              && w.对接方式 == "微信"
+              && w.群名称 == parm.群名称
+              );
+
+            if (model2 != null)
+            {
+                return SUCCESS(model2);
             }
             var tbContactModel = new TbContact();
             tbContactModel.CompanyId = parm.CompanyId;
@@ -110,6 +123,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
             tbContactModel.客户商家名称 = parm.商家名称;
             tbContactModel.对接方式 = "微信";
             tbContactModel.群名称 = parm.群名称;
+
+
             var response = _tbContactService.AddTbContact(tbContactModel);
             return SUCCESS(response);
         }

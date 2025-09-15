@@ -55,6 +55,7 @@ namespace ZR.Service.Business
         public async Task<PagedInfo<TbResultDistinctDto>> GetDistinctList(TbResultQueryDto parm)
         {
             var predicate = QueryExp(parm);
+            predicate.And(w => w.处理状态 != "已匹配" && w.处理状态 != "已处理");
 
             //predicate.AndIF(!string.IsNullOrEmpty(parm.单号), m => m.单号.Contains(parm.单号));
             //predicate.AndIF(!string.IsNullOrEmpty(parm.商家名称), m => m.商家名称.Contains(parm.商家名称));
@@ -66,23 +67,24 @@ namespace ZR.Service.Business
             //predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类型), m => m.问题件类型 == parm.问题件类型);
             //predicate.And(w => DateTime.Parse(w.操作时间) >= DateTime.Now.AddDays(-7));
 
+
             var list = Queryable()
                 .Where(predicate.ToExpression());
 
-            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息, g.CompanyId, g.执行机器人, g.处理状态 ,g.反馈信息}).Select(s => new TbResultDistinctDto
+            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息, g.CompanyId,g.反馈信息}).Select(s => new TbResultDistinctDto
             {
                 //ids= SqlFunc.Subqueryable<TbResult>().Where(w=>w.商家名称==),
                 商家名称 = s.商家名称,
                 收件人信息 = s.收件人信息,
                 CompanyId = s.CompanyId,
-                执行机器人 = s.执行机器人,
-                处理状态 = s.处理状态,
+                //执行机器人 = s.执行机器人,
+                //处理状态 = s.处理状态,
                 count = SqlFunc.AggregateCount(s.单号),
                 ReplyMessage= s.反馈信息
 
 
 
-            }).OrderBy(o=>o.处理状态);
+            }).OrderBy(o=>o.count);
 
             var response = groupList.ToPage(parm);
             foreach (var item in response.Result)
