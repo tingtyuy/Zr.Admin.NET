@@ -11,27 +11,29 @@
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
       <el-row>
-        <el-col :span="8">
+        <el-col  :span="16">
           <el-form-item>
-            <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable />
+            <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable style="width: 100%;"/>
           </el-form-item>
         </el-col>
-        <el-col :span="5">
+        <el-col :span="8">
           <el-form-item>
-            <el-select v-model="queryParams.isMatch" placeholder="匹配状态" clearable style="width: 100px;">
+            <el-select v-model="queryParams.isMatch" placeholder="匹配状态" clearable>
               <el-option :key="0" :label="'未匹配'" :value="false" />
               <el-option :key="1" :label="'已匹配'" :value="true" />
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :offset="1" :span="5">
-          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索1</el-button>
-        </el-col>
-        <el-col :span="5">
-          <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
-        </el-col>
       </el-row>
     </el-form>
+    <el-row  class="mb8">
+         <el-col :offset="14":span="5">
+            <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+      </el-col>
+      <el-col :span="5">
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+      </el-col>
+    </el-row>
     <!-- <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
