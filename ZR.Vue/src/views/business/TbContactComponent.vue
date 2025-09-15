@@ -10,13 +10,13 @@
   <div class="app-container">
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
-      <el-row :gutter="10" class="mb16">
-        <el-col :span="9">
+      <el-row>
+        <el-col :span="8">
           <el-form-item>
             <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable />
           </el-form-item>
         </el-col>
-        <el-col :span="9">
+        <el-col :span="5">
           <el-form-item>
             <el-select v-model="queryParams.isMatch" placeholder="匹配状态" clearable style="width: 100px;">
               <el-option :key="0" :label="'未匹配'" :value="false" />
@@ -24,51 +24,50 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
-          <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <!-- <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button> -->
-          </el-form-item>
+        <el-col :offset="1" :span="5">
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索1</el-button>
+        </el-col>
+        <el-col :span="5">
+          <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
         </el-col>
       </el-row>
     </el-form>
-    <el-row :gutter="10" class="mb8">
+    <!-- <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
-      </el-col>
-      <!-- <el-col :span="1.5">
+      </el-col> -->
+    <!-- <el-col :span="1.5">
         <el-button type="success" :disabled="single" v-hasPermi="['tbcontact:edit']" plain icon="el-icon-edit" size="mini" @click="handleUpdate">修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="danger" :disabled="multiple" v-hasPermi="['tbcontact:delete']" plain icon="el-icon-delete" size="mini" @click="handleDelete">删除</el-button>
       </el-col> -->
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
+    <!-- <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
+    <!-- </el-row> -->
     <!-- 数据区域 -->
-    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row>
+    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row
+      :row-class-name="tableRowClassName">
 
-      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" width="180" />
+      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" width="320" />
       <!-- <el-table-column prop="isEnable" label="启用状态" align="center" width="50" >
         <template slot-scope="scope">
           <dict-tag :options=" isEnableOptions" :value="scope.row.isEnable" />
         </template>
 </el-table-column> -->
-      <el-table-column prop="isMatch" label="状态" align="center" width="60">
+      <!-- <el-table-column prop="isMatch" label="状态" align="center" width="100">
 
         <template slot-scope="scope">
-          {{ scope.row.isMatch == 1 ? '已匹配' : '未匹配' }}
-          <!-- <dict-tag :options=" isMatchOptions" :value="scope.row.isMatch" /> -->
+          {{ scope.row.isMatch == 1 ? '设置完成' : '未设置' }}
         </template>
-      </el-table-column>
-      <el-table-column prop="isEnable" label="是否私人群" align="center" width="60">
+      </el-table-column> -->
+      <!-- <el-table-column prop="isEnable" label="是否私人群" align="center" width="60">
 
         <template slot-scope="scope">
           {{ scope.row.isEnable == 0 ? '客服群' : '私人群' }}
-          <!-- <dict-tag :options=" isMatchOptions" :value="scope.row.isMatch" /> -->
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
-      <el-table-column label="操作" align="center" width="60">
+      <el-table-column label="设置" align="center" width="60">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="匹配"
             @click="handleMatch(scope.row)"></el-button>
@@ -81,7 +80,7 @@
     <!-- <pagination small class="mt2" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" /> -->
 
     <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="20%">
-      <el-form ref="form" :model="form" :rules="rules" >
+      <el-form ref="form" :model="form" :rules="rules">
         <el-row :span="24">
           <el-col :lg="24">
             <el-form-item label="群名称" prop="群名称">
@@ -138,6 +137,8 @@
   </div>
 </template>
 <script>
+
+
 import {
   matchTbContact,
   listTbContact,
@@ -157,6 +158,8 @@ import {
 import TbWxGroupMemberComponent from '@/views/business/TbWxGroupMemberComponent.vue';
 // import dictData from '@/views/components/dictData'
 import { getDicts } from "@/api/system/dict/data";
+// import { theme } from 'element-plus'
+
 export default {
   name: "TbContactComponent",
   components: { TbWxGroupMemberComponent },
@@ -223,11 +226,18 @@ export default {
     };
   },
   created() {
+    // console.log(theme) // 查看所有变量
     this.loadDataSource();
     this.getList();
 
   },
   methods: {
+    tableRowClassName({ row, rowIndex }) {
+      if (row.isMatch == 1) {
+        return 'success-row';
+      }
+      return '';
+    },
     loadDataSource() {
       getDicts("wx_group_match_param").then((response) => {
         if (response.code == 200) {
@@ -383,3 +393,12 @@ export default {
   },
 };
 </script>
+<style>
+.el-table .warning-row {
+  background: oldlace;
+}
+
+.el-table .success-row {
+  background: #f0f9eb;
+}
+</style>

@@ -1,6 +1,7 @@
 using Aliyun.OSS;
 using Infrastructure.Attribute;
 using Infrastructure.Extensions;
+using System.Text;
 using System.Text.RegularExpressions;
 using ZR.Model.Business;
 using ZR.Model.Business.Dto;
@@ -8,7 +9,7 @@ using ZR.Model.System;
 using ZR.Repository;
 using ZR.Service.Business.IBusinessService;
 using ZR.ServiceCore.Services;
-
+using ZR.Common;
 namespace ZR.Service.Business
 {
     /// <summary>
@@ -31,28 +32,16 @@ namespace ZR.Service.Business
         public PagedInfo<TbContactDto> GetList(TbContactQueryDto parm)
         {
             var predicate = QueryExp(parm);
-            predicate.And(w => string.IsNullOrEmpty(w.客户));
-            predicate.And(w => string.IsNullOrEmpty(w.CompanyId));
+            predicate.And(w => string.IsNullOrEmpty(w.客户商家名称));
+            //parm.Sort = "群名称";
 
-            //// 1. 先查询每个 CompanyId 的最小 Id
-            //var minIds = Queryable()
-            //    .Where(predicate.ToExpression())
-            //    .GroupBy(g => new { g.CompanyId, g.群名称 })
-            //    .Select(g => new
-            //    {
-            //        CompanyId = g.CompanyId,
-            //        群名称 = g.群名称,
-            //        MinId = SqlFunc.AggregateMin(g.Id)
-            //    })
-            //    .ToList();
-
-            //// 2. 根据最小 Id 查询完整记录（包括导航属性）
-            //var list = Queryable()
-            //    .Includes(a => a.TbWxGroupMembers) // 正确位置：在 Select 之前
-            //    .Where(t => minIds.Select(x => x.MinId).Contains(t.Id))
-            //    ;
             var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression());
+
             var response = list.ToPage<TbContact, TbContactDto>(parm);
+            response.Result = response.Result
+           .OrderBy(x => TinyPinyin.PinyinHelper.GetPinyinInitials(x.群名称), StringComparer.OrdinalIgnoreCase)
+           .ToList();
+
             foreach (var result in response.Result)
             {
                 if (!string.IsNullOrEmpty(result.MatchParam))
@@ -61,14 +50,11 @@ namespace ZR.Service.Business
                     var num = 1;
                     foreach (var item in arr)
                     {
-
-                        result.MatchParamDes += num+ ". "+ _sysDictDataService.GetSingle(w => w.DictType == "wx_group_match_param" && w.DictValue == item).DictLabel+" ";
+                        result.MatchParamDes += num + ". " + _sysDictDataService.GetSingle(w => w.DictType == "wx_group_match_param" && w.DictValue == item).DictLabel + " ";
                         num++;
                     }
-                    //result.MatchParamDes= result.MatchParamDes.Remove(result.MatchParamDes.Length - 1, 1);
                 }
             }
-
 
             return response;
         }
