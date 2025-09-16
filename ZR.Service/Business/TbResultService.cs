@@ -56,41 +56,51 @@ namespace ZR.Service.Business
         {
             var predicate = QueryExp(parm);
             predicate.And(w => w.处理状态 != "已匹配" && w.处理状态 != "已处理");
-
-            //predicate.AndIF(!string.IsNullOrEmpty(parm.单号), m => m.单号.Contains(parm.单号));
-            //predicate.AndIF(!string.IsNullOrEmpty(parm.商家名称), m => m.商家名称.Contains(parm.商家名称));
-            //predicate.AndIF(!string.IsNullOrEmpty(parm.收件人信息), m => m.收件人信息.Contains(parm.收件人信息));
-            //predicate.And( m => m.处理状态 == "0");
-            //predicate.AndIF(parm.操作开始时间.HasValue, m => DateTime.Parse(m.操作时间) >= parm.操作开始时间);
-            //predicate.AndIF(parm.操作结束时间.HasValue, m => DateTime.Parse(m.操作时间) <= parm.操作结束时间);
-            //predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类别), m => m.问题件类别 == parm.问题件类别);
-            //predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类型), m => m.问题件类型 == parm.问题件类型);
-            //predicate.And(w => DateTime.Parse(w.操作时间) >= DateTime.Now.AddDays(-7));
-
-
+            //predicate.And(w=>w.结果.Contains("【通知】中第【20】条指令出错：业务异常——该商家没有在【商家联系方式对应表.xlsx】中"));
+  
             var list = Queryable()
                 .Where(predicate.ToExpression());
 
-            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息, g.CompanyId,g.反馈信息}).Select(s => new TbResultDistinctDto
+            var groupList = list.GroupBy(g => new { g.商家名称, g.收件人信息 }).Select(s => new TbResultDistinctDto
             {
-                //ids= SqlFunc.Subqueryable<TbResult>().Where(w=>w.商家名称==),
                 商家名称 = s.商家名称,
                 收件人信息 = s.收件人信息,
-                CompanyId = s.CompanyId,
+                //CompanyId = s.CompanyId,
                 //执行机器人 = s.执行机器人,
                 //处理状态 = s.处理状态,
                 count = SqlFunc.AggregateCount(s.单号),
-                ReplyMessage= s.反馈信息
+                list = SqlFunc.Subqueryable<TbResult>().Where(w => w.商家名称 == s.商家名称 && w.收件人信息 == s.收件人信息).ToList(),
+                //反馈信息 =SqlFunc.Subqueryable<TbResult>().Where(w=>w.商家名称==s.商家名称 && w.收件人信息==s.收件人信息).ToList().FirstOrDefault().反馈信息
+                //ReplyMessage= s.反馈信息
 
 
 
             }).OrderBy(o=>o.count);
 
+            //groupList.Select(s=> new TbResultDistinctDto
+            //{
+            //    //ids= SqlFunc.Subqueryable<TbResult>().Where(w=>w.商家名称==),
+            //    商家名称 = s.商家名称,
+            //    收件人信息 = s.收件人信息,
+            //    //CompanyId = s.CompanyId,
+            //    //执行机器人 = s.执行机器人,
+            //    //处理状态 = s.处理状态,
+            //    count = s.count,
+            //    OrderNo= list.First().单号,
+            //    反馈信息 = list.First().反馈信息
+            //    //ReplyMessage= s.反馈信息
+
+
+
+            //}).ToList();
+            //.OrderBy(o=>o.count)
+            //var response = new PagedInfo<TbResultDistinctDto>() ;
             var response = groupList.ToPage(parm);
             foreach (var item in response.Result)
             {
+                var firstModel= item.list.FirstOrDefault();
                 item.ids = GetIds(item.商家名称, item.收件人信息).ToList();
-                //item.ReplyMessage = await GetForwardMessage(item.商家名称, item.收件人信息);
+                item.ReplyMessage =$"{item.商家名称} {item.收件人信息} {firstModel.单号} {firstModel.反馈信息}" ;
             }
             return response;
         }

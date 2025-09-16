@@ -84,13 +84,13 @@
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="count" label="问题件数量" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="count" label="问题件数量" align="center" :show-overflow-tooltip="true" width="100" />
       <el-table-column prop="replyMessage" label="待转发信息" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="操作时间" label="操作时间" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column label="匹配" align="center" width="140">
+      <el-table-column label="匹配" align="center" width="100">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="匹配客户群"
             @click="handleAdd(scope.row)"></el-button>
@@ -103,7 +103,7 @@
       :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="25%" >
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="35%" >
       <!-- <TbContactFullComponent @rowClick="rowClickCallBack"></TbContactFullComponent> -->
       <TbContactComponent @rowClick="rowClickCallBack"></TbContactComponent>
       <el-button type="primary" @click="matchForm">确 定</el-button>

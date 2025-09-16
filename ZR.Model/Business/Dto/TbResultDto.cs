@@ -78,8 +78,11 @@ namespace ZR.Model.Business.Dto
         //public string 执行机器人 { get; set; }
         public int count { get; set; }
         public string ReplyMessage { get; set; }
-
+        public string  OrderNo { get; set; }
+        public string 反馈信息 { get; set; }
         //public string 处理状态 { get; set; }
+
+        public List<TbResult> list { get; set; }
 
     }
 

@@ -11,7 +11,7 @@
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
       <el-row>
-        <el-col :span="16">
+        <el-col :span="8">
           <el-form-item>
             <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable style="width: 100%;" />
           </el-form-item>
@@ -24,16 +24,22 @@
             </el-select>
           </el-form-item>
         </el-col>
+        <el-col :offset="2":span="3">
+          <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+        </el-col>
       </el-row>
     </el-form>
-    <el-row class="mb8">
+    <!-- <el-row class="mb8">
       <el-col :offset="14" :span="5">
         <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
       </el-col>
       <el-col :span="5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
       </el-col>
-    </el-row>
+    </el-row> -->
     <!-- <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
@@ -48,9 +54,9 @@
     <!-- </el-row> -->
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row
-      :row-class-name="tableRowClassName"  @row-click="handleRowClick">
+      :row-class-name="tableRowClassName" @row-click="handleRowClick">
 
-      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" width="320" />
+      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="isEnable" label="启用状态" align="center" width="50" >
         <template slot-scope="scope">
           <dict-tag :options=" isEnableOptions" :value="scope.row.isEnable" />

@@ -39,10 +39,10 @@
         </el-header>
         <el-main class="bordered">
           <el-row>
-            <el-col :span="6" class="bordered height">
+            <el-col :span="8" class="bordered height">
               <TbContactComponent></TbContactComponent>
             </el-col>
-            <el-col :span="18" class="bordered height">
+            <el-col :span="16" class="bordered height">
               <TbResultComponent></TbResultComponent>
             </el-col>
           </el-row>
@@ -168,7 +168,8 @@ export default {
 }
 
 .height {
- max-height: 660px;
+ max-height: 800px;
+ min-height: 660px;
  overflow: scroll;
 }
 </style>
