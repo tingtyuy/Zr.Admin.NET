@@ -103,7 +103,7 @@
       :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="35%" >
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="28%" >
       <!-- <TbContactFullComponent @rowClick="rowClickCallBack"></TbContactFullComponent> -->
       <TbContactComponent @rowClick="rowClickCallBack"></TbContactComponent>
       <el-button type="primary" @click="matchForm">确 定</el-button>

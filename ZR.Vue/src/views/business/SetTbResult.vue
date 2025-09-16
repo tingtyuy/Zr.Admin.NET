@@ -39,10 +39,10 @@
         </el-header>
         <el-main class="bordered">
           <el-row>
-            <el-col :span="8" class="bordered height">
+            <el-col :span="7" class="bordered height">
               <TbContactComponent></TbContactComponent>
             </el-col>
-            <el-col :span="16" class="bordered height">
+            <el-col :span="17" class="bordered height">
               <TbResultComponent></TbResultComponent>
             </el-col>
           </el-row>

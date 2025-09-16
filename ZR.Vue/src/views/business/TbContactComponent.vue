@@ -24,10 +24,10 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :offset="2":span="3">
+        <el-col :span="4">
           <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="4">
           <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
         </el-col>
       </el-row>
