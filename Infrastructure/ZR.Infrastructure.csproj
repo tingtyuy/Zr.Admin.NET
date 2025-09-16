@@ -5,9 +5,18 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<NoWarn>8632</NoWarn>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Extensions\Extension.DataSet.cs" />
+	  <Compile Remove="Extensions\Extension.Int.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Extensions\Extension.DataSet.cs" />
+	  <None Include="Extensions\Extension.Int.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
