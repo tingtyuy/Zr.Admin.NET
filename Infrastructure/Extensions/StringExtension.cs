@@ -7,7 +7,17 @@ namespace Infrastructure.Extensions
 {
     public static class StringExtension
     {
-
+        public static string DateTimeMinValueToEmpty(this string str)
+        {
+            if (str.StartsWith("0001") || str.StartsWith("1900"))
+            {
+                return "";
+            }
+            else
+            {
+                return str.ToString();
+            }
+        }
         /// <summary>
         /// SQL条件拼接
         /// </summary>

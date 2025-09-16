@@ -209,20 +209,21 @@
         <el-row>
             <el-col :lg="12">
             <el-form-item label="所属公司">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择所属公司" @change="selectRole($event)">
+              <el-select v-model="form.remark" multiple placeholder="请选择所属公司" @change="selectRole($event)">
                 <el-option v-for="item in roleOptions" :key="item.roleId" :label="item.roleName" :value="item.roleId" :disabled="item.status == 1">
                 </el-option>
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
+        <!--
         <el-row>
           <el-col :lg="24">
             <el-form-item label="备注">
               <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
             </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -267,6 +268,7 @@ import { getToken } from '@/utils/auth'
 import { treeselect } from '@/api/system/dept'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import { getDictList }from '@/api/business/company.js'
 
 export default {
   name: 'user',

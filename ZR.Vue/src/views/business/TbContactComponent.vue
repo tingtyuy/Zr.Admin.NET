@@ -11,7 +11,7 @@
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
       <el-row>
-        <el-col :span="8">
+        <!-- <el-col :span="8">
           <el-form-item>
             <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable style="width: 100%;" />
           </el-form-item>
@@ -26,7 +26,7 @@
         </el-col>
         <el-col :span="4">
           <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        </el-col>
+        </el-col> -->
         <el-col :span="4">
           <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
         </el-col>
@@ -75,15 +75,12 @@
         </template>
       </el-table-column> -->
 
-      <el-table-column label="设置" align="center" width="60">
+      <!-- <el-table-column label="设置" align="center" width="60">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="匹配"
             @click="handleMatch(scope.row)"></el-button>
-
-          <!-- <el-button size="mini" type="success" icon="el-icon-edit" title="编辑"
-            @click="handleAdd(scope.row)"></el-button> -->
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <!-- <pagination small class="mt2" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" /> -->
 
@@ -241,7 +238,8 @@ export default {
   },
   methods: {
     handleRowClick(row) {
-      this.$emit('rowClick', row);
+      // this.$emit('rowClick', row);
+      this.handleMatch(row);
     },
 
     tableRowClassName({ row, rowIndex }) {
@@ -318,6 +316,7 @@ export default {
     },
     /** 设定匹配规则操作 */
     handleMatch(row) {
+      this.$emit('rowClick', row);
       // this.matchForm={...row};
       this.matchForm.mIds = row.tbWxGroupMembers?.filter(f => f.isInternal == true).map(f => f.id) ?? [];
       this.matchForm.isEnable = row.isEnable;
