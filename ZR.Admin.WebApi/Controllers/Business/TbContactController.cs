@@ -1,3 +1,4 @@
+using Masuit.Tools;
 using Microsoft.AspNetCore.Mvc;
 using ZR.Model.Business;
 using ZR.Model.Business.Dto;
@@ -107,12 +108,17 @@ namespace ZR.Admin.WebApi.Controllers.Business
                     IsInternal = true
                 });
             }
+
             var response = _TbContactService.Update(w => w.Id == parm.Id, a => new TbContact
             {
                 IsEnable = parm.IsEnable
                  ,
                 IsMatch = true,
-                MatchParam = string.Join(',', parm.MatchParam)
+                商户名匹配 = parm.商户名匹配,
+                发件人匹配 = parm.发件人匹配,
+                联系电话匹配 = parm.联系电话匹配,
+                地址匹配 = parm.地址匹配,
+                MatchParam = parm.MatchParam
 
             });
 

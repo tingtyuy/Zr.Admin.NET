@@ -62,6 +62,14 @@ namespace ZR.Model.Business
         /// </summary>
         public bool IsMatch { get; set; }
 
+        public bool 商户名匹配 { get; set; }
+
+        public bool 发件人匹配 { get; set; }
+
+        public bool 联系电话匹配 { get; set; }
+
+        public bool 地址匹配 { get; set; }
+
         [Navigate(NavigateType.OneToMany,nameof(TbWxGroupMember.ContactId), nameof(Id))]
         public List<TbWxGroupMember> TbWxGroupMembers { get; set; }
 

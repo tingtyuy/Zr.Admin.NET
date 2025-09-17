@@ -70,6 +70,13 @@ namespace ZR.Model.Business.Dto
         [ExcelColumn(Name = "启用状态：0启用，1禁用")]
         public string IsEnableLabel { get; set; }
 
+        public bool 商户名匹配 { get; set; }
+
+        public bool 发件人匹配 { get; set; }
+
+        public bool 联系电话匹配 { get; set; }
+
+        public bool 地址匹配 { get; set; }
         public List<TbWxGroupMember>? TbWxGroupMembers { get; set; } 
     }
 
@@ -82,8 +89,15 @@ namespace ZR.Model.Business.Dto
               
         public bool IsEnable { get; set; }
 
-        public string[] MatchParam { get; set; }
+        public string MatchParam { get; set; }
 
         public List<int>? MIds { get; set; }
+        public bool 商户名匹配 { get; set; }
+
+        public bool 发件人匹配 { get; set; }
+
+        public bool 联系电话匹配 { get; set; }
+
+        public bool 地址匹配 { get; set; }
     }
 }

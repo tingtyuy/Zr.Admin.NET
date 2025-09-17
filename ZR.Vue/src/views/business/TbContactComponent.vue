@@ -61,6 +61,7 @@
               <el-checkbox v-model="matchForm.isEnable" label="是" />
             </el-form-item>
           </el-col>
+
           <!-- <el-col :lg="24">
             <el-form-item label="勾选我方人员" prop="mIds">
               <el-select v-model="matchForm.mIds" placeholder="请选择" style="width: 100%;" :multiple="true"
@@ -72,24 +73,42 @@
           </el-col> -->
 
           <el-col :lg="24">
-            <el-form-item label="匹配参数" prop="matchParam">
+            <el-form-item label="匹配参数" prop="商户名匹配" style="text-align: left;">
               <el-row :gutter="10">
-                  <el-col :span="24">
-
-                    <el-checkbox v-model="matchForm.checked1" disabled>商户名</el-checkbox>
-                  </el-col>
+                <el-col :span="24">
+                  <el-checkbox v-model="matchForm.商户名匹配" >商户名</el-checkbox>
+                </el-col>
               </el-row>
-              <el-checkbox v-model="matchForm.checked2" disabled>发件人</el-checkbox>
-              <el-checkbox v-model="matchForm.checked3" disabled>联系电话</el-checkbox>
-              <el-checkbox v-model="matchForm.checked4">地址匹配</el-checkbox>
-              <el-select v-model="matchForm.matchParam" placeholder="请选择平台" style="width: 100%;" :clearable="true"
-               >
+              <el-row :gutter="10">
+                <el-col :span="24">
+                  <el-checkbox v-model="matchForm.发件人匹配" >发件人</el-checkbox>
+                </el-col>
+              </el-row>
+              <el-row :gutter="10">
+                <el-col :span="24">
+                  <el-checkbox v-model="matchForm.联系电话匹配" >联系电话</el-checkbox>
+                </el-col>
+              </el-row>
+              <el-row :gutter="10">
+                <el-col :span="24">
+                  <el-checkbox v-model="matchForm.地址匹配">地址匹配</el-checkbox>
+                </el-col>
+              </el-row>
+
+            </el-form-item>
+          </el-col>
+
+          <el-col :lg="24">
+            <el-form-item label="平台匹配" prop="matchParam" style="text-align: left;">
+               <el-select v-model="matchForm.matchParam" placeholder="请选择平台"  :clearable="true">
                 <el-option v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictLabel"
                   :value="item.dictValue" />
               </el-select>
             </el-form-item>
           </el-col>
+
         </el-row>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="text" @click="matchCancel">取 消</el-button>
@@ -154,10 +173,10 @@ export default {
       // 表单参数
       form: {},
       matchForm: {
-        checked1:true,
-        checked2:true,
-        checked3:true,
-        checked4:false,
+        商户名匹配: true,
+        发件人匹配: true,
+        联系电话匹配: true,
+        地址匹配: false,
         mIds: [],
         isEnable: true,
         matchParam: '',
@@ -278,7 +297,7 @@ export default {
       this.matchForm.mIds = row.tbWxGroupMembers?.filter(f => f.isInternal == true).map(f => f.id) ?? [];
       this.matchForm.isEnable = row.isEnable;
       this.matchForm.isMatch = row.isMatch;
-      this.matchForm.matchParam = row.matchParam?.split(',') ?? [];
+      this.matchForm.matchParam = row.matchParam;
       this.matchForm.id = row.id;
       this.matchForm.群名称 = row.群名称;
       this.matchOpen = true;
