@@ -60,7 +60,7 @@ export const constantRoutes = [{
     redirect: 'index',
     children: [{
       path: 'index',
-      component: (resolve) => require(['@/views/index'], resolve),
+      component: (resolve) => require(['@/views/business/SetTbResult'], resolve),
       name: 'Index',
       meta: { title: '首页', icon: 'dashboard', affix: true }
     }],

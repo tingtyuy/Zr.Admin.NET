@@ -27,14 +27,14 @@
               </el-tag>
             </el-col>
           </el-row>
-          <el-row>
+          <!-- <el-row>
             <el-col :offset="18" :span="6">
               需要人工处理的问题件数量
               <el-tag color="red" effect="dark">
                 {{ statisticForm.num5 }}
               </el-tag>
             </el-col>
-          </el-row>
+          </el-row> -->
 
         </el-header>
         <el-main class="bordered">

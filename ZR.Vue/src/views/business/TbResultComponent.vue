@@ -24,7 +24,7 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="28%">
-      <TbContactComponent @rowClick="rowClickCallBack"></TbContactComponent>
+      <TbContactMatchComponent ref="matchComponent" @rowClick="rowClickCallBack" @isSet="isSetCallBack"></TbContactMatchComponent>
       <el-button type="primary" @click="matchForm">确 定</el-button>
     </el-dialog>
   </div>
@@ -40,14 +40,15 @@ import {
   forwardMessage,
   copyMessage,
 } from '@/api/business/tbResult.js';
-import TbContactComponent from '@/views/business/TbContactComponent.vue';
+import TbContactMatchComponent from '@/views/business/TbContactMatchComponent.vue';
 export default {
   name: "TbResultComponent",
   components: {
-    TbContactComponent
+    TbContactMatchComponent
   },
   data() {
     return {
+      isSet: false,
       row: {},
       row2: {},
       selectIdModel: {
@@ -159,6 +160,17 @@ export default {
   },
   methods: {
     matchForm() {
+
+      if (this.row2.isMatch != 1) {
+        $refs.matchComponent.handleMatch();
+      }
+      if(this.isSet == false){
+        this.$message({
+          message: '请先设置匹配规则',
+          type: 'warning'
+        });
+        return;
+      }
       var paramObj = { ...this.row, ...this.row2 };
       matchResult(paramObj).then(res => {
         if (res.code == 200) {
@@ -175,7 +187,11 @@ export default {
       this.row = row;
       console.log(row);
     },
+    isSetCallBack(isSet) {
+      this.isSet = isSet;
+    },
     rowClickCallBack(row) {
+
       this.row2 = row;
       console.log(row);
     },
