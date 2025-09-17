@@ -50,7 +50,7 @@ namespace ZR.Model.Business
         /// <summary>
         /// 启用状态：0启用，1禁用 
         /// </summary>
-        public bool IsEnable { get; set; }
+        public bool? IsEnable { get; set; }
 
         /// <summary>
         /// 匹配参数 

@@ -33,6 +33,7 @@ namespace ZR.Service.Business
         {
             var predicate = QueryExp(parm);
             predicate.And(w => string.IsNullOrEmpty(w.客户商家名称));
+            predicate.And(w => w.IsEnable == false || w.IsEnable == null );
             //parm.Sort = "群名称";
 
             var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression());

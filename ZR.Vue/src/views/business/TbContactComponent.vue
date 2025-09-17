@@ -11,78 +11,26 @@
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
       <el-row>
-        <!-- <el-col :span="8">
-          <el-form-item>
-            <el-input v-model="queryParams.群名称" placeholder="请输入群名称" clearable style="width: 100%;" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item>
-            <el-select v-model="queryParams.isMatch" placeholder="匹配状态" clearable>
-              <el-option :key="0" :label="'未匹配'" :value="false" />
-              <el-option :key="1" :label="'已匹配'" :value="true" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="4">
-          <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        </el-col> -->
+
         <el-col :span="4">
           <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
         </el-col>
       </el-row>
     </el-form>
-    <!-- <el-row class="mb8">
-      <el-col :offset="14" :span="5">
-        <el-button type="primary" plain icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-      </el-col>
-      <el-col :span="5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
-      </el-col>
-    </el-row> -->
-    <!-- <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
-      </el-col> -->
-    <!-- <el-col :span="1.5">
-        <el-button type="success" :disabled="single" v-hasPermi="['tbcontact:edit']" plain icon="el-icon-edit" size="mini" @click="handleUpdate">修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button type="danger" :disabled="multiple" v-hasPermi="['tbcontact:delete']" plain icon="el-icon-delete" size="mini" @click="handleDelete">删除</el-button>
-      </el-col> -->
-    <!-- <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
-    <!-- </el-row> -->
-    <!-- 数据区域 -->
-    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row
-      :row-class-name="tableRowClassName" @row-click="handleRowClick">
+
+    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick"
+      style=" margin-top: 10px;">
 
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-      <!-- <el-table-column prop="isEnable" label="启用状态" align="center" width="50" >
-        <template slot-scope="scope">
-          <dict-tag :options=" isEnableOptions" :value="scope.row.isEnable" />
-        </template>
-</el-table-column> -->
-      <!-- <el-table-column prop="isMatch" label="状态" align="center" width="100">
 
-        <template slot-scope="scope">
-          {{ scope.row.isMatch == 1 ? '设置完成' : '未设置' }}
-        </template>
-      </el-table-column> -->
-      <!-- <el-table-column prop="isEnable" label="是否私人群" align="center" width="60">
 
+      <el-table-column label="设置" align="center" width="100">
         <template slot-scope="scope">
-          {{ scope.row.isEnable == 0 ? '客服群' : '私人群' }}
+          <el-button size="mini" :type="scope.row.isMatch == 1 ? 'info' : 'success'" icon="el-icon-edit"
+            @click="handleMatch(scope.row)">设置</el-button>
         </template>
-      </el-table-column> -->
-
-      <!-- <el-table-column label="设置" align="center" width="60">
-        <template slot-scope="scope">
-          <el-button size="mini" type="success" icon="el-icon-edit" title="匹配"
-            @click="handleMatch(scope.row)"></el-button>
-        </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
-    <!-- <pagination small class="mt2" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" /> -->
 
     <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="20%" :modal="false">
       <el-form ref="form" :model="form" :rules="rules">
@@ -100,7 +48,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="微信群设置匹配规则弹窗" :lock-scroll="false" :visible.sync="matchOpen" width="30%" :modal="false">
+    <el-dialog title="商户群匹配规则设置" :lock-scroll="false" :visible.sync="matchOpen" width="30%" :modal="false">
       <el-form ref="matchForm2" :model="matchForm" label-width="100px">
         <el-row :span="24">
           <el-col :span="12">
@@ -113,7 +61,7 @@
               <el-checkbox v-model="matchForm.isEnable" label="是" />
             </el-form-item>
           </el-col>
-          <el-col :lg="24">
+          <!-- <el-col :lg="24">
             <el-form-item label="勾选我方人员" prop="mIds">
               <el-select v-model="matchForm.mIds" placeholder="请选择" style="width: 100%;" :multiple="true"
                 :clearable="true">
@@ -121,11 +69,21 @@
                   :value="item.id" />
               </el-select>
             </el-form-item>
-          </el-col>
+          </el-col> -->
+
           <el-col :lg="24">
             <el-form-item label="匹配参数" prop="matchParam">
-              <el-select v-model="matchForm.matchParam" placeholder="请选择" style="width: 100%;" :clearable="true"
-                :multiple="true">
+              <el-row :gutter="10">
+                  <el-col :span="24">
+
+                    <el-checkbox v-model="matchForm.checked1" disabled>商户名</el-checkbox>
+                  </el-col>
+              </el-row>
+              <el-checkbox v-model="matchForm.checked2" disabled>发件人</el-checkbox>
+              <el-checkbox v-model="matchForm.checked3" disabled>联系电话</el-checkbox>
+              <el-checkbox v-model="matchForm.checked4">地址匹配</el-checkbox>
+              <el-select v-model="matchForm.matchParam" placeholder="请选择平台" style="width: 100%;" :clearable="true"
+               >
                 <el-option v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictLabel"
                   :value="item.dictValue" />
               </el-select>
@@ -142,8 +100,6 @@
   </div>
 </template>
 <script>
-
-
 import {
   matchTbContact,
   listTbContact,
@@ -161,10 +117,7 @@ import {
   getTbWxGroupMember,
 } from '@/api/business/tbWxGroupMember.js';
 import TbWxGroupMemberComponent from '@/views/business/TbWxGroupMemberComponent.vue';
-// import dictData from '@/views/components/dictData'
 import { getDicts } from "@/api/system/dict/data";
-// import { theme } from 'element-plus'
-
 export default {
   name: "TbContactComponent",
   components: { TbWxGroupMemberComponent },
@@ -201,8 +154,12 @@ export default {
       // 表单参数
       form: {},
       matchForm: {
+        checked1:true,
+        checked2:true,
+        checked3:true,
+        checked4:false,
         mIds: [],
-        isEnable: false,
+        isEnable: true,
         matchParam: '',
         id: '',
         群名称: '',
@@ -238,8 +195,8 @@ export default {
   },
   methods: {
     handleRowClick(row) {
-      // this.$emit('rowClick', row);
-      this.handleMatch(row);
+      this.$emit('rowClick', row);
+      // this.handleMatch(row);
     },
 
     tableRowClassName({ row, rowIndex }) {
@@ -316,7 +273,7 @@ export default {
     },
     /** 设定匹配规则操作 */
     handleMatch(row) {
-      this.$emit('rowClick', row);
+      // this.$emit('rowClick', row);
       // this.matchForm={...row};
       this.matchForm.mIds = row.tbWxGroupMembers?.filter(f => f.isInternal == true).map(f => f.id) ?? [];
       this.matchForm.isEnable = row.isEnable;
@@ -410,6 +367,6 @@ export default {
 }
 
 .el-table .success-row {
-  background: #f0f9eb;
+  background: gray;
 }
 </style>
