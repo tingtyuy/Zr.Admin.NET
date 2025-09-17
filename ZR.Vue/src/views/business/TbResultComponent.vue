@@ -24,12 +24,14 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="28%">
-      <TbContactMatchComponent ref="matchComponent" @rowClick="rowClickCallBack" @isSet="isSetCallBack"></TbContactMatchComponent>
+      <TbContactMatchComponent ref="matchComponent" @rowClick="rowClickCallBack" @isSet="isSetCallBack">
+      </TbContactMatchComponent>
       <el-button type="primary" @click="matchForm">确 定</el-button>
     </el-dialog>
   </div>
 </template>
 <script>
+import { ref } from 'vue';
 import {
   matchResult,
   listTbResultdistinctlist,
@@ -162,9 +164,19 @@ export default {
     matchForm() {
 
       if (this.row2.isMatch != 1) {
-        $refs.matchComponent.handleMatch();
+        this.$refs.matchComponent.handleMatch(this.row2);
       }
-      if(this.isSet == false){
+      else {
+        this.isSetCallBack(true);
+      }
+
+    },
+    handleRowClick(row) {
+      this.row = row;
+      console.log(row);
+    },
+    isSetCallBack(isSet) {
+      if (isSet == false) {
         this.$message({
           message: '请先设置匹配规则',
           type: 'warning'
@@ -182,13 +194,6 @@ export default {
           this.getList();
         }
       })
-    },
-    handleRowClick(row) {
-      this.row = row;
-      console.log(row);
-    },
-    isSetCallBack(isSet) {
-      this.isSet = isSet;
     },
     rowClickCallBack(row) {
 

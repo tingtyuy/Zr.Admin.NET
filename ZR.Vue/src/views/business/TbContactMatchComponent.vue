@@ -140,12 +140,7 @@ import { getDicts } from "@/api/system/dict/data";
 export default {
   name: "TbContactMatchComponent",
   components: { TbWxGroupMemberComponent },
-  props: {
-    matchOpen: {
-      type: Boolean,
-      default: false
-    }
-  },
+
   data() {
     return {
       labelWidth: "100px",
