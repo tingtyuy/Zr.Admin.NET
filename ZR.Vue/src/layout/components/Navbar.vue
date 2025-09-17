@@ -9,27 +9,27 @@
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
-        <search id="header-search" class="right-menu-item" />
+        <!-- <search id="header-search" class="right-menu-item" /> -->
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
         <!-- <el-tooltip content="布局大小" effect="dark" placement="bottom"> -->
-        <size-select id="size-select" class="right-menu-item hover-effect" />
+        <!-- <size-select id="size-select" class="right-menu-item hover-effect" /> -->
         <!-- </el-tooltip> -->
-        <el-tooltip content="源码地址" effect="dark" placement="bottom">
+        <!-- <el-tooltip content="源码地址" effect="dark" placement="bottom">
           <zr-git class="right-menu-item hover-effect" />
         </el-tooltip>
         <el-tooltip content="文档地址" effect="dark" placement="bottom">
           <zr-doc class="right-menu-item hover-effect" />
-        </el-tooltip>
+        </el-tooltip> -->
       </template>
 			<!-- 通知 -->
-      <div class="right-menu-item">
+      <!-- <div class="right-menu-item">
         <el-popover placement="bottom" trigger="click" v-model="isShowUserNewsPopover" width="300" popper-class="el-popover-pupop-user-news">
           <el-badge @click.stop="isShowUserNewsPopover = !isShowUserNewsPopover" :is-dot="true" slot="reference">
             <i class="el-icon-bell" title="通知"></i>
           </el-badge>
           <Notice v-show="isShowUserNewsPopover" />
         </el-popover>
-      </div>
+      </div> -->
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
