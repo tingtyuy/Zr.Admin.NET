@@ -40,10 +40,10 @@
         <el-main class="bordered">
           <el-row>
             <el-col :span="7" class="bordered height">
-              <TbContactComponent></TbContactComponent>
+              <TbContactComponent ref="leftComponentRef"></TbContactComponent>
             </el-col>
             <el-col :span="17" class="bordered height">
-              <TbResultComponent></TbResultComponent>
+              <TbResultComponent @refreshLeftList="refreshLeftListCallBack"></TbResultComponent>
             </el-col>
           </el-row>
         </el-main>
@@ -109,6 +109,10 @@ export default {
     this.getList();
   },
   methods: {
+    refreshLeftListCallBack() {
+      debugger
+      this.$refs.leftComponentRef.getList();
+    },
     getList() {
       // this.loading = true;
       // listTbContact(this.wxGroupQueryForm).then(response => {

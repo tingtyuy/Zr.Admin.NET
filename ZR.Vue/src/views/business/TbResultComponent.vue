@@ -168,8 +168,9 @@ export default {
       }
       else {
         this.isSetCallBack(true);
-      }
 
+      }
+      this.$emit('refreshLeftList');
     },
     handleRowClick(row) {
       this.row = row;
