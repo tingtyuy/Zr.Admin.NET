@@ -301,15 +301,15 @@ export default {
       this.matchForm.id = row.id;
       this.matchForm.群名称 = row.群名称;
       this.matchOpen = true;
-      listTbWxGroupMemberOptions({
-        groupName: row.群名称,
-        ContactId: row.id,
-        IsInternal: false,
-      }).then((response) => {
-        if (response.code == 200) {
-          this.WxGroupMemberOptions = response.data;
-        }
-      });
+      // listTbWxGroupMemberOptions({
+      //   groupName: row.群名称,
+      //   ContactId: row.id,
+      //   IsInternal: false,
+      // }).then((response) => {
+      //   if (response.code == 200) {
+      //     this.WxGroupMemberOptions = response.data;
+      //   }
+      // });
     },
 
 
