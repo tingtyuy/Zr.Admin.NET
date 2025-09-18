@@ -23,7 +23,6 @@
 
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
 
-
       <el-table-column label="设置" align="center" width="100">
         <template slot-scope="scope">
           <el-button size="mini" :type="scope.row.isMatch == 1 ? 'info' : 'success'" icon="el-icon-edit"
@@ -39,6 +38,12 @@
             <el-form-item label="群名称" prop="群名称">
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
+            <el-form-item style="text-align: left;">
+              <el-tag type="info">1、此处用于输入新建的商户群</el-tag>
+              <el-tag type="info">2、确保机器人微信号已经在新建的这个商户群里了</el-tag>
+              <el-tag type="info">3、确保输入的商户群名是正确的</el-tag>
+            </el-form-item>
+
           </el-col>
         </el-row>
       </el-form>
@@ -76,17 +81,17 @@
             <el-form-item label="匹配参数" prop="商户名匹配" style="text-align: left;">
               <el-row :gutter="10">
                 <el-col :span="24">
-                  <el-checkbox v-model="matchForm.商户名匹配" >商户名</el-checkbox>
+                  <el-checkbox v-model="matchForm.商户名匹配">商户名</el-checkbox>
                 </el-col>
               </el-row>
               <el-row :gutter="10">
                 <el-col :span="24">
-                  <el-checkbox v-model="matchForm.发件人匹配" >发件人</el-checkbox>
+                  <el-checkbox v-model="matchForm.发件人匹配">发件人</el-checkbox>
                 </el-col>
               </el-row>
               <el-row :gutter="10">
                 <el-col :span="24">
-                  <el-checkbox v-model="matchForm.联系电话匹配" >联系电话</el-checkbox>
+                  <el-checkbox v-model="matchForm.联系电话匹配">联系电话</el-checkbox>
                 </el-col>
               </el-row>
               <el-row :gutter="10">
@@ -100,7 +105,7 @@
 
           <el-col :lg="24">
             <el-form-item label="平台匹配" prop="matchParam" style="text-align: left;">
-               <el-select v-model="matchForm.matchParam" placeholder="请选择平台"  :clearable="true">
+              <el-select v-model="matchForm.matchParam" placeholder="请选择平台" :clearable="true">
                 <el-option v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictLabel"
                   :value="item.dictValue" />
               </el-select>
@@ -171,7 +176,9 @@ export default {
       open: false,
       matchOpen: false,
       // 表单参数
-      form: {},
+      form: {
+        群名称: ""
+      },
       matchForm: {
         商户名匹配: true,
         发件人匹配: true,
@@ -203,6 +210,10 @@ export default {
       dataList: [],
       total: 0,
       rules: {
+        群名称: [
+          { required: true, message: '请输入群名称', trigger: 'blur' },
+          { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+        ],
       },
     };
   },

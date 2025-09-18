@@ -40,7 +40,7 @@ namespace ZR.Service.Business
 
             var response = list.ToPage<TbContact, TbContactDto>(parm);
             response.Result = response.Result
-           .OrderBy(x => TinyPinyin.PinyinHelper.GetPinyinInitials(x.群名称), StringComparer.OrdinalIgnoreCase)
+           .OrderBy(x => string.IsNullOrEmpty(x.群名称)?"": TinyPinyin.PinyinHelper.GetPinyinInitials(x.群名称), StringComparer.OrdinalIgnoreCase)
            .ToList();
 
             foreach (var result in response.Result)

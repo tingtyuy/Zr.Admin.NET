@@ -162,15 +162,17 @@ export default {
   },
   methods: {
     matchForm() {
+      if (this.row2.群名称 != undefined) {
+        if (this.row2.isMatch != 1) {
+          this.$refs.matchComponent.handleMatch(this.row2);
+        }
+        else {
+          this.isSetCallBack(true);
 
-      if (this.row2.isMatch != 1) {
-        this.$refs.matchComponent.handleMatch(this.row2);
+        }
+        this.$emit('refreshLeftList');
       }
-      else {
-        this.isSetCallBack(true);
 
-      }
-      this.$emit('refreshLeftList');
     },
     handleRowClick(row) {
       this.row = row;
