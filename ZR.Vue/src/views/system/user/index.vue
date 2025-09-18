@@ -209,8 +209,8 @@
         <el-row>
             <el-col :lg="12">
             <el-form-item label="所属公司">
-              <el-select v-model="form.remark" multiple placeholder="请选择所属公司" @change="selectRole($event)">
-                <el-option v-for="item in roleOptions" :key="item.roleId" :label="item.roleName" :value="item.roleId" :disabled="item.status == 1">
+              <el-select v-model="form.remark"  placeholder="请选择所属公司" @change="selectRole($event)">
+                <el-option v-for="item in remarkOptions" :key="item.companyId" :label="item.companyName" :value="item.companyId" >
                 </el-option>
               </el-select>
             </el-form-item>
@@ -268,7 +268,7 @@ import { getToken } from '@/utils/auth'
 import { treeselect } from '@/api/system/dept'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import { getDictList }from '@/api/business/company.js'
+import { listCompany }from '@/api/business/company.js'
 
 export default {
   name: 'user',
@@ -309,6 +309,8 @@ export default {
       postOptions: [],
       // 角色选项
       roleOptions: [],
+      // 所属公司选项
+      remarkOptions: [],
       // 表单参数
       form: {},
       defaultProps: {
@@ -396,6 +398,9 @@ export default {
     })
     this.getConfigKey('sys.user.initPassword').then((response) => {
       this.initPassword = response.data
+    })
+    listCompany({pageSize:999}).then((response) => {
+      this.remarkOptions = response.data.result
     })
   },
   methods: {
