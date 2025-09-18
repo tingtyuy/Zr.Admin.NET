@@ -225,7 +225,7 @@ namespace ZR.Service.Business
         private static Expressionable<TbResult> QueryExp(TbResultQueryDto parm)
         {
             var predicate = Expressionable.Create<TbResult>();
-
+            predicate.And(w => w.CompanyId == parm.CompanyId);
             return predicate;
         }
     }

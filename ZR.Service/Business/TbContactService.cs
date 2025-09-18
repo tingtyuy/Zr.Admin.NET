@@ -122,6 +122,7 @@ namespace ZR.Service.Business
             var predicate = Expressionable.Create<TbContact>();
             predicate.AndIF(!string.IsNullOrEmpty(parm.群名称), m => m.群名称.Contains(parm.群名称));
             predicate.AndIF(parm.IsMatch.HasValue, m => m.IsMatch == parm.IsMatch);
+            predicate.And(w => w.CompanyId == parm.CompanyId);
             return predicate;
         }
     }

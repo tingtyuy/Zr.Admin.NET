@@ -13,6 +13,7 @@ namespace ZR.Model.Business.Dto
         public string 处理状态 { get; set; }
         public string 单号 { get; set; }
 
+        public string CompanyId { get; set; }
         public string 商家名称 { get; set; }
 
         /// <summary>

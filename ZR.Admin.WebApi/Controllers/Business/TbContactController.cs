@@ -4,6 +4,7 @@ using ZR.Model.Business;
 using ZR.Model.Business.Dto;
 using ZR.Service.Business;
 using ZR.Service.Business.IBusinessService;
+using ZR.ServiceCore.Services;
 
 //创建时间：2025-09-03
 namespace ZR.Admin.WebApi.Controllers.Business
@@ -19,11 +20,13 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// </summary>
         private readonly ITbContactService _TbContactService;
         private readonly ITbWxGroupMemberService _tbWxGroupMemberService;
+        private readonly ISysUserService  sysUserService;
 
-        public TbContactController(ITbContactService TbContactService, ITbWxGroupMemberService tbWxGroupMemberService)
+        public TbContactController(ITbContactService TbContactService, ITbWxGroupMemberService tbWxGroupMemberService, ISysUserService sysUserService)
         {
             _TbContactService = TbContactService;
             _tbWxGroupMemberService = tbWxGroupMemberService;
+            this.sysUserService = sysUserService;
         }
 
         /// <summary>
@@ -35,6 +38,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         //[ActionPermissionFilter(Permission = "tbcontact:list")]
         public IActionResult QueryTbContact([FromQuery] TbContactQueryDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             var response = _TbContactService.GetList(parm);
             return SUCCESS(response);
         }
@@ -64,6 +70,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [Log(Title = "", BusinessType = BusinessType.INSERT)]
         public IActionResult AddTbContact([FromBody] TbContactDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             var modal = parm.Adapt<TbContact>().ToCreate(HttpContext);
 
             var response = _TbContactService.AddTbContact(modal);
@@ -80,6 +89,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [Log(Title = "", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateTbContact([FromBody] TbContactDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             var modal = parm.Adapt<TbContact>().ToUpdate(HttpContext);
             var response = _TbContactService.UpdateTbContact(modal);
 
@@ -95,6 +107,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
         public IActionResult MatchTbContact([FromBody] TbContactMatchDto parm)
         {
             //var modal = parm.Adapt<TbContact>().ToUpdate(HttpContext);
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
             _tbWxGroupMemberService.Update(w => w.ContactId == parm.Id, a => new TbWxGroupMember
             {
                 IsInternal = false
@@ -118,7 +132,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 发件人匹配 = parm.发件人匹配,
                 联系电话匹配 = parm.联系电话匹配,
                 地址匹配 = parm.地址匹配,
-                MatchParam = parm.MatchParam
+                MatchParam = parm.MatchParam,
+                CompanyId=user.Remark
 
             });
 

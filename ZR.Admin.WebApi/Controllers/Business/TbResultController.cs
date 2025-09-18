@@ -4,6 +4,7 @@ using ZR.Model.Business;
 using ZR.Model.Business.Dto;
 using ZR.Service.Business;
 using ZR.Service.Business.IBusinessService;
+using ZR.ServiceCore.Services;
 
 //创建时间：2025-08-25
 namespace ZR.Admin.WebApi.Controllers.Business
@@ -19,10 +20,13 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// </summary>
         private readonly ITbResultService _TbResultService;
         private readonly ITbContactService _tbContactService;
-        public TbResultController(ITbResultService TbResultService, ITbContactService tbContactService)
+        private readonly ISysUserService sysUserService;
+
+        public TbResultController(ITbResultService TbResultService, ITbContactService tbContactService, ISysUserService sysUserService)
         {
             _TbResultService = TbResultService;
             _tbContactService = tbContactService;
+            this.sysUserService = sysUserService;
         }
 
         /// <summary>
@@ -34,6 +38,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [ActionPermissionFilter(Permission = "tbresult:list")]
         public IActionResult QueryTbResult([FromQuery] TbResultQueryDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             var response = _TbResultService.GetList(parm);
             return SUCCESS(response);
         }
@@ -47,6 +54,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         //[ActionPermissionFilter(Permission = "tbresult:distinctlist")]
         public async Task<IActionResult> QueryTbResultDistinctList([FromQuery] TbResultQueryDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             var response = await _TbResultService.GetDistinctList(parm);
             return SUCCESS(response);
         }
@@ -77,6 +87,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [Log(Title = "", BusinessType = BusinessType.INSERT)]
         public IActionResult AddTbResult([FromBody] TbResultDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             var modal = parm.Adapt<TbResult>().ToCreate(HttpContext);
 
             var response = _TbResultService.AddTbResult(modal);
@@ -92,6 +105,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [Log(Title = "", BusinessType = BusinessType.INSERT)]
         public IActionResult Match([FromBody] TbResultMatchDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             if (parm.Ids.Any())
             {
                 foreach (var item in parm.Ids)
@@ -138,6 +154,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [Log(Title = "", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateTbResult([FromBody] TbResultDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             var modal = parm.Adapt<TbResult>().ToUpdate(HttpContext);
             var response = _TbResultService.UpdateTbResult(modal);
 
