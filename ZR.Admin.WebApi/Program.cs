@@ -13,6 +13,9 @@ using ZR.Infrastructure.WebExtensions;
 using ZR.ServiceCore.Signalr;
 using ZR.ServiceCore.SqlSugar;
 using ZR.Mall;
+using Refit;
+using ZR.ServiceCore.WxBot;
+using ZR.ServiceCore.Ollama;
 //using SQLitePCL;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -89,6 +92,28 @@ builder.Services.AddSwaggerConfig();
 builder.Services.AddLogo();
 // 添加本地化服务
 builder.Services.AddLocalization(options => options.ResourcesPath = "");
+
+#region WxBotService
+// 在 Program.cs 或 Startup.cs 中注册
+builder.Services.AddRefitClient<IWxServerHubAPI>()
+    .ConfigureHttpClient(c =>
+    {
+        c.BaseAddress = new Uri("http://127.0.0.1:9999/");
+        //c.DefaultRequestHeaders.Add("User-Agent", "MyApp");
+    });
+
+IWxServerHubAPI wxServerHubAPI = builder.Services.BuildServiceProvider().GetRequiredService<IWxServerHubAPI>();
+await wxServerHubAPI.PostCallBack(new CallBackRequestModel() { callback = "http://localhost:8888/wxbot/post" });
+builder.Services.AddRefitClient<IOllamaHubAPI>()
+    .ConfigureHttpClient(c =>
+    {
+        c.BaseAddress = new Uri("http://localhost:11434/api");
+        //c.DefaultRequestHeaders.Add("User-Agent", "MyApp");
+    });
+
+
+
+#endregion
 // 在应用程序启动的最开始处调用
 var app = builder.Build();
 InternalApp.ServiceProvider = app.Services;
