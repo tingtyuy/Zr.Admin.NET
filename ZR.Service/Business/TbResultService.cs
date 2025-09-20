@@ -56,8 +56,7 @@ namespace ZR.Service.Business
         {
             var predicate = QueryExp(parm);
             predicate.And(w => w.处理状态 != "已匹配" && w.处理状态 != "已处理");
-            predicate.And(w=>w.结果.Contains("【通知】中第【20】条指令出错：业务异常——该商家没有在【商家联系方式对应表.xlsx】中"));
-
+            predicate.And(w=>w.结果.Contains("业务异常——该商家没有在【商家联系方式对应表.xlsx】"));
             var list = Queryable()
                 .Where(predicate.ToExpression());
 

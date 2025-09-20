@@ -172,7 +172,7 @@ export default {
 }
 
 .height {
- max-height: 800px;
+ max-height: 700px;
  min-height: 660px;
  overflow: scroll;
 }
