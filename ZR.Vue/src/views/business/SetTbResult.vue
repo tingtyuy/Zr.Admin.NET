@@ -39,10 +39,10 @@
         </el-header>
         <el-main class="bordered">
           <el-row>
-            <el-col :span="7" class="bordered height">
+            <el-col :span="7" class="bordered">
               <TbContactComponent ref="leftComponentRef"></TbContactComponent>
             </el-col>
-            <el-col :span="17" class="bordered height">
+            <el-col :span="17" class="bordered">
               <TbResultComponent @refreshLeftList="refreshLeftListCallBack"></TbResultComponent>
             </el-col>
           </el-row>
@@ -171,9 +171,5 @@ export default {
   text-align: center;
 }
 
-.height {
- max-height: 700px;
- min-height: 660px;
- overflow: scroll;
-}
+
 </style>

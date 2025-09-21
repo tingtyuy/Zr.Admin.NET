@@ -19,7 +19,7 @@
     </el-form>
 
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick"
-      style=" margin-top: 10px;">
+      style=" margin-top: 10px;" class="height">
 
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
 
@@ -392,6 +392,12 @@ export default {
 };
 </script>
 <style>
+.height {
+  max-height: 700px;
+  min-height: 660px;
+  overflow: scroll;
+}
+
 .el-table .warning-row {
   background: oldlace;
 }

@@ -9,7 +9,8 @@
 <template>
   <div class="app-container">
     <!-- 数据区域 -->
-    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick">
+    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick"
+      class="height">
       <el-table-column prop="count" label="问题件数量" align="center" :show-overflow-tooltip="true" width="100" />
       <el-table-column prop="replyMessage" label="待转发信息" align="center" :show-overflow-tooltip="true" />
       <el-table-column label="匹配" align="center" width="100">
@@ -382,3 +383,10 @@ export default {
   },
 };
 </script>
+<style scoped>
+.height {
+  max-height: 500px;
+  min-height: 465px;
+  overflow: hidden;
+}
+</style>
