@@ -11,15 +11,22 @@
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
       <el-row>
-
-        <el-col :span="4">
+        <el-col :span="14">
+          <el-form-item>
+            <el-input v-model="queryParams.群名称" placeholder="群名称" clearable />
+          </el-form-item>
+        </el-col>
+        <el-col :span="5">
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        </el-col>
+        <el-col :span="5">
           <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
         </el-col>
       </el-row>
     </el-form>
 
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick"
-      style=" margin-top: 10px;" class="height" >
+      style=" margin-top: 10px;" class="height">
 
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
 
@@ -352,7 +359,7 @@ export default {
           })
 
       } catch (error) {
-          t.$emit('isSet', false);
+        t.$emit('isSet', false);
         console.error("Error in matchTbContact:", error);
         t.msgError("设置匹配规则失败");
 
@@ -384,12 +391,12 @@ export default {
 };
 </script>
 <style>
-.height
-{
- max-height: 500px;
- min-height: 460px;
- overflow: scroll;
+.height {
+  max-height: 500px;
+  min-height: 460px;
+  overflow: scroll;
 }
+
 .el-table .warning-row {
   background: oldlace;
 }

@@ -11,8 +11,15 @@
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
       v-show="showSearch" @submit.native.prevent>
       <el-row>
-
-        <el-col :span="4">
+        <el-col :span="14">
+          <el-form-item>
+            <el-input v-model="queryParams.群名称" placeholder="群名称" clearable />
+          </el-form-item>
+        </el-col>
+        <el-col :span="5">
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        </el-col>
+        <el-col :span="5">
           <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
         </el-col>
       </el-row>
