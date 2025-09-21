@@ -12,7 +12,7 @@
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick"
       class="height">
       <el-table-column prop="count" label="问题件数量" align="center" :show-overflow-tooltip="true" width="100" />
-      <el-table-column prop="replyMessage" label="待转发信息" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="反馈信息" label="待转发信息" align="center" :show-overflow-tooltip="true" />
       <el-table-column label="匹配" align="center" width="100">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="匹配客户群"
@@ -28,6 +28,17 @@
       <TbContactMatchComponent ref="matchComponent" @rowClick="rowClickCallBack" @isSet="isSetCallBack">
       </TbContactMatchComponent>
       <el-button type="primary" @click="matchForm">确 定</el-button>
+      <el-button icon="el-icon-refresh" @click="handleForward">转发商户</el-button>
+    </el-dialog>
+
+    <!-- 转发对话框 -->
+    <el-dialog :title="forwardTitle" :lock-scroll="false" :visible.sync="forward" width="450px" :center="true">
+      <el-input v-model="forwardForm.replyMessage" type="textarea" size="medium" rows="10" />
+      <div slot="footer" class="dialog-footer">
+        <el-button type="text" @click="forwardCancel">关 闭</el-button>
+        <el-button type="primary" v-clipboard="forwardForm.replyMessage" v-clipboard:success="clipboardSuccess">复
+          制</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -51,6 +62,9 @@ export default {
   },
   data() {
     return {
+      forwardTitle: "",
+      forward: false,
+      forwardForm: {},
       isSet: false,
       row: {},
       row2: {},
@@ -162,6 +176,43 @@ export default {
     ];
   },
   methods: {
+    clipboardSuccess() {
+      this.$message({
+        message: '复制成功',
+        type: 'success'
+      });
+
+      this.forwardCancel();
+      this.open = false;
+      this.getList();
+    },
+    forwardCancel() {
+      this.forward = false;
+    },
+    // handleForward() {
+    //   let page = this;
+    //   if (page.ids.length == 0) {
+    //     page.$message({
+    //       message: '警告，请至少选择一条数据进行操作',
+    //       type: 'warning'
+    //     });
+    //     return;
+    //   }
+
+    //   page.$confirm('是否确认转发选中的数据？')
+    //     .then(function () {
+
+    //       page.forward = true;
+
+    //       // forwardMessage(page.ids.toString()).then(res => {
+    //       //   if (res.code == 200) {
+    //       page.forwardTitle = ``;
+    //       page.forwardForm.replyMessage = page.row.replyMessage;
+    //       page.msgSuccess("转发成功");
+    //     })
+
+
+    // },
     matchForm() {
       if (this.row2.群名称 != undefined) {
         if (this.row2.isMatch != 1) {
@@ -217,31 +268,20 @@ export default {
     },
     // 转发商户
     handleForward() {
-      let page = this;
-      if (page.ids.length == 0) {
-        page.$message({
-          message: '警告，请至少选择一条数据进行操作',
-          type: 'warning'
-        });
-        return;
-      }
-
-      page.$confirm('是否确认转发选中的数据？')
-        .then(function () {
-
-          page.forward = true;
-
-          forwardMessage(page.ids.toString()).then(res => {
+      this.$confirm('是否确认转发吗？')
+        .then(() => {
+          copyMessage(this.row.ids).then(res => {
             if (res.code == 200) {
-              page.forwardTitle = `${res.data.bussinessName} ${res.data.sendUser}`;
-              page.forwardForm = res.data;
+              this.forward = true;
+              this.forwardTitle = "";
+              this.forwardForm.replyMessage = this.row.replyMessage;
+
             }
           })
-
-
-          // this.msgSuccess("转发成功");
         })
-        .catch((e) => { console.log(e) });
+        .catch(() => { });
+
+
     },
     // 查询数据
     getList() {

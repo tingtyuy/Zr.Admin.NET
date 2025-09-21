@@ -99,7 +99,8 @@ namespace ZR.Service.Business
             {
                 var firstModel= item.list.FirstOrDefault();
                 item.ids = GetIds(item.商家名称, item.收件人信息).ToList();
-                item.ReplyMessage =$"{item.商家名称} {item.收件人信息} {firstModel.单号} {firstModel.反馈信息}" ;
+                item.反馈信息 = $"{item.商家名称} {item.收件人信息} {firstModel.单号} {firstModel.反馈信息}" ;
+                item.ReplyMessage =await GetForwardMessage(item.商家名称, item.收件人信息);
             }
             return response;
         }
@@ -155,7 +156,7 @@ namespace ZR.Service.Business
         /// <returns></returns>
         public int UpdateTbResultStatus(long[] idArr)
         {
-            return Update(w => idArr.Contains(w.Id), c => new TbResult() { 处理状态 = "已处理" });
+            return Update(w => idArr.Contains(w.Id), c => new TbResult() { 处理状态 = "已匹配" });
 
         }
         /// <summary>

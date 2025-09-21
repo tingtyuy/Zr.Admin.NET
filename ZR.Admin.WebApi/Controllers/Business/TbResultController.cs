@@ -194,7 +194,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// </summary>
         /// <returns></returns>
         [HttpPost("copy/{ids}")]
-        [ActionPermissionFilter(Permission = "tbresult:copy")]
+        //[ActionPermissionFilter(Permission = "tbresult:copy")]
         [Log(Title = "", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateTbResultStatus([FromRoute] string ids)
         {
