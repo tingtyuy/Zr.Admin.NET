@@ -74,7 +74,7 @@ namespace ZR.Service.Business
 
 
 
-            }).OrderBy(o=>o.count);
+            }).OrderByDescending(o=>o.count);
 
             //groupList.Select(s=> new TbResultDistinctDto
             //{

@@ -95,7 +95,7 @@ export default {
         问题件类别: '',
         收件人信息: '',
         pageNum: 1,
-        pageSize: 12,
+        pageSize: 10,
         sort: undefined,
         sortType: undefined,
       },
@@ -427,6 +427,6 @@ export default {
 .height {
   max-height: 500px;
   min-height: 465px;
-  overflow: hidden;
+  overflow: scroll;
 }
 </style>

@@ -24,7 +24,11 @@
         </el-col>
       </el-row>
     </el-form>
-
+    <el-row  class="mb8">
+      <el-col :offset="20" :span="2">
+      <el-tag type="info">总数: {{ total }}</el-tag>
+      </el-col>
+    </el-row>
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick"
       style=" margin-top: 10px;" class="height">
 
@@ -46,9 +50,9 @@
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
             <el-form-item style="text-align: left;">
-              <el-tag type="info">1、此处用于输入新建的商户群</el-tag>
-              <el-tag type="info">2、确保机器人微信号已经在新建的这个商户群里了</el-tag>
-              <el-tag type="info">3、确保输入的商户群名是正确的</el-tag>
+              <el-tag type="danger">1、此处用于输入新建的商户群</el-tag>
+              <el-tag type="danger">2、确保机器人微信号已经在新建的这个商户群里了</el-tag>
+              <el-tag type="danger">3、确保输入的商户群名是正确的</el-tag>
             </el-form-item>
 
           </el-col>
@@ -154,6 +158,7 @@ export default {
   components: { TbWxGroupMemberComponent },
   data() {
     return {
+    total:0,
       labelWidth: "100px",
       formLabelWidth: "100px",
       // 选中id数组

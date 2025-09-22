@@ -46,6 +46,11 @@
             <el-form-item label="群名称" prop="群名称">
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
+            <el-form-item style="text-align: left;">
+              <el-tag type="danger">1、此处用于输入新建的商户群</el-tag>
+              <el-tag type="danger">2、确保机器人微信号已经在新建的这个商户群里了</el-tag>
+              <el-tag type="danger">3、确保输入的商户群名是正确的</el-tag>
+            </el-form-item>
           </el-col>
         </el-row>
       </el-form>
