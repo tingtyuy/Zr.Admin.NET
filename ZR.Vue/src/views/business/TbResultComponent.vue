@@ -239,6 +239,11 @@ export default {
         return;
       }
       var paramObj = { ...this.row, ...this.row2 };
+      if((paramObj.商家名称==undefined || paramObj.商家名称=='') || (paramObj.收件人信息==undefined || paramObj.收件人信息=='')){
+        console.log(商家名称或收件人信息不能为空);
+        console.log(paramObj);
+        return;
+      }
       matchResult(paramObj).then(res => {
         if (res.code == 200) {
           this.$message({
