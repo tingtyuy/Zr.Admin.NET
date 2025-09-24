@@ -8,6 +8,7 @@ namespace ZR.Service.Business.IBusinessService
     /// </summary>
     public interface ITbContactService : IBaseService<TbContact>
     {
+        PagedInfo<TbContactDto> GetList2(TbContactQueryDto parm);
         PagedInfo<TbContactDto> GetList(TbContactQueryDto parm);
 
         TbContact GetInfo(int Id);

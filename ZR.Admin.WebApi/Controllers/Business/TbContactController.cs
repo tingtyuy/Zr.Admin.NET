@@ -29,6 +29,21 @@ namespace ZR.Admin.WebApi.Controllers.Business
             this.sysUserService = sysUserService;
         }
 
+
+        /// <summary>
+        /// 查询列表2
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("list2")]
+
+        public IActionResult QueryTbContact2([FromQuery] TbContactQueryDto parm)
+        {
+            var response = _TbContactService.GetList2(parm);
+            return SUCCESS(response);
+        }
+
+
         /// <summary>
         /// 查询列表
         /// </summary>

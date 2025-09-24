@@ -23,6 +23,22 @@ namespace ZR.Service.Business
         {
             _sysDictDataService = sysDictDataService;
         }
+        /// <summary>
+        /// 查询列表2
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public PagedInfo<TbContactDto> GetList2(TbContactQueryDto parm)
+        {
+            var predicate = QueryExp(parm);
+
+            var response = Queryable()
+                .Where(predicate.ToExpression())
+                .ToPage<TbContact, TbContactDto>(parm);
+
+            return response;
+        }
+
 
         /// <summary>
         /// 查询列表
@@ -36,11 +52,11 @@ namespace ZR.Service.Business
             predicate.And(w => w.IsEnable == false || w.IsEnable == null );
             //parm.Sort = "群名称";
 
-            var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression());
+            var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression()).OrderBy("CONVERT(`群名称` USING gbk)");
 
             var response = list.ToPage<TbContact, TbContactDto>(parm);
             response.Result = response.Result
-           .OrderBy(x => string.IsNullOrEmpty(x.群名称)?"": TinyPinyin.PinyinHelper.GetPinyinInitials(x.群名称), StringComparer.OrdinalIgnoreCase)
+           
            .ToList();
 
             foreach (var result in response.Result)

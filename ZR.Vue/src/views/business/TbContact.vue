@@ -10,7 +10,11 @@
   <div class="app-container">
     <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px" v-show="showSearch"
       @submit.native.prevent>
-
+        <!-- <el-col :span="14"> -->
+          <el-form-item>
+            <el-input v-model="queryParams.群名称" placeholder="群名称" clearable />
+          </el-form-item>
+        <!-- </el-col> -->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <!-- <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button> -->
@@ -31,25 +35,25 @@
 
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="50" align="center"/>
-      <el-table-column prop="客户" label="客户" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="客户商家名称" label="客户商家名称" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="对接方式" label="对接方式" align="center" :show-overflow-tooltip="true" />
+      <!-- <el-table-column type="selection" width="50" align="center"/> -->
+      <!-- <el-table-column prop="客户" label="客户" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="客户商家名称" label="客户商家名称" align="center" :show-overflow-tooltip="true" /> -->
+      <!-- <el-table-column prop="对接方式" label="对接方式" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="是否直接退回" label="是否直接退回" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="isEnable" label="启用状态：0启用，1禁用" align="center">
+      <!-- <el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="是否直接退回" label="是否直接退回" align="center" :show-overflow-tooltip="true" /> -->
+      <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
+      <el-table-column prop="isEnable" label="启用状态" align="center" width="200">
         <template slot-scope="scope">
-          <dict-tag :options=" isEnableOptions" :value="scope.row.isEnable" />
+          {{ scope.row.isEnable=1?'禁用':'启用' }}
         </template>
       </el-table-column>
-      <el-table-column prop="matchParam" label="匹配参数" align="center" />
+      <!-- <el-table-column prop="matchParam" label="匹配参数" align="center" />
       <el-table-column prop="isMatch" label="是否匹配：0启用，1禁用" align="center">
         <template slot-scope="scope">
           <dict-tag :options=" isMatchOptions" :value="scope.row.isMatch" />
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
@@ -63,11 +67,11 @@
     <pagination class="mt10" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" >
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open"  width="400px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row :gutter="20">
+        <el-row >
 
-          <el-col :lg="12">
+          <!-- <el-col :lg="12">
             <el-form-item label="客户" prop="客户">
               <el-input v-model="form.客户" placeholder="请输入客户" />
             </el-form-item>
@@ -83,15 +87,15 @@
             <el-form-item label="对接方式" prop="对接方式">
               <el-input v-model="form.对接方式" placeholder="请输入对接方式" />
             </el-form-item>
-          </el-col>
+          </el-col> -->
 
-          <el-col :lg="12">
+          <el-col :lg="24">
             <el-form-item label="群名称" prop="群名称">
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
           </el-col>
 
-          <el-col :lg="12">
+          <!-- <el-col :lg="12">
             <el-form-item label="联系人" prop="联系人">
               <el-input v-model="form.联系人" placeholder="请输入联系人" />
             </el-form-item>
@@ -107,17 +111,17 @@
             <el-form-item label="CompanyId" prop="companyId">
               <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
             </el-form-item>
-          </el-col>
+          </el-col> -->
 
-          <el-col :lg="12">
-            <el-form-item label="启用状态：0启用，1禁用" prop="isEnable">
+          <!-- <el-col :lg="12">
+            <el-form-item label="启用状态" prop="isEnable">
               <el-radio-group v-model="form.isEnable">
                 <el-radio v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictValue">{{item.dictLabel}}</el-radio>
               </el-radio-group>
             </el-form-item>
-          </el-col>
+          </el-col> -->
 
-          <el-col :lg="12">
+          <!-- <el-col :lg="12">
             <el-form-item label="匹配参数" prop="matchParam">
               <el-input v-model="form.matchParam" placeholder="请输入匹配参数" />
             </el-form-item>
@@ -129,7 +133,7 @@
                 <el-radio v-for="item in isMatchOptions" :key="item.dictValue" :label="item.dictValue">{{item.dictLabel}}</el-radio>
               </el-radio-group>
             </el-form-item>
-          </el-col>
+          </el-col> -->
 
         </el-row>
       </el-form>
