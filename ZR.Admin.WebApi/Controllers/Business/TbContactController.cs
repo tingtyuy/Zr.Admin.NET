@@ -39,6 +39,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
 
         public IActionResult QueryTbContact2([FromQuery] TbContactQueryDto parm)
         {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
             var response = _TbContactService.GetList2(parm);
             return SUCCESS(response);
         }

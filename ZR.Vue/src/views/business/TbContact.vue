@@ -8,13 +8,19 @@
 -->
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px" v-show="showSearch"
-      @submit.native.prevent>
-        <!-- <el-col :span="14"> -->
-          <el-form-item>
-            <el-input v-model="queryParams.群名称" placeholder="群名称" clearable />
-          </el-form-item>
-        <!-- </el-col> -->
+    <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
+      v-show="showSearch" @submit.native.prevent>
+      <!-- <el-col :span="14"> -->
+      <el-form-item>
+        <el-input v-model="queryParams.客户" placeholder="客户" clearable />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="queryParams.客户商家名称" placeholder="客户商家名称" clearable />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="queryParams.群名称" placeholder="群名称" clearable />
+      </el-form-item>
+      <!-- </el-col> -->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <!-- <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button> -->
@@ -22,32 +28,36 @@
     </el-form>
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" v-hasPermi="['tbcontact:add']" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+        <el-button type="primary" v-hasPermi="['tbcontact:add']" plain icon="el-icon-plus" size="mini"
+          @click="handleAdd">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="success" :disabled="single" v-hasPermi="['tbcontact:edit']" plain icon="el-icon-edit" size="mini" @click="handleUpdate">修改</el-button>
+        <el-button type="success" :disabled="single" v-hasPermi="['tbcontact:edit']" plain icon="el-icon-edit"
+          size="mini" @click="handleUpdate">修改</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="danger" :disabled="multiple" v-hasPermi="['tbcontact:delete']" plain icon="el-icon-delete" size="mini" @click="handleDelete">删除</el-button>
+        <el-button type="danger" :disabled="multiple" v-hasPermi="['tbcontact:delete']" plain icon="el-icon-delete"
+          size="mini" @click="handleDelete">删除</el-button>
       </el-col>
       <!-- <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
     </el-row>
 
     <!-- 数据区域 -->
-    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange" @selection-change="handleSelectionChange">
+    <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
+      @selection-change="handleSelectionChange">
       <!-- <el-table-column type="selection" width="50" align="center"/> -->
-      <!-- <el-table-column prop="客户" label="客户" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="客户商家名称" label="客户商家名称" align="center" :show-overflow-tooltip="true" /> -->
+      <el-table-column prop="客户" label="客户" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="客户商家名称" label="客户商家名称" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="对接方式" label="对接方式" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-      <!-- <el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" />
+      <!-- <!-- <el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="是否直接退回" label="是否直接退回" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="isEnable" label="启用状态" align="center" width="200">
         <template slot-scope="scope">
           {{ scope.row.isEnable=0?'禁用':'启用' }}
         </template>
-      </el-table-column> -->
+</el-table-column> -->
       <!-- <el-table-column prop="matchParam" label="匹配参数" align="center" />
       <el-table-column prop="isMatch" label="是否匹配：0启用，1禁用" align="center">
         <template slot-scope="scope">
@@ -64,12 +74,13 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination class="mt10" background :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    <pagination class="mt10" background :total="total" :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open"  width="400px" :close-on-click-modal="false">
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="400px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row >
+        <el-row>
 
           <!-- <el-col :lg="12">
             <el-form-item label="客户" prop="客户">
@@ -148,7 +159,7 @@
 </template>
 <script>
 import {
-  listTbContact,
+  listTbContact2,
   addTbContact,
   delTbContact,
   updateTbContact,
@@ -160,7 +171,7 @@ export default {
   data() {
     return {
       labelWidth: "100px",
-      formLabelWidth:"100px",
+      formLabelWidth: "100px",
       // 选中id数组
       ids: [],
       // 非单个禁用
@@ -187,21 +198,21 @@ export default {
       // 表单参数
       form: {},
       columns: [
-        { index: 0, key: '客户', label: `客户`, checked:  true  },
-        { index: 1, key: '客户商家名称', label: `客户商家名称`, checked:  true  },
-        { index: 2, key: '对接方式', label: `对接方式`, checked:  true  },
-        { index: 3, key: '群名称', label: `群名称`, checked:  true  },
-        { index: 4, key: '联系人', label: `联系人`, checked:  true  },
-        { index: 5, key: '是否直接退回', label: `是否直接退回`, checked:  true  },
-        { index: 6, key: 'companyId', label: `CompanyId`, checked:  true  },
-        { index: 7, key: 'isEnable', label: `启用状态：0启用，1禁用`, checked:  true  },
-        { index: 8, key: 'matchParam', label: `匹配参数`, checked:  true  },
-        { index: 9, key: 'isMatch', label: `是否匹配：0启用，1禁用`, checked:  false  },
+        { index: 0, key: '客户', label: `客户`, checked: true },
+        { index: 1, key: '客户商家名称', label: `客户商家名称`, checked: true },
+        { index: 2, key: '对接方式', label: `对接方式`, checked: true },
+        { index: 3, key: '群名称', label: `群名称`, checked: true },
+        { index: 4, key: '联系人', label: `联系人`, checked: true },
+        { index: 5, key: '是否直接退回', label: `是否直接退回`, checked: true },
+        { index: 6, key: 'companyId', label: `CompanyId`, checked: true },
+        { index: 7, key: 'isEnable', label: `启用状态：0启用，1禁用`, checked: true },
+        { index: 8, key: 'matchParam', label: `匹配参数`, checked: true },
+        { index: 9, key: 'isMatch', label: `是否匹配：0启用，1禁用`, checked: false },
       ],
       // 启用状态：0启用，1禁用选项列表 格式 eg:{ dictLabel: '标签', dictValue: '0'}
-isEnableOptions: [],
+      isEnableOptions: [],
       // 是否匹配：0启用，1禁用选项列表 格式 eg:{ dictLabel: '标签', dictValue: '0'}
-isMatchOptions: [],
+      isMatchOptions: [],
       dataList: [],
       total: 0,
       rules: {
@@ -219,13 +230,13 @@ isMatchOptions: [],
     // 查询数据
     getList() {
       this.loading = true;
-      listTbContact(this.queryParams).then(res => {
-         if (res.code == 200) {
-           this.dataList = res.data.result;
-           this.total = res.data.totalNum;
-           this.loading = false;
-         }
-       })
+      listTbContact2(this.queryParams).then(res => {
+        if (res.code == 200) {
+          this.dataList = res.data.result;
+          this.total = res.data.totalNum;
+          this.loading = false;
+        }
+      })
     },
     // 取消按钮
     cancel() {
@@ -260,7 +271,7 @@ isMatchOptions: [],
       this.single = selection.length != 1
       this.multiple = !selection.length;
     },
-     // 自定义排序
+    // 自定义排序
     sortChange(column) {
       if (column.prop == null || column.order == null) {
         this.queryParams.sort = undefined;
@@ -296,7 +307,7 @@ isMatchOptions: [],
           this.handleQuery();
           this.msgSuccess("删除成功");
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -325,14 +336,14 @@ isMatchOptions: [],
                 this.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
-            })
+              })
           } else {
             addTbContact(this.form)
               .then((res) => {
                 this.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
-            })
+              })
           }
         }
       });

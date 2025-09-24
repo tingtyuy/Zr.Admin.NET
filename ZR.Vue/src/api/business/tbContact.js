@@ -13,6 +13,18 @@ export function listTbContact(query) {
 }
 
 /**
+ * 分页查询2
+ * @param {查询条件} data
+ */
+export function listTbContact2(query) {
+  return request({
+    url: 'business/TbContact/list2',
+    method: 'get',
+    params: query,
+  })
+}
+
+/**
  * 新增
  * @param data
  */
