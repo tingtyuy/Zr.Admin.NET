@@ -30,7 +30,7 @@
       <el-col :span="1.5">
         <el-button type="danger" :disabled="multiple" v-hasPermi="['tbcontact:delete']" plain icon="el-icon-delete" size="mini" @click="handleDelete">删除</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <!-- <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
     </el-row>
 
     <!-- 数据区域 -->
@@ -43,11 +43,11 @@
       <!-- <el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="是否直接退回" label="是否直接退回" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="isEnable" label="启用状态" align="center" width="200">
+      <!-- <el-table-column prop="isEnable" label="启用状态" align="center" width="200">
         <template slot-scope="scope">
-          {{ scope.row.isEnable=1?'禁用':'启用' }}
+          {{ scope.row.isEnable=0?'禁用':'启用' }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <!-- <el-table-column prop="matchParam" label="匹配参数" align="center" />
       <el-table-column prop="isMatch" label="是否匹配：0启用，1禁用" align="center">
         <template slot-scope="scope">
@@ -116,6 +116,7 @@
           <!-- <el-col :lg="12">
             <el-form-item label="启用状态" prop="isEnable">
               <el-radio-group v-model="form.isEnable">
+
                 <el-radio v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictValue">{{item.dictLabel}}</el-radio>
               </el-radio-group>
             </el-form-item>
