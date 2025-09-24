@@ -18,5 +18,6 @@ namespace ZR.Service.Business.IBusinessService
         int UpdateTbResultStatus(long[] idArr);
         Task<ReplyMessageDto> GetForwardMessageResult(long[] idArr);
        Task<PagedInfo<TbResultDistinctDto>> GetDistinctList(TbResultQueryDto parm);
+        PagedInfo<TbResultDto> GetList2(TbResultQueryDto parm);
     }
 }

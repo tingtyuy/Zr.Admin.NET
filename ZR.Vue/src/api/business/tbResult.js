@@ -12,6 +12,18 @@ export function listTbResult(query) {
   })
 }
 
+/**
+ * 分页查询2
+ * @param {查询条件} data
+ */
+export function listTbResult2(query) {
+  return request({
+    url: 'business/TbResult/list2',
+    method: 'get',
+    params: query,
+  })
+}
+
 
 /**
  * 分页查询分组列表

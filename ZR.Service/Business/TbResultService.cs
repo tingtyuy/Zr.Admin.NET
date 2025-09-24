@@ -52,11 +52,43 @@ namespace ZR.Service.Business
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
+        public PagedInfo<TbResultDto> GetList2(TbResultQueryDto parm)
+        {
+            var predicate = QueryExp2(parm);
+
+            predicate.AndIF(!string.IsNullOrEmpty(parm.单号), m => m.单号.Contains(parm.单号));
+            predicate.AndIF(!string.IsNullOrEmpty(parm.商家名称), m => m.商家名称.Contains(parm.商家名称));
+            predicate.AndIF(!string.IsNullOrEmpty(parm.收件人信息), m => m.收件人信息.Contains(parm.收件人信息));
+            predicate.AndIF(!string.IsNullOrEmpty(parm.处理状态), m => m.处理状态 == parm.处理状态);
+            predicate.AndIF(parm.操作开始时间.HasValue, m => DateTime.Parse(m.操作时间) >= parm.操作开始时间);
+            predicate.AndIF(parm.操作结束时间.HasValue, m => DateTime.Parse(m.操作时间) <= parm.操作结束时间);
+            predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类别), m => m.问题件类别 == parm.问题件类别);
+            //predicate.AndIF(!string.IsNullOrEmpty(parm.问题件类型), m => m.问题件类型 == parm.问题件类型);
+            //predicate.And(w => DateTime.Parse(w.操作时间) >= DateTime.Now.AddDays(-7));
+
+            var response = Queryable().LeftJoin<TbContact>((a, b) => a.CompanyId == b.CompanyId && a.收件人信息 == b.客户 && a.商家名称 == b.客户商家名称)
+                .Select((a, b) => new TbResultDto
+                {
+                    单号 = a.单号,
+                    群名称 = b.群名称
+                }, true).MergeTable()
+                .Where(predicate.ToExpression())
+                .OrderByDescending(s => s.操作时间)
+                .ToPage(parm);
+
+            return response;
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
         public async Task<PagedInfo<TbResultDistinctDto>> GetDistinctList(TbResultQueryDto parm)
         {
             var predicate = QueryExp(parm);
             predicate.And(w => w.处理状态 != "已匹配" && w.处理状态 != "已处理");
-            predicate.And(w=>w.结果.Contains("业务异常——该商家没有在【商家联系方式对应表.xlsx】"));
+            predicate.And(w => w.结果.Contains("业务异常——该商家没有在【商家联系方式对应表.xlsx】"));
             var list = Queryable()
                 .Where(predicate.ToExpression());
 
@@ -74,7 +106,7 @@ namespace ZR.Service.Business
 
 
 
-            }).OrderByDescending(o=>o.count);
+            }).OrderByDescending(o => o.count);
 
             //groupList.Select(s=> new TbResultDistinctDto
             //{
@@ -97,10 +129,10 @@ namespace ZR.Service.Business
             var response = groupList.ToPage(parm);
             foreach (var item in response.Result)
             {
-                var firstModel= item.list.FirstOrDefault();
+                var firstModel = item.list.FirstOrDefault();
                 item.ids = GetIds(item.商家名称, item.收件人信息).ToList();
-                item.反馈信息 = $"{item.商家名称} {item.收件人信息} {firstModel.单号} {firstModel.反馈信息}" ;
-                item.ReplyMessage =await GetForwardMessage(item.商家名称, item.收件人信息);
+                item.反馈信息 = $"{item.商家名称} {item.收件人信息} {firstModel.单号} {firstModel.反馈信息}";
+                item.ReplyMessage = await GetForwardMessage(item.商家名称, item.收件人信息);
             }
             return response;
         }
@@ -225,6 +257,12 @@ namespace ZR.Service.Business
         private static Expressionable<TbResult> QueryExp(TbResultQueryDto parm)
         {
             var predicate = Expressionable.Create<TbResult>();
+            predicate.And(w => w.CompanyId == parm.CompanyId);
+            return predicate;
+        }
+        private static Expressionable<TbResultDto> QueryExp2(TbResultQueryDto parm)
+        {
+            var predicate = Expressionable.Create<TbResultDto>();
             predicate.And(w => w.CompanyId == parm.CompanyId);
             return predicate;
         }

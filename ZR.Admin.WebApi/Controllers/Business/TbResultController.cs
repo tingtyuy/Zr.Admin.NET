@@ -46,6 +46,20 @@ namespace ZR.Admin.WebApi.Controllers.Business
         }
 
         /// <summary>
+        /// 查询列表2
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("list2")]
+        public IActionResult QueryTbResult2([FromQuery] TbResultQueryDto parm)
+        {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
+            var response = _TbResultService.GetList2(parm);
+            return SUCCESS(response);
+        }
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="parm"></param>

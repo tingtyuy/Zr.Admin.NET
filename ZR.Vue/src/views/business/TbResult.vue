@@ -10,8 +10,14 @@
   <div class="app-container">
     <el-row :gutter="12" class="mb8">
       <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
-        v-show="showSearch" @submit.native.prevent>
-        <el-col :span="6">
+      v-show="showSearch" @submit.native.prevent>
+      <el-col :span="6">
+        <el-form-item label="运单号" prop="单号">
+          <el-input v-model="queryParams.单号" placeholder="请输入运单号" clearable :style="{ width: '100%' }">
+          </el-input>
+        </el-form-item>
+      </el-col>
+      <el-col :span="6">
           <el-form-item label="开始日期" prop="操作开始时间">
             <el-date-picker v-model="queryParams.操作开始时间" type="date" placeholder="开始日期" value-format="yyyy-MM-dd"
               clearable>
@@ -38,12 +44,6 @@
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="运单号" prop="单号">
-            <el-input v-model="queryParams.单号" placeholder="请输入运单号" clearable :style="{ width: '100%' }">
-            </el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
           <el-form-item label="处理状态" prop="处理状态">
             <el-select v-model="queryParams.处理状态" placeholder="请选择状态" clearable :style="{ width: '100%' }">
               <el-option v-for="(item, index) in 处理状态Options" :key="index" :label="item.label" :value="item.value"
@@ -60,14 +60,14 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <!-- <el-col :span="6">
           <el-form-item label="问题件类别" prop="问题件类别">
             <el-select v-model="queryParams.问题件类别" placeholder="请选择问题件类别" clearable :style="{ width: '100%' }">
               <el-option v-for="(item, index) in 问题件类别Options" :key="index" :label="item.label" :value="item.value"
                 :disabled="item.disabled"></el-option>
             </el-select>
           </el-form-item>
-        </el-col>
+        </el-col> -->
         <el-col :span="6" :offset="19">
           <el-button size="mini"  @click="clearAllCheck">清空选中状态</el-button>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -104,14 +104,14 @@
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="结果" label="结果" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" />
+      <!-- <el-table-column prop="结果" label="结果" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="操作时间" label="操作时间" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" />
+      <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
 
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
-          <el-button size="mini" v-hasPermi="['tbresult:edit']" type="success" icon="el-icon-edit" title="编辑"
+          <el-button size="mini" type="success" icon="el-icon-edit" title="编辑"
             @click="handleUpdate(scope.row)"></el-button>
           <el-button size="mini" v-hasPermi="['tbresult:delete']" type="danger" icon="el-icon-delete" title="删除"
             @click="handleDelete(scope.row)"></el-button>
@@ -195,7 +195,7 @@
 </template>
 <script>
 import {
-  listTbResult,
+  listTbResult2,
   addTbResult,
   delTbResult,
   updateTbResult,
@@ -265,6 +265,9 @@ export default {
       rules: {
       },
       处理状态Options: [{
+        "label": "已匹配",
+        "value": "已匹配"
+      },{
         "label": "已处理",
         "value": "已处理"
       }, {
@@ -358,7 +361,7 @@ export default {
     // 查询数据
     getList() {
       this.loading = true;
-      listTbResult(this.queryParams).then(res => {
+      listTbResult2(this.queryParams).then(res => {
         if (res.code == 200) {
           this.dataList = res.data.result;
           this.total = res.data.totalNum;

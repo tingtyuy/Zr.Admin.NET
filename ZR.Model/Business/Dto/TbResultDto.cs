@@ -65,6 +65,8 @@ namespace ZR.Model.Business.Dto
         public string 执行机器人 { get; set; }
 
         public string 操作时间 { get; set; }
+        public string 群名称 { get; set; }
+
 
         public string CompanyId { get; set; }
 
