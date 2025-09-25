@@ -46,7 +46,7 @@ namespace ZR.Service.Business
                     群名称 = a.群名称,
                     IsEnable = b.IsEnable,
                     Id=a.Id
-                })
+                },true)
                 .OrderBy(a => a.客户).OrderBy(a => a.客户商家名称);
 
             var response = list.ToPage<TbContact, TbContactDto>(parm);

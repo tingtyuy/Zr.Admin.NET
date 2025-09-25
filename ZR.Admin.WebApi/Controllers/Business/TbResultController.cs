@@ -119,6 +119,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [Log(Title = "", BusinessType = BusinessType.INSERT)]
         public IActionResult Match([FromBody] TbResultMatchDto parm)
         {
+
             long userId = HttpContext.GetUId();
             var user = sysUserService.SelectUserById(userId);
             parm.CompanyId = user.Remark;
@@ -128,6 +129,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 {
                     var model = _TbResultService.GetById(item);
                     model.处理状态 = "已匹配";
+                    model.account=user.NickName;
+                    model.匹配时间=DateTime.Now;
                     _TbResultService.Update(model);
                 }
             }
@@ -153,6 +156,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
             tbContactModel.客户商家名称 = parm.商家名称;
             tbContactModel.对接方式 = "微信";
             tbContactModel.群名称 = parm.群名称;
+            tbContactModel.account = user.NickName;
+            tbContactModel.匹配时间 = DateTime.Now;
 
 
             var response = _tbContactService.AddTbContact(tbContactModel);

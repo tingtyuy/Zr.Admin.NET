@@ -77,6 +77,9 @@ namespace ZR.Model.Business.Dto
         public bool 联系电话匹配 { get; set; }
 
         public bool 地址匹配 { get; set; }
+        public string account { get; set; }
+
+        public DateTime? 匹配时间 { get; set; }
         public List<TbWxGroupMember>? TbWxGroupMembers { get; set; } 
     }
 
