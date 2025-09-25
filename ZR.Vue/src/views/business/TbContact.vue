@@ -60,7 +60,8 @@
       <!-- <el-table-column prop="对接方式" label="对接方式" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
       <!--<el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" /> -->
-      <!-- <el-table-column prop="是否直接退回" label="是否直接退回" align="center" :show-overflow-tooltip="true" />  -->
+      <el-table-column prop="account" label="操作员" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="匹配时间" label="匹配时间" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="isEnable" label="私人群" align="center" width="200">
         <template slot-scope="scope">
