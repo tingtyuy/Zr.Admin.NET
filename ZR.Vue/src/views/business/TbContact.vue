@@ -111,6 +111,7 @@
 
           <el-col :lg="22">
             <el-form-item label="群名称" prop="群名称">
+              <el-tag type="danger">请注意，在此修改群名后，务必与真实商户群的名字一致</el-tag>
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
           </el-col>
@@ -132,7 +133,6 @@
               <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
             </el-form-item>
           </el-col> -->
-
           <el-col :lg="12">
             <el-form-item label="私人群" prop="isEnable">
               <el-select v-model="form.isEnable" placeholder="私人群" clearable>

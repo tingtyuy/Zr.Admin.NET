@@ -104,6 +104,7 @@
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="结果" label="结果" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="操作时间" label="操作时间" align="center" :show-overflow-tooltip="true" />
@@ -230,7 +231,7 @@ export default {
         操作结束时间: '',
         商家名称: '',
         单号: '',
-        处理状态: '',
+        处理状态: '已处理',
         问题件类型: '',
         问题件类别: '',
         收件人信息: '',
