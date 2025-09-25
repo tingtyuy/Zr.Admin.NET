@@ -31,7 +31,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
 
 
         /// <summary>
-        /// 查询列表2
+        /// 商户群列表
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -48,7 +48,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
 
 
         /// <summary>
-        /// 查询列表
+        /// 商户群管理
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -113,6 +113,29 @@ namespace ZR.Admin.WebApi.Controllers.Business
             var modal = parm.Adapt<TbContact>().ToUpdate(HttpContext);
             var response = _TbContactService.UpdateTbContact(modal);
 
+            return ToResponse(response);
+        }
+
+        /// <summary>
+        /// 商户群列表修改私人群状态和群名称
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("update")]
+        //[ActionPermissionFilter(Permission = "tbcontact:edit")]
+        [Log(Title = "", BusinessType = BusinessType.UPDATE)]
+        public IActionResult UpdateTbContact2([FromBody] TbContactDto parm)
+        {
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
+            parm.CompanyId = user.Remark;
+            var modal = parm.Adapt<TbContact>().ToUpdate(HttpContext);
+            //修改群状态
+            var currentRow= _TbContactService.GetInfo(parm.Id);
+            var modal2 = _TbContactService.Queryable().Where(w => w.CompanyId == currentRow.CompanyId && w.群名称 == currentRow.群名称 && string.IsNullOrEmpty(w.客户)).First();
+            modal2.IsEnable = parm.IsEnable;
+            _TbContactService.UpdateTbContact(modal2);
+            //修改群名称
+            var response = _TbContactService.Update(w=>w.群名称==currentRow.群名称,c=> new TbContact() {  群名称=parm.群名称});
             return ToResponse(response);
         }
 

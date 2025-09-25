@@ -21,7 +21,7 @@ namespace ZR.Model.Business.Dto
 
         public string CompanyId { get; set; }
 
-        public bool IsEnable { get; set; }
+        public bool? IsEnable { get; set; }
 
         public string MatchParam { get; set; }
 

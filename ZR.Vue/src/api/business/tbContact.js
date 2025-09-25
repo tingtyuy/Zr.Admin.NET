@@ -37,6 +37,17 @@ export function addTbContact(data) {
 }
 
 /**
+ * / 商户群列表修改私人群状态和群名称
+ * @param data
+*/
+export function updateTbContact2(data) {
+  return request({
+    url: 'business/TbContact/update',
+    method: 'PUT',
+    data: data,
+  })
+}
+/**
  * 修改
  * @param data
 */

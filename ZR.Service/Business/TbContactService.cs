@@ -32,29 +32,41 @@ namespace ZR.Service.Business
         {
             var predicate = QueryExp(parm);
             predicate.And(w => !string.IsNullOrEmpty(w.客户商家名称));
-            predicate.And(w => w.IsEnable == false || w.IsEnable == null);
+            //predicate.And(w => w.IsEnable == false || w.IsEnable == null);
             //parm.Sort = "群名称";
 
-            var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression()).OrderBy(o=>o.客户).OrderBy(o=>o.客户商家名称);
+            //var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression()).OrderBy(o=>o.客户).OrderBy(o=>o.客户商家名称);
+            var list = Queryable()
+                .Where(predicate.ToExpression())
+                .LeftJoin<TbContact>((a, b) => a.群名称 == b.群名称 && string.IsNullOrEmpty(b.客户商家名称) && b.CompanyId==parm.CompanyId)
+                .Select((a, b) => new TbContact
+                {
+                    客户 = a.客户,
+                    客户商家名称 = a.客户商家名称,
+                    群名称 = a.群名称,
+                    IsEnable = b.IsEnable,
+                    Id=a.Id
+                })
+                .OrderBy(a => a.客户).OrderBy(a => a.客户商家名称);
 
             var response = list.ToPage<TbContact, TbContactDto>(parm);
             response.Result = response.Result
 
            .ToList();
 
-            foreach (var result in response.Result)
-            {
-                if (!string.IsNullOrEmpty(result.MatchParam))
-                {
-                    var arr = result.MatchParam.Split(',');
-                    var num = 1;
-                    foreach (var item in arr)
-                    {
-                        result.MatchParamDes += num + ". " + _sysDictDataService.GetSingle(w => w.DictType == "wx_group_match_param" && w.DictValue == item).DictLabel + " ";
-                        num++;
-                    }
-                }
-            }
+            //foreach (var result in response.Result)
+            //{
+            //    if (!string.IsNullOrEmpty(result.MatchParam))
+            //    {
+            //        var arr = result.MatchParam.Split(',');
+            //        var num = 1;
+            //        foreach (var item in arr)
+            //        {
+            //            result.MatchParamDes += num + ". " + _sysDictDataService.GetSingle(w => w.DictType == "wx_group_match_param" && w.DictValue == item).DictLabel + " ";
+            //            num++;
+            //        }
+            //    }
+            //}
 
             return response;
         }
@@ -69,14 +81,14 @@ namespace ZR.Service.Business
         {
             var predicate = QueryExp(parm);
             predicate.And(w => string.IsNullOrEmpty(w.客户商家名称));
-            predicate.And(w => w.IsEnable == false || w.IsEnable == null );
+            predicate.And(w => w.IsEnable == false || w.IsEnable == null);
             //parm.Sort = "群名称";
 
             var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression()).OrderBy("CONVERT(`群名称` USING gbk)");
 
             var response = list.ToPage<TbContact, TbContactDto>(parm);
             response.Result = response.Result
-           
+
            .ToList();
 
             foreach (var result in response.Result)
@@ -159,6 +171,7 @@ namespace ZR.Service.Business
             predicate.AndIF(!string.IsNullOrEmpty(parm.群名称), m => m.群名称.Contains(parm.群名称));
             predicate.AndIF(!string.IsNullOrEmpty(parm.客户), m => m.客户.Contains(parm.客户));
             predicate.AndIF(!string.IsNullOrEmpty(parm.客户商家名称), m => m.客户商家名称.Contains(parm.客户商家名称));
+            predicate.AndIF(parm.IsEnable.HasValue, m => m.IsEnable == parm.IsEnable);
             predicate.AndIF(parm.IsMatch.HasValue, m => m.IsMatch == parm.IsMatch);
             predicate.And(w => w.CompanyId == parm.CompanyId);
             return predicate;

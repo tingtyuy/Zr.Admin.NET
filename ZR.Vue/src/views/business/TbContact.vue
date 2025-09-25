@@ -20,6 +20,15 @@
       <el-form-item>
         <el-input v-model="queryParams.群名称" placeholder="群名称" clearable />
       </el-form-item>
+      <el-form-item>
+        <el-select v-model="queryParams.isEnable" placeholder="私人群" clearable>
+          <el-option label="私人群" :value="true"></el-option>
+          <el-option label="办公群" :value="false"></el-option>
+        </el-select>
+      </el-form-item>
+      <!-- <el-form-item>
+        <el-input v-model="queryParams.IsEnable" placeholder="私人群" clearable />
+      </el-form-item> -->
       <!-- </el-col> -->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -46,18 +55,18 @@
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
       @selection-change="handleSelectionChange">
       <!-- <el-table-column type="selection" width="50" align="center"/> -->
-      <el-table-column prop="客户" label="客户" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="客户" label="发件人" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="客户商家名称" label="客户商家名称" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="对接方式" label="对接方式" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-      <!-- <!-- <el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="是否直接退回" label="是否直接退回" align="center" :show-overflow-tooltip="true" /> -->
+      <!--<el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" /> -->
+      <!-- <el-table-column prop="是否直接退回" label="是否直接退回" align="center" :show-overflow-tooltip="true" />  -->
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
-      <!-- <el-table-column prop="isEnable" label="启用状态" align="center" width="200">
+      <el-table-column prop="isEnable" label="私人群" align="center" width="200">
         <template slot-scope="scope">
-          {{ scope.row.isEnable=0?'禁用':'启用' }}
+          {{ scope.row.isEnable == true ? '私人群' : '办公群' }}
         </template>
-</el-table-column> -->
+      </el-table-column>
       <!-- <el-table-column prop="matchParam" label="匹配参数" align="center" />
       <el-table-column prop="isMatch" label="是否匹配：0启用，1禁用" align="center">
         <template slot-scope="scope">
@@ -69,8 +78,8 @@
         <template slot-scope="scope">
           <el-button size="mini" v-hasPermi="['tbcontact:edit']" type="success" icon="el-icon-edit" title="编辑"
             @click="handleUpdate(scope.row)"></el-button>
-          <el-button size="mini" v-hasPermi="['tbcontact:delete']" type="danger" icon="el-icon-delete" title="删除"
-            @click="handleDelete(scope.row)"></el-button>
+          <!-- <el-button size="mini" v-hasPermi="['tbcontact:delete']" type="danger" icon="el-icon-delete" title="删除"
+            @click="handleDelete(scope.row)"></el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -78,7 +87,7 @@
       :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="400px" :close-on-click-modal="false">
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
 
@@ -100,7 +109,7 @@
             </el-form-item>
           </el-col> -->
 
-          <el-col :lg="24">
+          <el-col :lg="22">
             <el-form-item label="群名称" prop="群名称">
               <el-input v-model="form.群名称" placeholder="请输入群名称" />
             </el-form-item>
@@ -124,14 +133,14 @@
             </el-form-item>
           </el-col> -->
 
-          <!-- <el-col :lg="12">
-            <el-form-item label="启用状态" prop="isEnable">
-              <el-radio-group v-model="form.isEnable">
-
-                <el-radio v-for="item in isEnableOptions" :key="item.dictValue" :label="item.dictValue">{{item.dictLabel}}</el-radio>
-              </el-radio-group>
+          <el-col :lg="12">
+            <el-form-item label="私人群" prop="isEnable">
+              <el-select v-model="form.isEnable" placeholder="私人群" clearable>
+                <el-option label="私人群" :value="true"></el-option>
+                <el-option label="办公群" :value="false"></el-option>
+              </el-select>
             </el-form-item>
-          </el-col> -->
+          </el-col>
 
           <!-- <el-col :lg="12">
             <el-form-item label="匹配参数" prop="matchParam">
@@ -163,6 +172,7 @@ import {
   addTbContact,
   delTbContact,
   updateTbContact,
+  updateTbContact2,
   getTbContact,
 } from '@/api/business/tbContact.js';
 
@@ -312,26 +322,31 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
+      debugger
+      this.form = { ...row };
       const id = row.id || this.ids;
-      getTbContact(id).then((res) => {
-        const { code, data } = res;
-        if (code == 200) {
-          this.open = true;
-          this.title = "修改数据";
-          this.opertype = 2;
+      this.open = true;
+      this.title = "修改数据";
+      this.opertype = 2;
+      // getTbContact(id).then((res) => {
+      //   const { code, data } = res;
+      //   if (code == 200) {
+      //     this.open = true;
+      //     this.title = "修改数据";
+      //     this.opertype = 2;
 
-          this.form = {
-            ...data,
-          };
-        }
-      });
+      //     this.form = {
+      //       ...data,
+      //     };
+      //   }0
+      // });
     },
     /** 提交按钮 */
     submitForm: function () {
       this.$refs["form"].validate((valid) => {
         if (valid) {
           if (this.form.id != undefined && this.opertype === 2) {
-            updateTbContact(this.form)
+            updateTbContact2(this.form)
               .then((res) => {
                 this.msgSuccess("修改成功");
                 this.open = false;
