@@ -10,27 +10,14 @@
   <div class="app-container">
     <el-row :gutter="12" class="mb8">
       <el-form :model="queryParams" size="small" label-position="right" inline ref="queryForm" label-width="100px"
-      v-show="showSearch" @submit.native.prevent>
-      <el-col :span="6">
-        <el-form-item label="运单号" prop="单号">
-          <el-input v-model="queryParams.单号" placeholder="请输入运单号" clearable :style="{ width: '100%' }">
-          </el-input>
-        </el-form-item>
-      </el-col>
-      <el-col :span="6">
-          <el-form-item label="开始日期" prop="操作开始时间">
-            <el-date-picker v-model="queryParams.操作开始时间" type="date" placeholder="开始日期" value-format="yyyy-MM-dd"
-              clearable>
-            </el-date-picker>
-          </el-form-item>
-        </el-col>
+        v-show="showSearch" @submit.native.prevent>
         <el-col :span="6">
-          <el-form-item label="结束日期" prop="操作结束时间">
-            <el-date-picker v-model="queryParams.操作结束时间" type="date" placeholder="结束日期" value-format="yyyy-MM-dd"
-              clearable>
-            </el-date-picker>
+          <el-form-item label="运单号" prop="单号">
+            <el-input v-model="queryParams.单号" placeholder="请输入运单号" clearable :style="{ width: '100%' }">
+            </el-input>
           </el-form-item>
         </el-col>
+
         <el-col :span="6">
           <el-form-item label="商家名称" prop="商家名称">
             <el-input v-model="queryParams.商家名称" placeholder="请输入商家名称" clearable :style="{ width: '100%' }">
@@ -60,6 +47,20 @@
             </el-select>
           </el-form-item>
         </el-col>
+        <el-col :span="6">
+          <el-form-item label="开始日期" prop="操作开始时间">
+            <el-date-picker v-model="queryParams.操作开始时间" type="date" placeholder="开始日期" value-format="yyyy-MM-dd"
+              clearable>
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="结束日期" prop="操作结束时间">
+            <el-date-picker v-model="queryParams.操作结束时间" type="date" placeholder="结束日期" value-format="yyyy-MM-dd"
+              clearable>
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
         <!-- <el-col :span="6">
           <el-form-item label="问题件类别" prop="问题件类别">
             <el-select v-model="queryParams.问题件类别" placeholder="请选择问题件类别" clearable :style="{ width: '100%' }">
@@ -69,7 +70,7 @@
           </el-form-item>
         </el-col> -->
         <el-col :span="6" :offset="19">
-          <el-button size="mini"  @click="clearAllCheck">清空选中状态</el-button>
+          <el-button size="mini" @click="clearAllCheck">清空选中状态</el-button>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
         </el-col>
@@ -268,7 +269,7 @@ export default {
       处理状态Options: [{
         "label": "已匹配",
         "value": "已匹配"
-      },{
+      }, {
         "label": "已处理",
         "value": "已处理"
       }, {
