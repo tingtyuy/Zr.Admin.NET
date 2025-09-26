@@ -55,19 +55,19 @@
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
       @selection-change="handleSelectionChange">
       <!-- <el-table-column type="selection" width="50" align="center"/> -->
-      <el-table-column prop="客户" label="发件人" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="客户商家名称" label="客户商家名称" align="center" :show-overflow-tooltip="true" />
-      <!-- <el-table-column prop="对接方式" label="对接方式" align="center" :show-overflow-tooltip="true" /> -->
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-      <!--<el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="account" label="操作员" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="匹配时间" label="匹配时间" align="center" :show-overflow-tooltip="true" />
-      <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
+      <el-table-column prop="客户商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="客户" label="发件人" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="isEnable" label="私人群" align="center" width="200">
         <template slot-scope="scope">
           {{ scope.row.isEnable == true ? '私人群' : '办公群' }}
         </template>
       </el-table-column>
+      <!-- <el-table-column prop="对接方式" label="对接方式" align="center" :show-overflow-tooltip="true" /> -->
+      <!--<el-table-column prop="联系人" label="联系人" align="center" :show-overflow-tooltip="true" /> -->
+      <el-table-column prop="account" label="操作员" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="匹配时间" label="匹配时间" align="center" :show-overflow-tooltip="true" />
+      <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column prop="matchParam" label="匹配参数" align="center" />
       <el-table-column prop="isMatch" label="是否匹配：0启用，1禁用" align="center">
         <template slot-scope="scope">
