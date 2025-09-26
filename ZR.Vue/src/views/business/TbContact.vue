@@ -12,13 +12,13 @@
       v-show="showSearch" @submit.native.prevent>
       <!-- <el-col :span="14"> -->
       <el-form-item>
-        <el-input v-model="queryParams.客户" placeholder="客户" clearable />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="queryParams.客户商家名称" placeholder="客户商家名称" clearable />
-      </el-form-item>
-      <el-form-item>
         <el-input v-model="queryParams.群名称" placeholder="群名称" clearable />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="queryParams.客户商家名称" placeholder="商家名称" clearable />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="queryParams.客户" placeholder="发件人" clearable />
       </el-form-item>
       <el-form-item>
         <el-select v-model="queryParams.isEnable" placeholder="私人群" clearable>
