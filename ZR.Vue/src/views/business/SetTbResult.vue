@@ -5,27 +5,27 @@
             <el-col :span="6">
               今天问题件处理总数
               <el-tag effect="dark">
-                {{ statisticForm.num2 }}
+                {{ statisticForm.sum }}
               </el-tag>
             </el-col>
             <el-col :span="6">
               拒收问题件数量
               <el-tag effect="dark">
-                {{ statisticForm.num1 }}
+                {{ statisticForm.ju }}
               </el-tag>
             </el-col>
             <el-col :span="6">
               破损问题件数量
               <el-tag effect="dark">
-                {{ statisticForm.num3 }}
+                {{ statisticForm.po }}
               </el-tag>
             </el-col>
-            <el-col :span="6">
+            <!-- <el-col :span="6">
               信息有误问题件数量
               <el-tag effect="dark">
                 {{ statisticForm.num4 }}
               </el-tag>
-            </el-col>
+            </el-col> -->
           </el-row>
           <!-- <el-row>
             <el-col :offset="18" :span="6">
@@ -43,7 +43,7 @@
               <TbContactComponent ref="leftComponentRef"></TbContactComponent>
             </el-col>
             <el-col :span="17" class="bordered">
-              <TbResultComponent @refreshLeftList="refreshLeftListCallBack"></TbResultComponent>
+              <TbResultComponent @refreshLeftList="refreshLeftListCallBack" ></TbResultComponent>
             </el-col>
           </el-row>
         </el-main>
@@ -53,6 +53,7 @@
 import TbContactComponent from '@/views/business/TbContactComponent.vue';
 import TbResultComponent from '@/views/business/TbResultComponent.vue';
 import {
+  getStatistic,
   listTbResultdistinctlist,
   listTbResult,
   addTbResult,
@@ -80,11 +81,10 @@ export default {
   data() {
     return {
       statisticForm: {
-        num1: '999',
-        num2: '777',
-        num3: '555',
-        num4: '333',
-        num5: '11',
+        sum: 0,
+        ju: 0,
+        po: 0,
+
       },
       wxGroupDialogOpen: false,
       wxGroupDialogForm: {
@@ -110,10 +110,15 @@ export default {
   },
   methods: {
     refreshLeftListCallBack() {
-      debugger
+      this.getList();
       this.$refs.leftComponentRef.getList();
     },
     getList() {
+
+      getStatistic().then(response => {
+        const { data } = response;
+        this.statisticForm = data;
+      });
       // this.loading = true;
       // listTbContact(this.wxGroupQueryForm).then(response => {
       //   this.loading = false;

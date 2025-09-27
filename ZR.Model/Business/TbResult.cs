@@ -67,7 +67,7 @@ namespace ZR.Model.Business
 
         public string account { get; set; }
 
-        public DateTime?  匹配时间{ get; set; }
+        public DateTime  匹配时间{ get; set; }
 
     }
 }

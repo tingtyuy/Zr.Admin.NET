@@ -70,6 +70,18 @@ export function getTbResult(id) {
   })
 }
 
+
+/**
+ * 获取统计
+ */
+export function getStatistic(id) {
+  return request({
+    url: 'business/TbResult/statistic',
+    method: 'get'
+  })
+}
+
+
 /**
  * 删除
  * @param {主键} pid

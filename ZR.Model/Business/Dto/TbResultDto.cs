@@ -69,9 +69,16 @@ namespace ZR.Model.Business.Dto
 
 
         public string CompanyId { get; set; }
+        public string 平台 { get; set; }
+        public string 发件地址 { get; set; }
 
     }
 
+    public class StatisticDto {
+        public int sum { get; set; }
+        public int ju { get; set; }
+        public int po { get; set; }
+    }
     public class TbResultDistinctDto
     {
         public List<long> ids { get; set; }

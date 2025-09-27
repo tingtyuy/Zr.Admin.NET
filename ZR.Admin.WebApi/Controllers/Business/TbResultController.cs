@@ -75,7 +75,27 @@ namespace ZR.Admin.WebApi.Controllers.Business
             return SUCCESS(response);
         }
 
+        /// <summary>
+        /// 查询统计数
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("statistic")]
+        public IActionResult GetStatistic(int Id)
+        {
+            var list = _TbResultService.Queryable().Where(w => !string.IsNullOrEmpty(w.处理状态) && w.匹配时间.Date == DateTime.Now.Date);
 
+            var info = new StatisticDto()
+            {
+
+                sum = list.Count(),
+                ju = list.Where(w => w.问题件类型 == "拒收").Count(),
+                po = list.Where(w => w.问题件类型 == "破损件").Count(),
+
+            };
+
+
+            return SUCCESS(info);
+        }
 
         /// <summary>
         /// 查询详情
@@ -129,8 +149,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 {
                     var model = _TbResultService.GetById(item);
                     model.处理状态 = "已匹配";
-                    model.account=user.NickName;
-                    model.匹配时间=DateTime.Now;
+                    model.account = user.NickName;
+                    model.匹配时间 = DateTime.Now;
                     _TbResultService.Update(model);
                 }
             }

@@ -79,10 +79,9 @@
     </el-row>
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button icon="el-icon-refresh" v-hasPermi="['tbresult:forward']" size="mini"
-          @click="handleForward">转发商户</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="handleForward">变更商户群</el-button>
       </el-col>
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button type="primary" v-hasPermi="['tbresult:add']" plain icon="el-icon-plus" size="mini"
           @click="handleAdd">新增</el-button>
       </el-col>
@@ -94,29 +93,34 @@
         <el-button type="danger" :disabled="multiple" v-hasPermi="['tbresult:delete']" plain icon="el-icon-delete"
           size="mini" @click="handleDelete">删除</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
     </el-row>
 
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
-      @selection-change="handleSelectionChange" @select-all="handleSelectAll">
+      @selection-change="handleSelectionChange" @select-all="handleSelectAll" @row-click="handleRowClick">
       <el-table-column type="selection" width="50" align="center" />
+      <el-table-column prop="id" label="id" align="center" :show-overflow-tooltip="true" />
+
       <el-table-column prop="问题件类型" label="问题件类型" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="平台" label="平台" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="发件地址" label="发件地址" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="结果" label="结果" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="操作时间" label="操作时间" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="account" label="操作员" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="匹配时间" label="匹配时间" align="center" :show-overflow-tooltip="true" />
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
-
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" icon="el-icon-edit" title="编辑"
+          <el-button size="mini" type="success" icon="el-icon-edit" title="变更商户群"
             @click="handleUpdate(scope.row)"></el-button>
-          <el-button size="mini" v-hasPermi="['tbresult:delete']" type="danger" icon="el-icon-delete" title="删除"
-            @click="handleDelete(scope.row)"></el-button>
+          <!-- <el-button size="mini" v-hasPermi="['tbresult:delete']" type="danger" icon="el-icon-delete" title="删除"
+            @click="handleDelete(scope.row)"></el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -124,79 +128,27 @@
       :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open">
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row :gutter="20">
-
-          <el-col :lg="12">
-            <el-form-item label="问题件类型" prop="问题件类型">
-              <el-input v-model="form.问题件类型" placeholder="请输入问题件类型" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="单号" prop="单号">
-              <el-input v-model="form.单号" placeholder="请输入单号" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="商家名称" prop="商家名称">
-              <el-input v-model="form.商家名称" placeholder="请输入商家名称" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="收件人信息" prop="收件人信息">
-              <el-input v-model="form.收件人信息" placeholder="请输入收件人信息" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="结果" prop="结果">
-              <el-input v-model="form.结果" placeholder="请输入结果" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="执行机器人" prop="执行机器人">
-              <el-input v-model="form.执行机器人" placeholder="请输入执行机器人" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="操作时间" prop="操作时间">
-              <el-input v-model="form.操作时间" placeholder="请输入操作时间" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :lg="12">
-            <el-form-item label="CompanyId" prop="companyId">
-              <el-input v-model="form.companyId" placeholder="请输入CompanyId" />
-            </el-form-item>
-          </el-col>
-
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="text" @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-      </div>
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="28%">
+      <TbContactMatchComponent ref="matchComponent" @rowClick="rowClickCallBack" @isSet="isSetCallBack">
+      </TbContactMatchComponent>
+      <el-button type="primary" @click="matchForm">确 定</el-button>
+      <el-button icon="el-icon-refresh" @click="handleForward">转发商户</el-button>
     </el-dialog>
 
     <!-- 转发对话框 -->
-    <el-dialog :title="forwardTitle" :lock-scroll="false" :visible.sync="forward" width="450px" :center="true">
+    <!-- <el-dialog :title="forwardTitle" :lock-scroll="false" :visible.sync="forward" width="450px" :center="true">
       <el-input v-model="forwardForm.replyMessage" type="textarea" size="medium" rows="10" />
       <div slot="footer" class="dialog-footer">
         <el-button type="text" @click="forwardCancel">关 闭</el-button>
         <el-button type="primary" v-clipboard="forwardForm.replyMessage">复 制</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
   </div>
 </template>
 <script>
 import {
+  matchResult,
   listTbResult2,
   addTbResult,
   delTbResult,
@@ -205,11 +157,17 @@ import {
   forwardMessage,
   copyMessage,
 } from '@/api/business/tbResult.js';
-
+import TbContactMatchComponent from '@/views/business/TbContactMatchComponent.vue';
 export default {
   name: "tbresult",
+  components: {
+    TbContactMatchComponent
+  },
   data() {
     return {
+      isSet: false,
+      row: {},
+      row2: {},
       selectIdModel: {
         name: '',
         phone: ''
@@ -321,6 +279,74 @@ export default {
     ];
   },
   methods: {
+    rowClickCallBack(row) {
+
+      this.row2 = row;
+      console.log(row);
+    },
+    handleRowClick(row) {
+      this.row = row;
+      if(!this.ids.includes(row.id)){
+        this.ids.push(row.id);
+      }
+      this.row.ids = this.ids;
+      console.log(row);
+    },
+    isSetCallBack(isSet) {
+      if (isSet == false) {
+        this.$message({
+          message: '请先设置匹配规则',
+          type: 'warning'
+        });
+        return;
+      }
+      var paramObj = { ...this.row, ...this.row2 };
+      if ((paramObj.商家名称 == undefined || paramObj.商家名称 == '') || (paramObj.收件人信息 == undefined || paramObj.收件人信息 == '')) {
+        console.log(商家名称或收件人信息不能为空);
+        console.log(paramObj);
+        return;
+      }
+      matchResult(paramObj).then(res => {
+        if (res.code == 200) {
+          this.$message({
+            message: '匹配成功',
+            type: 'success'
+          });
+          this.open = false;
+          this.getList();
+        }
+      })
+    },
+    // 转发商户
+    handleForward() {
+      this.$confirm('是否确认转发吗？')
+        .then(() => {
+          copyMessage(this.row.ids).then(res => {
+            if (res.code == 200) {
+              this.forward = true;
+              this.forwardTitle = "";
+              this.forwardForm.replyMessage = this.row.replyMessage;
+
+            }
+          })
+        })
+        .catch(() => { });
+
+
+    },
+    matchForm() {
+      if (this.row2.群名称 != undefined) {
+        if (this.row2.isMatch != 1) {
+          this.$refs.matchComponent.handleMatch(this.row2);
+        }
+        else {
+          this.isSetCallBack(true);
+
+        }
+        this.$emit('refreshLeftList');
+      }
+
+    },
     // 清空选中状态
     clearAllCheck() {
       this.$refs.table.clearSelection();
@@ -330,7 +356,6 @@ export default {
     },
     handleSelectAll(selection) {
       console.log(selection);
-
     },
     // 转发商户
     handleForward() {
@@ -407,6 +432,7 @@ export default {
     // 表格选中时
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.id);
+        console.log(this.ids);
       this.single = selection.length != 1
       this.multiple = !selection.length;
       if (selection.length > 0) {
@@ -419,6 +445,9 @@ export default {
           this.$refs.table.toggleRowSelection(item, false);
         });
       }
+
+      // this.row.ids = this.ids;
+
     },
     // 自定义排序
     sortChange(column) {
