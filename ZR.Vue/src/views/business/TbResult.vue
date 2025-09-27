@@ -79,7 +79,7 @@
     </el-row>
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button icon="el-icon-refresh" size="mini" @click="handleAdd()">变更商户群</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="handleAdd2()">变更商户群</el-button>
       </el-col>
       <!-- <el-col :span="1.5">
         <el-button type="primary" v-hasPermi="['tbresult:add']" plain icon="el-icon-plus" size="mini"
@@ -118,7 +118,7 @@
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="变更商户群"
-            @click="handleAdd()"></el-button>
+            @click="handleAdd(scope.row)"></el-button>
           <!-- <el-button size="mini" v-hasPermi="['tbresult:delete']" type="danger" icon="el-icon-delete" title="删除"
             @click="handleDelete(scope.row)"></el-button> -->
         </template>
@@ -148,6 +148,7 @@
 </template>
 <script>
 import {
+  reMatchResult,
   matchResult,
   listTbResult2,
   addTbResult,
@@ -286,8 +287,9 @@ export default {
       console.log(row);
     },
     handleRowClick(row) {
-      this.row = row;
-      this.selectRows = row
+      // debugger
+      // this.row = row;
+      // this.selectRows =[row]
       // if (!this.ids.includes(row.id)) {
       //   this.ids.push(row.id);
       // }
@@ -308,7 +310,7 @@ export default {
         console.log(paramObj);
         return;
       }
-      matchResult(paramObj).then(res => {
+      reMatchResult(paramObj).then(res => {
         if (res.code == 200) {
           this.$message({
             message: '匹配成功',
@@ -468,22 +470,27 @@ export default {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    handleAdd(row) {
+      this.selectRows = [row];
+      this.handleAdd2();
+    },
     /** 新增按钮操作 */
-    handleAdd() {
-      if (this.selectRows.length > 0) {
-        this.row = {
-          CompanyId: this.selectRows[0].CompanyId,
-          商家名称: this.selectRows[0].商家名称,
-          执行机器人: this.selectRows[0].执行机器人,
-          收件人信息: this.selectRows[0].收件人信息,
-          Ids: this.selectRows.map(s => s.id),
-        };
-        console.log(this.row);
-        this.reset();
-        this.open = true;
-        this.title = "匹配";
-        this.opertype = 1;
-      }
+    handleAdd2() {
+
+      this.row = {
+        companyId: this.selectRows[0].companyId,
+        商家名称: this.selectRows[0].商家名称,
+        执行机器人: this.selectRows[0].执行机器人,
+        收件人信息: this.selectRows[0].收件人信息,
+        Ids: this.selectRows.map(s => s.id),
+      };
+
+      console.log(this.row);
+      this.reset();
+      this.open = true;
+      this.title = "匹配";
+      this.opertype = 1;
+
     },
     /** 删除按钮操作 */
     handleDelete(row) {

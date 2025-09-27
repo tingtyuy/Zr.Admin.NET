@@ -126,3 +126,14 @@ export function matchResult(data) {
     data: data,
   })
 }
+/**
+ * 问题件重新匹配
+ * @param data
+ */
+export function reMatchResult(data) {
+  return request({
+    url: 'business/TbResult/reMatch',
+    method: 'post',
+    data: data,
+  })
+}

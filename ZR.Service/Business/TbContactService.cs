@@ -47,7 +47,7 @@ namespace ZR.Service.Business
                     IsEnable = b.IsEnable,
                     Id=a.Id
                 },true)
-                .OrderBy(a => a.客户).OrderBy(a => a.客户商家名称);
+                .OrderByDescending(a =>a.匹配时间);
 
             var response = list.ToPage<TbContact, TbContactDto>(parm);
             response.Result = response.Result

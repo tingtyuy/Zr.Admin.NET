@@ -48,6 +48,8 @@ namespace ZR.Model.Business.Dto
     /// </summary>
     public class TbResultDto
     {
+        public string account { get; set; }
+        public DateTime? 匹配时间 { get; set; }
         public long Id { get; set; }
 
         public string 问题件类型 { get; set; }

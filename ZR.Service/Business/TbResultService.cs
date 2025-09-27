@@ -41,7 +41,7 @@ namespace ZR.Service.Business
 
             var response = Queryable()
                 .Where(predicate.ToExpression())
-                .OrderByDescending(s => s.操作时间)
+                .OrderByDescending(s => s.匹配时间)
                 .ToPage<TbResult, TbResultDto>(parm);
 
             return response;
@@ -74,7 +74,7 @@ namespace ZR.Service.Business
                     群名称 = b.群名称
                 }, true).MergeTable()
                 .Where(predicate.ToExpression())
-                .OrderByDescending(s => s.操作时间)
+                .OrderByDescending(s => s.匹配时间)
                 .ToPage(parm);
 
             return response;
