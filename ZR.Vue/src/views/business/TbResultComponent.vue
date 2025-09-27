@@ -246,6 +246,7 @@ export default {
         console.log(paramObj);
         return;
       }
+
       matchResult(paramObj).then(res => {
         if (res.code == 200) {
           this.$message({
@@ -255,6 +256,7 @@ export default {
           this.open = false;
           this.getList();
         }
+
       })
     },
     rowClickCallBack(row) {

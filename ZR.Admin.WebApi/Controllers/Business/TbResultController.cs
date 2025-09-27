@@ -140,9 +140,25 @@ namespace ZR.Admin.WebApi.Controllers.Business
         public IActionResult Match([FromBody] TbResultMatchDto parm)
         {
 
+
             long userId = HttpContext.GetUId();
             var user = sysUserService.SelectUserById(userId);
             parm.CompanyId = user.Remark;
+
+
+            var model2 = _tbContactService.GetFirst(w => w.CompanyId == parm.CompanyId
+              && w.IsEnable == false
+              && w.客户 == parm.收件人信息
+              && w.客户商家名称 == parm.商家名称
+              && w.对接方式 == "微信"
+              );
+
+            if (model2 != null)
+            {
+                var msg = $"商户群已经匹配过了:{model2.群名称}";
+                return ToResponse(ResultCode.FAIL, msg); //
+            }
+
             if (parm.Ids.Any())
             {
                 foreach (var item in parm.Ids)
@@ -155,18 +171,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 }
             }
 
-            var model2 = _tbContactService.GetFirst(w => w.CompanyId == parm.CompanyId
-              && w.IsEnable == false
-              && w.客户 == parm.收件人信息
-              && w.客户商家名称 == parm.商家名称
-              && w.对接方式 == "微信"
-              && w.群名称 == parm.群名称
-              );
 
-            if (model2 != null)
-            {
-                return SUCCESS(model2);
-            }
             var tbContactModel = new TbContact();
             tbContactModel.CompanyId = parm.CompanyId;
             tbContactModel.IsEnable = false;

@@ -289,8 +289,8 @@ export default {
       if(!this.ids.includes(row.id)){
         this.ids.push(row.id);
       }
-      this.row.ids = this.ids;
-      console.log(row);
+      // this.row.ids = this.ids;
+      // console.log(row);
     },
     isSetCallBack(isSet) {
       if (isSet == false) {
