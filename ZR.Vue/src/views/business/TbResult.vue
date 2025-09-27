@@ -79,7 +79,7 @@
     </el-row>
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button icon="el-icon-refresh" size="mini" @click="handleForward">变更商户群</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="handleAdd()">变更商户群</el-button>
       </el-col>
       <!-- <el-col :span="1.5">
         <el-button type="primary" v-hasPermi="['tbresult:add']" plain icon="el-icon-plus" size="mini"
@@ -118,7 +118,7 @@
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="变更商户群"
-            @click="handleUpdate(scope.row)"></el-button>
+            @click="handleAdd()"></el-button>
           <!-- <el-button size="mini" v-hasPermi="['tbresult:delete']" type="danger" icon="el-icon-delete" title="删除"
             @click="handleDelete(scope.row)"></el-button> -->
         </template>
@@ -269,6 +269,7 @@ export default {
         "value": "有单无货"
       }
       ],
+      selectRows: []
     };
   },
   created() {
@@ -286,9 +287,10 @@ export default {
     },
     handleRowClick(row) {
       this.row = row;
-      if(!this.ids.includes(row.id)){
-        this.ids.push(row.id);
-      }
+      this.selectRows = row
+      // if (!this.ids.includes(row.id)) {
+      //   this.ids.push(row.id);
+      // }
       // this.row.ids = this.ids;
       // console.log(row);
     },
@@ -432,7 +434,7 @@ export default {
     // 表格选中时
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.id);
-        console.log(this.ids);
+      this.selectRows = selection;
       this.single = selection.length != 1
       this.multiple = !selection.length;
       if (selection.length > 0) {
@@ -445,7 +447,7 @@ export default {
           this.$refs.table.toggleRowSelection(item, false);
         });
       }
-
+      console.log(this.selectRows)
       // this.row.ids = this.ids;
 
     },
@@ -468,10 +470,20 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加";
-      this.opertype = 1;
+      if (this.selectRows.length > 0) {
+        this.row = {
+          CompanyId: this.selectRows[0].CompanyId,
+          商家名称: this.selectRows[0].商家名称,
+          执行机器人: this.selectRows[0].执行机器人,
+          收件人信息: this.selectRows[0].收件人信息,
+          Ids: this.selectRows.map(s => s.id),
+        };
+        console.log(this.row);
+        this.reset();
+        this.open = true;
+        this.title = "匹配";
+        this.opertype = 1;
+      }
     },
     /** 删除按钮操作 */
     handleDelete(row) {
