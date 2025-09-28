@@ -27,6 +27,8 @@ namespace ZR.Model.Business.Dto
         public DateTime? 操作结束时间 { get; set; }
 
         public string 收件人信息 { get; set; }
+        public string 平台 { get; set; }
+        public string 发件地址 { get; set; }
     }
     /// <summary>
     /// 问题件匹配输入对象

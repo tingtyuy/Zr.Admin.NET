@@ -25,8 +25,20 @@
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="收件人信息" prop="收件人信息">
-            <el-input v-model="queryParams.收件人信息" placeholder="请输入收件人信息" clearable :style="{ width: '100%' }">
+          <el-form-item label="发件人信息" prop="发件人信息">
+            <el-input v-model="queryParams.收件人信息" placeholder="请输入发件人信息" clearable :style="{ width: '100%' }">
+            </el-input>
+          </el-form-item>
+        </el-col>
+              <el-col :span="6">
+          <el-form-item label="平台" prop="平台">
+            <el-input v-model="queryParams.平台" placeholder="请输入平台" clearable :style="{ width: '100%' }">
+            </el-input>
+          </el-form-item>
+        </el-col>
+              <el-col :span="6">
+          <el-form-item label="发件地址" prop="发件地址">
+            <el-input v-model="queryParams.发件地址" placeholder="请输入发件地址" clearable :style="{ width: '100%' }">
             </el-input>
           </el-form-item>
         </el-col>
@@ -40,14 +52,14 @@
         </el-col>
 
         <el-col :span="6">
-          <el-form-item label="问题件类型" prop="问题件类型">
-            <el-select v-model="queryParams.问题件类型" placeholder="请选择问题件类型" clearable :style="{ width: '100%' }">
+          <el-form-item label="类型" prop="类型">
+            <el-select v-model="queryParams.问题件类型" placeholder="请选择类型" clearable :style="{ width: '100%' }">
               <el-option v-for="(item, index) in 问题件类型Options" :key="index" :label="item.label" :value="item.value"
                 :disabled="item.disabled"></el-option>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <!-- <el-col :span="6">
           <el-form-item label="开始日期" prop="操作开始时间">
             <el-date-picker v-model="queryParams.操作开始时间" type="date" placeholder="开始日期" value-format="yyyy-MM-dd"
               clearable>
@@ -60,7 +72,7 @@
               clearable>
             </el-date-picker>
           </el-form-item>
-        </el-col>
+        </el-col> -->
         <!-- <el-col :span="6">
           <el-form-item label="问题件类别" prop="问题件类别">
             <el-select v-model="queryParams.问题件类别" placeholder="请选择问题件类别" clearable :style="{ width: '100%' }">
@@ -99,30 +111,26 @@
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
       @selection-change="handleSelectionChange" @select-all="handleSelectAll" @row-click="handleRowClick">
-      <el-table-column type="selection" width="50" align="center" />
-      <el-table-column prop="id" label="id" align="center" :show-overflow-tooltip="true" />
-
-      <el-table-column prop="问题件类型" label="问题件类型" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" />
+      <el-table-column type="selection" width="50" align="center"  />
+      <el-table-column prop="问题件类型" label="类型" align="left" :show-overflow-tooltip="true" width="80" />
+      <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" width="150" />
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="平台" label="平台" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="发件地址" label="发件地址" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="发件地址" label="发件地址" align="center" :show-overflow-tooltip="true"  />
+      <el-table-column prop="平台" label="平台" align="center" :show-overflow-tooltip="true"  width="80"/>
       <!-- <el-table-column prop="结果" label="结果" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="account" label="操作员" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="匹配时间" label="匹配时间" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="account" label="操作员" align="center" :show-overflow-tooltip="true"  width="80"/>
+      <el-table-column prop="匹配时间" label="匹配时间" align="center" :show-overflow-tooltip="true" width="80" />
+      <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true"  width="80"/>
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column label="操作" align="center" width="140">
+      <!-- <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="变更商户群"
             @click="handleAdd(scope.row)"></el-button>
-          <!-- <el-button size="mini" v-hasPermi="['tbresult:delete']" type="danger" icon="el-icon-delete" title="删除"
-            @click="handleDelete(scope.row)"></el-button> -->
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <pagination class="mt10" background :total="total" :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize" @pagination="getList" />
