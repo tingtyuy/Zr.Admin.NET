@@ -115,7 +115,7 @@
       <el-table-column prop="问题件类型" label="类型" align="left" :show-overflow-tooltip="true" width="80" />
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" width="150" />
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="收件人信息" label="收件人信息" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="收件人信息" label="发件人信息" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="发件地址" label="发件地址" align="center" :show-overflow-tooltip="true"  />
       <el-table-column prop="平台" label="平台" align="center" :show-overflow-tooltip="true"  width="80"/>
