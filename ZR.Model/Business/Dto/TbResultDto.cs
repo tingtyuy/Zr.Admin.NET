@@ -82,6 +82,7 @@ namespace ZR.Model.Business.Dto
         public int sum { get; set; }
         public int ju { get; set; }
         public int po { get; set; }
+        public int sendSum { get; set; }
     }
     public class TbResultDistinctDto
     {

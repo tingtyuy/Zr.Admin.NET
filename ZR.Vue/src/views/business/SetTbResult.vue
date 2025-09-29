@@ -20,6 +20,12 @@
                 {{ statisticForm.po }}
               </el-tag>
             </el-col>
+            <el-col :span="6">
+              已匹配问题件数量
+              <el-tag effect="dark">
+                {{ statisticForm.sendSum }}
+              </el-tag>
+            </el-col>
             <!-- <el-col :span="6">
               信息有误问题件数量
               <el-tag effect="dark">
@@ -43,7 +49,7 @@
               <TbContactComponent ref="leftComponentRef"></TbContactComponent>
             </el-col>
             <el-col :span="17" class="bordered">
-              <TbResultComponent @refreshLeftList="refreshLeftListCallBack" ></TbResultComponent>
+              <TbResultComponent @refreshLeftList="refreshLeftListCallBack"></TbResultComponent>
             </el-col>
           </el-row>
         </el-main>
@@ -84,6 +90,7 @@ export default {
         sum: 0,
         ju: 0,
         po: 0,
+        sendSum: 0,
 
       },
       wxGroupDialogOpen: false,
@@ -175,6 +182,4 @@ export default {
   margin-bottom: 10px;
   text-align: center;
 }
-
-
 </style>

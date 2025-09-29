@@ -1,10 +1,13 @@
+using Aliyun.OSS;
 using Microsoft.AspNetCore.Mvc;
+using SqlSugar;
 using System.Threading.Tasks;
 using ZR.Model.Business;
 using ZR.Model.Business.Dto;
 using ZR.Service.Business;
 using ZR.Service.Business.IBusinessService;
 using ZR.ServiceCore.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 //创建时间：2025-08-25
 namespace ZR.Admin.WebApi.Controllers.Business
@@ -19,14 +22,16 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// 接口
         /// </summary>
         private readonly ITbResultService _TbResultService;
+        private readonly ITbOrderService _tbOrderService;
         private readonly ITbContactService _tbContactService;
         private readonly ISysUserService sysUserService;
 
-        public TbResultController(ITbResultService TbResultService, ITbContactService tbContactService, ISysUserService sysUserService)
+        public TbResultController(ITbResultService TbResultService, ITbContactService tbContactService, ISysUserService sysUserService, ITbOrderService tbOrderService)
         {
             _TbResultService = TbResultService;
             _tbContactService = tbContactService;
             this.sysUserService = sysUserService;
+            _tbOrderService = tbOrderService;
         }
 
         /// <summary>
@@ -82,17 +87,21 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [HttpGet("statistic")]
         public IActionResult GetStatistic(int Id)
         {
-            var list = _TbResultService.Queryable().Where(w => !string.IsNullOrEmpty(w.处理状态) && w.匹配时间.Date == DateTime.Now.Date);
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);
 
+
+
+            var tbResultList = _TbResultService.Queryable().Where(w =>  w.处理状态 == "已匹配" && w.匹配时间.Date == DateTime.Now.Date && w.CompanyId == user.Remark);
+            var orderList = _tbOrderService.Queryable().Where(w => w.状态 == "被读取" && SqlFunc.ToDate(w.使用时间).Date == DateTime.Now.Date && w.CompanyId == user.Remark).ToList();
             var info = new StatisticDto()
             {
 
-                sum = list.Count(),
-                ju = list.Where(w => w.问题件类型 == "拒收").Count(),
-                po = list.Where(w => w.问题件类型 == "破损件").Count(),
-
+                sum = orderList.Count(),
+                ju = orderList.Where(w => w.问题件类型 == "拒收").Count(),
+                po = orderList.Where(w => w.问题件类型 == "破损件").Count(),
+                sendSum = tbResultList.Count()
             };
-
 
             return SUCCESS(info);
         }
@@ -210,7 +219,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
               && w.客户商家名称 == parm.商家名称
               && w.对接方式 == "微信"
               );
-            model2.群名称=parm.群名称;
+            model2.群名称 = parm.群名称;
             model2.account = user.NickName;
             model2.匹配时间 = DateTime.Now;
 

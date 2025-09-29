@@ -30,13 +30,13 @@
             </el-input>
           </el-form-item>
         </el-col>
-              <el-col :span="6">
+        <el-col :span="6">
           <el-form-item label="平台" prop="平台">
             <el-input v-model="queryParams.平台" placeholder="请输入平台" clearable :style="{ width: '100%' }">
             </el-input>
           </el-form-item>
         </el-col>
-              <el-col :span="6">
+        <el-col :span="6">
           <el-form-item label="发件地址" prop="发件地址">
             <el-input v-model="queryParams.发件地址" placeholder="请输入发件地址" clearable :style="{ width: '100%' }">
             </el-input>
@@ -111,19 +111,21 @@
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
       @selection-change="handleSelectionChange" @select-all="handleSelectAll" @row-click="handleRowClick">
-      <el-table-column type="selection" width="50" align="center"  />
+      <el-table-column type="selection" width="50" align="center" />
       <el-table-column prop="问题件类型" label="类型" align="left" :show-overflow-tooltip="true" width="80" />
       <el-table-column prop="单号" label="单号" align="center" :show-overflow-tooltip="true" width="150" />
       <el-table-column prop="商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="收件人信息" label="发件人信息" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="发件地址" label="发件地址" align="center" :show-overflow-tooltip="true"  />
-      <el-table-column prop="平台" label="平台" align="center" :show-overflow-tooltip="true"  width="80"/>
+      <el-table-column prop="发件地址" label="发件地址" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="平台" label="平台" align="center" :show-overflow-tooltip="true" width="80" />
       <!-- <el-table-column prop="结果" label="结果" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="执行机器人" label="执行机器人" align="center" :show-overflow-tooltip="true" /> -->
-      <el-table-column prop="account" label="操作员" align="center" :show-overflow-tooltip="true"  width="80"/>
+      <el-table-column prop="account" label="操作员" align="center" :show-overflow-tooltip="true" width="80" />
       <el-table-column prop="匹配时间" label="匹配时间" align="center" :show-overflow-tooltip="true" width="80" />
-      <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true"  width="80"/>
+      <el-table-column prop="处理状态" label="处理状态" align="center" :show-overflow-tooltip="true" width="80" :formatter="formatStatus" />
+
+
       <!-- <el-table-column prop="companyId" label="CompanyId" align="center" :show-overflow-tooltip="true" /> -->
       <!-- <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
@@ -233,16 +235,22 @@ export default {
       total: 0,
       rules: {
       },
-      处理状态Options: [{
-        "label": "已匹配",
-        "value": "已匹配"
-      }, {
-        "label": "已处理",
-        "value": "已处理"
-      }, {
-        "label": "未匹配",
-        "value": ""
-      }
+      处理状态Options: [
+        {
+          "label": "已补发",
+          "value": "已补发"
+        }, {
+          "label": "已转发",
+          "value": "已处理"
+        }
+        , {
+          "label": "已匹配",
+          "value": "已匹配"
+        }
+        , {
+          "label": "未匹配",
+          "value": ""
+        }
       ],
       问题件类型Options: [{
         "label": "拒收",
@@ -289,6 +297,10 @@ export default {
     ];
   },
   methods: {
+    formatStatus(row) {
+      const option = this.处理状态Options.find(opt => opt.value === row.处理状态);
+      return option ? option.label : row.status;
+    },
     rowClickCallBack(row) {
 
       this.row2 = row;
