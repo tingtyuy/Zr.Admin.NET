@@ -21,7 +21,7 @@
               </el-tag>
             </el-col>
             <el-col :span="6">
-              已匹配问题件数量
+              已匹配商户群数量
               <el-tag effect="dark">
                 {{ statisticForm.sendSum }}
               </el-tag>

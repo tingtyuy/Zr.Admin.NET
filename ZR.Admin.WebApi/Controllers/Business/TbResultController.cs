@@ -90,9 +90,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
             long userId = HttpContext.GetUId();
             var user = sysUserService.SelectUserById(userId);
 
+   
 
-
-            var tbResultList = _TbResultService.Queryable().Where(w =>  w.处理状态 == "已匹配" && w.匹配时间.Date == DateTime.Now.Date && w.CompanyId == user.Remark);
+            var count = _tbContactService.Queryable().Where(w => w.匹配时间.Date == DateTime.Now.Date && w.CompanyId == user.Remark);
             var orderList = _tbOrderService.Queryable().Where(w => w.状态 == "被读取" && SqlFunc.ToDate(w.使用时间).Date == DateTime.Now.Date && w.CompanyId == user.Remark).ToList();
             var info = new StatisticDto()
             {
@@ -100,7 +100,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 sum = orderList.Count(),
                 ju = orderList.Where(w => w.问题件类型 == "拒收").Count(),
                 po = orderList.Where(w => w.问题件类型 == "破损件").Count(),
-                sendSum = tbResultList.Count()
+                sendSum = count.Count()
             };
 
             return SUCCESS(info);

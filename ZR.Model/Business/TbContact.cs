@@ -71,7 +71,7 @@ namespace ZR.Model.Business
         public bool 地址匹配 { get; set; }
         public string account{ get; set; }
 
-        public DateTime? 匹配时间 { get; set; }
+        public DateTime 匹配时间 { get; set; }
 
         [Navigate(NavigateType.OneToMany,nameof(TbWxGroupMember.ContactId), nameof(Id))]
         public List<TbWxGroupMember> TbWxGroupMembers { get; set; }
