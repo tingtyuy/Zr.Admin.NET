@@ -39,9 +39,9 @@ namespace Models
            /// <summary>
            /// Desc:
            /// Default:
-           /// Nullable:True
+           /// Nullable:False
            /// </summary>           
-           public int? F报价主表ID {get;set;}
+           public int F报价主表ID {get;set;}
 
     }
 }

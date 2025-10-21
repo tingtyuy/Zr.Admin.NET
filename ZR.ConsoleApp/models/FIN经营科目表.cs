@@ -21,14 +21,14 @@ namespace Models
            /// Nullable:False
            /// </summary>           
            [SugarColumn(IsPrimaryKey=true)]
-           public string F经营科目名称 {get;set;}
+           public string F科目编码 {get;set;}
 
            /// <summary>
            /// Desc:
            /// Default:
            /// Nullable:False
            /// </summary>           
-           public string F会计科目编码 {get;set;}
+           public string F业务类别 {get;set;}
 
            /// <summary>
            /// Desc:
@@ -40,30 +40,16 @@ namespace Models
            /// <summary>
            /// Desc:
            /// Default:
-           /// Nullable:False
-           /// </summary>           
-           public string F一级分类 {get;set;}
-
-           /// <summary>
-           /// Desc:
-           /// Default:
-           /// Nullable:False
-           /// </summary>           
-           public string F二级分类 {get;set;}
-
-           /// <summary>
-           /// Desc:
-           /// Default:
            /// Nullable:True
            /// </summary>           
-           public string F申通费用名称 {get;set;}
+           public string F科目分组 {get;set;}
 
            /// <summary>
            /// Desc:
            /// Default:
-           /// Nullable:True
+           /// Nullable:False
            /// </summary>           
-           public string F申通科目代码 {get;set;}
+           public string F经营别名 {get;set;}
 
            /// <summary>
            /// Desc:
@@ -71,6 +57,13 @@ namespace Models
            /// Nullable:False
            /// </summary>           
            public decimal F默认值 {get;set;}
+
+           /// <summary>
+           /// Desc:
+           /// Default:
+           /// Nullable:True
+           /// </summary>           
+           public string F数据来源 {get;set;}
 
            /// <summary>
            /// Desc:

@@ -20,7 +20,6 @@ namespace Models
            /// Default:
            /// Nullable:False
            /// </summary>           
-           [SugarColumn(IsPrimaryKey=true)]
            public string FUID {get;set;}
 
            /// <summary>
@@ -127,6 +126,14 @@ namespace Models
            /// Nullable:True
            /// </summary>           
            public string F客户临时ID {get;set;}
+
+           /// <summary>
+           /// Desc:
+           /// Default:
+           /// Nullable:False
+           /// </summary>           
+           [SugarColumn(IsPrimaryKey=true,IsIdentity=true)]
+           public int FID {get;set;}
 
     }
 }

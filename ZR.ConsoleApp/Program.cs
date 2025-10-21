@@ -1,6 +1,8 @@
 ﻿using MiniExcelLibs;
+using Models;
 using NPOI.SS.UserModel;
 using SqlSugar;
+using ZR.Common;
 using ZR.Common.ExcelHelper;
 
 SqlSugarClient db;
@@ -8,64 +10,76 @@ Test();
 void Test()
 {
     InitDb();
-
+    var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+    var logHelper = new LogHelper(logFilePath);
 
 
     //db.DbFirst.IsCreateAttribute().CreateClassFile(@"D:\123456789\kai\Zr.Admin.NET\ZR.ConsoleApp\models");
 
+    //return;
+
+    db.Deleteable<TempUserOrderData>().ExecuteCommand();
     var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
     var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
+
     var filePaths = new List<string>();
-    GetAllFiles(fileDir, filePaths);
+    GetAllFiles(targetDir, filePaths);
 
     foreach (var filePath in filePaths)
     {
-        //var rows = MiniExcel.Query(filePath).ToList();
-        //// 获取 A1 单元格的值（第0行第0列）
-        //if (rows.Count > 6)
+        var rows = MiniExcel.Query(filePath).ToList();
+        // 获取 A1 单元格的值（第0行第0列）
+        if (rows.Count > 6)
+        {
+            var userName = rows[2].B;
+            var orderCount = rows[5].D;
+            var orderMoney = rows[5].F;
+            //db.Insertable(new TempUserOrderData
+            //{
+            //    UserName = userName,
+            //    OrderCount = orderCount,
+            //    OrderMoney =orderMoney
+            //}).ExecuteCommand();
+            //logHelper.Logger.Information($"{filePath}=>userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
+            Console.WriteLine($"userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
+        }
+        //var npoiExcelHelper = new NpoiExcelHelper(filePath);
+        //if (npoiExcelHelper.Workbook is null)
         //{
-        //    var userName = rows[2].B;
-        //    var orderCount = rows[5].D;
-        //    var orderMoney = rows[5].F;
-        //    Console.WriteLine($"userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
+
+        //    logHelper.Logger.Error($"文件无法打开：{filePath}");
+        //    continue;
         //}
-        var npoiExcelHelper = new NpoiExcelHelper(filePath);
-        if (npoiExcelHelper.Workbook is null)
-        {
+        //var sheet = npoiExcelHelper.Workbook.GetSheetAt(1);
+        //DateTime thresholdDate = new DateTime(2025, 9, 5);
+        //npoiExcelHelper.ForeachRow(sheet, row =>
+        //{
 
-            Console.WriteLine($"文件无法打开：{filePath}");
-            continue;
-        }
-        var sheet = npoiExcelHelper.Workbook.GetSheetAt(1);
-        DateTime thresholdDate = new DateTime(2025, 9, 5);
-        npoiExcelHelper.ForeachRow(sheet, row =>
-        {
+        //    ICell cell = row.GetCell(0);
+        //    if (cell == null)
+        //    {
+        //        logHelper.Logger.Error($"第一列不是业务日期：{filePath}");
+        //        return;
+        //    }
+        //    if (DateTime.TryParse(cell.ToString(), out DateTime cellDate))
+        //    {
+        //        if (cellDate < thresholdDate)
+        //        {
+        //            sheet.RemoveRow(row);
+        //        }
+        //    }
 
-            ICell cell = row.GetCell(0);
-            if (cell == null)
-            {
-                Console.WriteLine($"第一列不是业务日期：{filePath}");
-                return;
-            }
-            if (DateTime.TryParse(cell.ToString(), out DateTime cellDate))
-            {
-                if (cellDate < thresholdDate)
-                {
-                    sheet.RemoveRow(row);
-                }
-            }
 
-       
-        });
+        //});
 
-        // 保存修改
-        using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-        {
-
-            npoiExcelHelper.Workbook.Write(fs);
-            File.Move(filePath, targetDir);
-            Console.WriteLine($"修改完成：{filePath}");
-        }
+        //// 保存修改
+        //using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+        //{
+        //    npoiExcelHelper.Workbook.Write(fs);
+        //}
+        //var targetFilePath = Path.Combine(targetDir, Path.GetFileName(filePath));
+        //File.Move(filePath, targetFilePath);
+        //logHelper.Logger.Information($"修改完成：{filePath}");
 
     }
 
@@ -137,7 +151,7 @@ void InitDb()
 {
     db = new SqlSugarClient(new ConnectionConfig()
     {
-        ConnectionString = "Data Source=47.105.65.51;Initial Catalog=mdsto_dev;Encrypt=True;TrustServerCertificate=True;User ID=mdsto_dbadmin;Password=Mdstodb2025;Connection Timeout=1200"
+        ConnectionString = "Data Source=47.105.65.51;Initial Catalog=mdtwo_dev;Encrypt=True;TrustServerCertificate=True;User ID=mdtwo_dbadmin;Password=Mdtwo2025;Connection Timeout=1200"
         ,
         DbType = DbType.SqlServer,
         IsAutoCloseConnection = true

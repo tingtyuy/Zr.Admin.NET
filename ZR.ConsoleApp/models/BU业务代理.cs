@@ -63,7 +63,7 @@ namespace Models
            /// Default:
            /// Nullable:True
            /// </summary>           
-           public string F所属网点UID {get;set;}
+           public int? F所属网点UID {get;set;}
 
            /// <summary>
            /// Desc:备注
@@ -75,10 +75,9 @@ namespace Models
            /// <summary>
            /// Desc:
            /// Default:
-           /// Nullable:False
+           /// Nullable:True
            /// </summary>           
-           [SugarColumn(IsIdentity=true)]
-           public int F排序 {get;set;}
+           public int? F排序 {get;set;}
 
            /// <summary>
            /// Desc:

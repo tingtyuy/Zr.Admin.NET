@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace ZR.Common.ExcelHelper
 {
-    public class NpoiExcelHelper
+    public class ExcelHelper
     {
         public readonly string ExcelFilePath;
 
         public readonly IWorkbook Workbook;
 
-        public NpoiExcelHelper(string _excelFilePath)
+        public ExcelHelper(string _excelFilePath)
         {
             ExcelFilePath = _excelFilePath;
             try

@@ -8,34 +8,33 @@ namespace Models
     ///<summary>
     ///
     ///</summary>
-    [SugarTable("ACT_GE_PROPERTY")]
-    public partial class ACT_GE_PROPERTY
+    [SugarTable("TempUserOrderData")]
+    public partial class TempUserOrderData
     {
-           public ACT_GE_PROPERTY(){
+           public TempUserOrderData(){
 
 
            }
            /// <summary>
            /// Desc:
            /// Default:
-           /// Nullable:False
+           /// Nullable:True
            /// </summary>           
-           [SugarColumn(IsPrimaryKey=true)]
-           public string NAME_ {get;set;}
+           public string UserName {get;set;}
 
            /// <summary>
            /// Desc:
            /// Default:
            /// Nullable:True
            /// </summary>           
-           public string VALUE_ {get;set;}
+           public int? OrderCount {get;set;}
 
            /// <summary>
            /// Desc:
            /// Default:
            /// Nullable:True
            /// </summary>           
-           public int? REV_ {get;set;}
+           public decimal? OrderMoney {get;set;}
 
     }
 }

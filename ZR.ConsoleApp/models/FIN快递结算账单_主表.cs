@@ -112,13 +112,6 @@ namespace Models
            /// Default:0
            /// Nullable:False
            /// </summary>           
-           public decimal F总重量 {get;set;}
-
-           /// <summary>
-           /// Desc:
-           /// Default:0
-           /// Nullable:False
-           /// </summary>           
            public decimal F均重加收金额 {get;set;}
 
            /// <summary>
@@ -134,6 +127,13 @@ namespace Models
            /// Nullable:False
            /// </summary>           
            public decimal F单量加收金额 {get;set;}
+
+           /// <summary>
+           /// Desc:
+           /// Default:0
+           /// Nullable:False
+           /// </summary>           
+           public decimal F总重量 {get;set;}
 
            /// <summary>
            /// Desc:
