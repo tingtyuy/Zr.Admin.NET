@@ -10,15 +10,20 @@ Test();
 void Test()
 {
     InitDb();
+
+    #region 日志
     var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
-    var logHelper = new LogHelper(logFilePath);
+    var logHelper = new LogHelper(logFilePath); 
+    #endregion
 
-
+    #region 创建实体类
     //db.DbFirst.IsCreateAttribute().CreateClassFile(@"D:\123456789\kai\Zr.Admin.NET\ZR.ConsoleApp\models");
 
-    //return;
+    //return; 
+    #endregion
 
-    db.Deleteable<TempUserOrderData>().ExecuteCommand();
+    //db.Deleteable<TempUserOrderData>().ExecuteCommand();
+
     var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
     var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
 
@@ -27,60 +32,33 @@ void Test()
 
     foreach (var filePath in filePaths)
     {
-        var rows = MiniExcel.Query(filePath).ToList();
-        // 获取 A1 单元格的值（第0行第0列）
-        if (rows.Count > 6)
-        {
-            var userName = rows[2].B;
-            var orderCount = rows[5].D;
-            var orderMoney = rows[5].F;
-            //db.Insertable(new TempUserOrderData
-            //{
-            //    UserName = userName,
-            //    OrderCount = orderCount,
-            //    OrderMoney =orderMoney
-            //}).ExecuteCommand();
-            //logHelper.Logger.Information($"{filePath}=>userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
-            Console.WriteLine($"userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
-        }
-        //var npoiExcelHelper = new NpoiExcelHelper(filePath);
-        //if (npoiExcelHelper.Workbook is null)
-        //{
+        #region 导出客户、总单量、总金额
+        //ExportTatalStatistic(filePath); 
+        #endregion
 
-        //    logHelper.Logger.Error($"文件无法打开：{filePath}");
+        #region 删除指定日期之前的数据
+        //bool flowControl = MakeDateData(logHelper, targetDir, filePath);
+        //if (!flowControl)
+        //{
         //    continue;
-        //}
-        //var sheet = npoiExcelHelper.Workbook.GetSheetAt(1);
-        //DateTime thresholdDate = new DateTime(2025, 9, 5);
-        //npoiExcelHelper.ForeachRow(sheet, row =>
-        //{
+        //} 
+        #endregion
 
-        //    ICell cell = row.GetCell(0);
-        //    if (cell == null)
-        //    {
-        //        logHelper.Logger.Error($"第一列不是业务日期：{filePath}");
-        //        return;
-        //    }
-        //    if (DateTime.TryParse(cell.ToString(), out DateTime cellDate))
-        //    {
-        //        if (cellDate < thresholdDate)
-        //        {
-        //            sheet.RemoveRow(row);
-        //        }
-        //    }
+        #region 对比申通总单量
 
 
-        //});
+        #endregion
 
-        //// 保存修改
-        //using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-        //{
-        //    npoiExcelHelper.Workbook.Write(fs);
-        //}
-        //var targetFilePath = Path.Combine(targetDir, Path.GetFileName(filePath));
-        //File.Move(filePath, targetFilePath);
-        //logHelper.Logger.Information($"修改完成：{filePath}");
+        #region 导入所有仓内
 
+        #endregion
+
+        #region 导入所有仓外
+
+        /// 1. 确定sheet(快递费或账单明细)
+        /// 2. 获取表头
+
+        #endregion
     }
 
 }
@@ -163,4 +141,66 @@ void InitDb()
         };
     });
 
+}
+
+static bool MakeDateData(LogHelper logHelper, string targetDir, string filePath)
+{
+    var npoiExcelHelper = new NpoiExcelHelper(filePath);
+    if (npoiExcelHelper.Workbook is null)
+    {
+
+        logHelper.Logger.Error($"文件无法打开：{filePath}");
+        return false;
+    }
+    var sheet = npoiExcelHelper.Workbook.GetSheetAt(1);
+    DateTime thresholdDate = new DateTime(2025, 9, 5);
+    npoiExcelHelper.ForeachRow(sheet, row =>
+    {
+
+        ICell cell = row.GetCell(0);
+        if (cell == null)
+        {
+            logHelper.Logger.Error($"第一列不是业务日期：{filePath}");
+            return;
+        }
+        if (DateTime.TryParse(cell.ToString(), out DateTime cellDate))
+        {
+            if (cellDate < thresholdDate)
+            {
+                sheet.RemoveRow(row);
+            }
+        }
+
+
+    });
+
+    // 保存修改
+    using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+    {
+        npoiExcelHelper.Workbook.Write(fs);
+    }
+    var targetFilePath = Path.Combine(targetDir, Path.GetFileName(filePath));
+    File.Move(filePath, targetFilePath);
+    logHelper.Logger.Information($"修改完成：{filePath}");
+    return true;
+}
+
+static void ExportTatalStatistic(string filePath)
+{
+    var rows = MiniExcel.Query(filePath).ToList();
+    // 获取 A1 单元格的值（第0行第0列）
+    if (rows.Count > 6)
+    {
+        var userName = rows[2].B;
+        var orderCount = rows[5].D;
+        var orderMoney = rows[5].F;
+        //db.Insertable(new TempUserOrderData
+        //{
+        //    UserName = userName,
+        //    OrderCount = orderCount,
+        //    OrderMoney =orderMoney
+        //}).ExecuteCommand();
+        //logHelper.Logger.Information($"{filePath}=>userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
+        Console.WriteLine($"userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
+    }
 }
