@@ -8,7 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MiniExcel" Version="1.41.4" />
+    <Folder Include="models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZR.Common\ZR.Common.csproj" />
   </ItemGroup>
 
 </Project>
