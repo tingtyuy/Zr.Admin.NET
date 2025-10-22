@@ -27,7 +27,7 @@ namespace ZR.Common
 
         public DbHelper()
         {
-            InitDb();
+            InitDb2();
             LogHelper = new LogHelper();
         }
         private void InitDb()
@@ -47,6 +47,24 @@ namespace ZR.Common
             });
 
         }
+        private void InitDb2()
+        {
+            db = new SqlSugarClient(new ConnectionConfig()
+            {
+                ConnectionString = "Data Source=localhost;Initial Catalog=demo;User ID=root;Password=123456;AllowLoadLocalInfile=true;Connection Timeout=1200"
+                ,
+                DbType = SqlSugar.DbType.MySql,
+                IsAutoCloseConnection = true
+            }, configAction: db =>
+            {
+                db.Aop.OnLogExecuting = (sql, pars) =>
+                {
+                    Console.WriteLine(sql);
+                };
+            });
+
+        }
+
 
         public void CreateTable(string tableName, string[] tableColumns, EnumDbHelperCreateTableModel enumCreateTableModel = EnumDbHelperCreateTableModel.CreateIfNotExists)
         {

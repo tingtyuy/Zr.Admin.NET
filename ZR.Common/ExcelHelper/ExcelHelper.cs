@@ -120,7 +120,7 @@ namespace ZR.Common.ExcelHelper
                       Value = cell?.ToString().FilterSpecial(), // 处理 null 并去除空格
                       ColumnIndex = cell.ColumnIndex
                   })
-                  .Where(x => x.Value != null) // 可选：过滤掉值为 null 的列
+                  .Where(x => !string.IsNullOrEmpty(x.Value) ) // 可选：过滤掉值为 null 的列
                   .ToDictionary(x => x.ColumnIndex, x => x.Value);
         }
 

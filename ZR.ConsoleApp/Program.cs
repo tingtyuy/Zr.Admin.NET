@@ -30,7 +30,7 @@ void Test()
     //var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
     //var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
 
-    var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
+    var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单";
 
 
     var filePaths = new List<string>();
