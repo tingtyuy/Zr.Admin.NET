@@ -72,7 +72,7 @@ namespace ZR.Common
     
             if (db.DbMaintenance.IsAnyTable(tableName))
             {
-                if (enumCreateTableModel == EnumDbHelperCreateTableModel.CreateNew)
+                if (enumCreateTableModel == EnumDbHelperCreateTableModel.CreateIfNotExists)
                 {
                     ///跳过表
                     Console.WriteLine($"表 {tableName} 已存在，跳过创建。");
