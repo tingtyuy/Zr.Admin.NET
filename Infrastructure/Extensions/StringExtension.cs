@@ -7,6 +7,14 @@ namespace Infrastructure.Extensions
 {
     public static class StringExtension
     {
+        /// <summary>
+        /// 过滤掉空和特殊符号字符
+        /// </summary>
+        /// <returns></returns>
+        public static string FilterSpecial(this string str)
+        {
+          return Regex.Replace(str, @"[^\u4e00-\u9fa5a-zA-Z0-9_]", "");
+        }
         public static string DateTimeMinValueToEmpty(this string str)
         {
             if (str.StartsWith("0001") || str.StartsWith("1900"))

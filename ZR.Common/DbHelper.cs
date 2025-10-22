@@ -1,17 +1,26 @@
-﻿using SqlSugar;
+﻿using Infrastructure.Extensions;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ZR.Infrastructure.Extensions;
 
 namespace ZR.Common
 {
+    public enum EnumDbHelperCreateTableModel
+    {
+        CreateNew = 1,
+        CreateIfNotExists = 2,
+    }
     public class DbHelper
     {
+
         public SqlSugarClient db;
 
         public LogHelper LogHelper;
@@ -39,21 +48,28 @@ namespace ZR.Common
 
         }
 
-        public void CreateTable(string tableName, string[] tableColumns)
+        public void CreateTable(string tableName, string[] tableColumns, EnumDbHelperCreateTableModel enumCreateTableModel = EnumDbHelperCreateTableModel.CreateIfNotExists)
         {
-            // 表名过滤掉空和特殊符号字符
-            tableName = Regex.Replace(tableName, @"[^\u4e00-\u9fa5a-zA-Z0-9_]", "");
             // 检查表是否已存在
+    
             if (db.DbMaintenance.IsAnyTable(tableName))
             {
-                Console.WriteLine($"表 {tableName} 已存在，跳过创建。");
-                return;
+                if (enumCreateTableModel == EnumDbHelperCreateTableModel.CreateIfNotExists)
+                {
+                    ///跳过表
+                    Console.WriteLine($"表 {tableName} 已存在，跳过创建。");
+                    return;
+                }
+                else if (enumCreateTableModel == EnumDbHelperCreateTableModel.CreateNew)
+                {
+                    ///删除表
+                    db.DbMaintenance.DropTable(tableName);
+                    Console.WriteLine($"表 {tableName} 已删除。");
+                }
+
             }
-   
-            // 列名过滤掉空和特殊符号字符
-            tableColumns = tableColumns.Where(column => !string.IsNullOrEmpty(column))
-                .Select(s => Regex.Replace(s, @"[^\u4e00-\u9fa5a-zA-Z0-9_]", ""))  // 过滤特殊符号
-                .ToArray();
+
+       
 
             // 构建列定义
             var columns = new List<DbColumnInfo>();
@@ -75,64 +91,17 @@ namespace ZR.Common
         }
 
 
-        public void InsertToTable(string tableName, string[] tableColumns)
+        public void InsertToTable(string tableName, string[] tableColumns, DataTable dataTable)
         {
-            // 表名过滤掉空和特殊符号字符
-            tableName = Regex.Replace(tableName, @"[^\u4e00-\u9fa5a-zA-Z0-9_]", "");
-            // 检查表是否已存在
-            if (db.DbMaintenance.IsAnyTable(tableName))
-            {
-                Console.WriteLine($"表 {tableName} 已存在，跳过创建。");
-                return;
-            }
+            LogHelper.Logger.Information($"表 {tableName} 数据更新成功！");
 
-            // 列名过滤掉空和特殊符号字符
-            tableColumns = tableColumns.Where(column => !string.IsNullOrEmpty(column))
-                .Select(s => Regex.Replace(s, @"[^\u4e00-\u9fa5a-zA-Z0-9_]", ""))  // 过滤特殊符号
-                .ToArray();
+            //var sql = db.Insertable(dynamics).ToSqlString();
 
-            // 构建列定义
-            var columns = new List<DbColumnInfo>();
-            foreach (string tableColumn in tableColumns)
-            {
-                // 默认类型为NVARCHAR(255)，可根据需要调整
-                columns.Add(new DbColumnInfo
-                {
-                    DbColumnName = tableColumn,
-                    DataType = "nvarchar",
-                    Length = 255,
-                    IsNullable = true
-                });
-            }
-
-            // 动态创建表
-            db.DbMaintenance.CreateTable(tableName, columns);
-            LogHelper.Logger.Information($"表 {tableName} 创建成功！");
-        }
-        public void BulkInsertData(SqlSugarClient db, DataTable dataTable, string tableName)
-        {
-            //// 将DataTable转换为动态对象列表
-            //var entities = new List<ExpandoObject>();
-            //foreach (DataRow row in dataTable.Rows)
-            //{
-            //    dynamic entity = new ExpandoObject();
-            //    var dict = (IDictionary<string, object>)entity;
-            //    foreach (DataColumn col in dataTable.Columns)
-            //    {
-            //        dict[col.ColumnName] = row[col];
-            //    }
-            //    entities.Add(entity);
-            //}
-
-            //// 批量插入（使用SqlSugar的动态建表能力）
-            //db.Fastest<dynamic>()
-            //    .AS(tableName)
-            //    .BulkCopy(entities);
-
-            //Console.WriteLine($"成功插入 {entities.Count} 条数据到表 {tableName}！");
+            db.Fastest<dynamic>()
+                        .AS(tableName)
+                        .BulkCopy(dataTable);
         }
 
-     
     }
 
 }

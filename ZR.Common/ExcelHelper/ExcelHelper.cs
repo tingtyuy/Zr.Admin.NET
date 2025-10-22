@@ -1,14 +1,17 @@
-﻿using Microsoft.Identity.Client;
+﻿using Infrastructure.Extensions;
+using Microsoft.Identity.Client;
 using NPOI.HSSF.UserModel;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using ZR.Infrastructure.Extensions;
 namespace ZR.Common.ExcelHelper
 {
     public class ExcelHelper
@@ -101,18 +104,82 @@ namespace ZR.Common.ExcelHelper
 
         }
 
-        public  string[] GetFirstRowAsStringArray(ISheet sheet)
+        public Dictionary<int, string> GetFirstRowAsStringArray(ISheet sheet)
         {
+            var result = new Dictionary<int, string>();
             if (sheet == null)
                 throw new ArgumentNullException(nameof(sheet), "工作表不能为 null！");
 
             IRow firstRow = sheet.GetRow(0);
             if (firstRow == null)
-                return Array.Empty<string>(); // 返回空数组而非 null
+                return result;
 
             return firstRow.Cells
-                .Select(cell => cell.ToString()?.Trim()) // 处理可能的 null 值并去除空格
-                .ToArray();
+                  .Select(cell => new
+                  {
+                      Value = cell?.ToString().FilterSpecial(), // 处理 null 并去除空格
+                      ColumnIndex = cell.ColumnIndex
+                  })
+                  .Where(x => x.Value != null) // 可选：过滤掉值为 null 的列
+                  .ToDictionary(x => x.ColumnIndex, x => x.Value);
+        }
+
+        public DataTable GetTableData(ISheet sheet)
+        {
+            if (sheet == null)
+                throw new ArgumentNullException(nameof(sheet));
+
+            var firstRow = GetFirstRowAsStringArray(sheet);
+
+            var dataTable = new System.Data.DataTable();
+
+            dataTable.Columns.AddRange(firstRow.Values.Select(s => new  System.Data.DataColumn(s)).ToArray());
+
+            for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)
+            {
+                var cells = sheet.GetRow(rowIndex).Cells.Where(s => firstRow.Keys.Contains(s.ColumnIndex)).Select(s=> GetCellValue(s)).ToArray();
+
+                DataRow newRow = dataTable.NewRow();
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    if (i < dataTable.Columns.Count)
+                    {
+                        newRow[i] = string.IsNullOrEmpty(cells[i].ToString()) ? DBNull.Value : (object)cells[i];
+                    }
+                }
+
+                dataTable.Rows.Add(newRow);
+            }
+            return dataTable;
+        }
+
+
+        private object GetCellValue(ICell cell)
+        {
+            if (cell == null)
+                return DBNull.Value;
+
+            return cell.CellType switch
+            {
+                CellType.String => cell.StringCellValue,
+                CellType.Numeric => cell.NumericCellValue,
+                CellType.Boolean => cell.BooleanCellValue,
+                CellType.Formula => GetFormulaCellValue(cell), // 处理公式
+                CellType.Blank => DBNull.Value,
+                _ => cell.ToString() // 其他类型（如日期、错误）转为字符串
+            };
+        }
+
+        // 处理公式单元格
+        private object GetFormulaCellValue(ICell cell)
+        {
+            switch (cell.CachedFormulaResultType)
+            {
+                case CellType.String: return cell.StringCellValue;
+                case CellType.Numeric: return cell.NumericCellValue;
+                case CellType.Boolean: return cell.BooleanCellValue;
+                default: return cell.ToString();
+            }
         }
     }
 }

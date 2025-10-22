@@ -1,10 +1,11 @@
-﻿using MiniExcelLibs;
+﻿using Infrastructure.Extensions;
+using MiniExcelLibs;
 using Models;
 using NPOI.SS.UserModel;
 using SqlSugar;
 using ZR.Common;
 using ZR.Common.ExcelHelper;
-
+using ZR.Infrastructure.Extensions;
 
 Test();
 void Test()
@@ -19,7 +20,7 @@ void Test()
     #endregion
 
     #region 创建实体类
-    dbHelper.db.DbFirst.IsCreateAttribute().CreateClassFile(@"D:\123456789\kai\Zr.Admin.NET\ZR.ConsoleApp\models");
+    //dbHelper.db.DbFirst.IsCreateAttribute().CreateClassFile(@"D:\123456789\kai\Zr.Admin.NET\ZR.ConsoleApp\models");
 
     //return; 
     #endregion
@@ -71,13 +72,25 @@ void Test()
             logHelper.Logger.Error($"未找到指定工作表：{filePath}");
             continue;
         }
-        // 2. 拿到表头
+        // 2. 拿到表头 和 表名
 
-        var headers = npoiExcelHelper.GetFirstRowAsStringArray(sheet);
+        var tableColumns =npoiExcelHelper.GetFirstRowAsStringArray(sheet).Select(s=>s.Value).ToArray();
+        var tableName =Path.GetFileNameWithoutExtension(filePath).FilterSpecial();
 
-        // 2. 获取表头
+        // 3. 创建表
 
-        dbHelper.CreateTable(Path.GetFileNameWithoutExtension(filePath), headers);
+        dbHelper.CreateTable(tableName, tableColumns, EnumDbHelperCreateTableModel.CreateNew);
+
+        // 5. 读取数据
+
+        //var tableData = MiniExcel.QueryAsDataTable(filePath,useHeaderRow:true, sheetName: sheet.SheetName);
+        var tableData = npoiExcelHelper.GetTableData(sheet);
+
+        // 4. 插入数据
+
+        //dbHelper.db.Insertable(tableData).AS(tableName).ExecuteCommand();
+
+        dbHelper.InsertToTable(tableName, tableColumns, tableData);
 
         #endregion
     }
