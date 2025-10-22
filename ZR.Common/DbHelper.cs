@@ -51,7 +51,7 @@ namespace ZR.Common
         {
             db = new SqlSugarClient(new ConnectionConfig()
             {
-                ConnectionString = "Data Source=localhost;Initial Catalog=demo;User ID=root;Password=123456;AllowLoadLocalInfile=true;Connection Timeout=1200"
+                ConnectionString = "Data Source=localhost;Database=demo;User ID=root;Password=123456;pooling=true;port=3306;sslmode=none;CharSet=utf8;Convert Zero Datetime=True;Allow Zero Datetime=True;AllowLoadLocalInfile=true;"
                 ,
                 DbType = SqlSugar.DbType.MySql,
                 IsAutoCloseConnection = true
@@ -72,7 +72,7 @@ namespace ZR.Common
     
             if (db.DbMaintenance.IsAnyTable(tableName))
             {
-                if (enumCreateTableModel == EnumDbHelperCreateTableModel.CreateIfNotExists)
+                if (enumCreateTableModel == EnumDbHelperCreateTableModel.CreateNew)
                 {
                     ///跳过表
                     Console.WriteLine($"表 {tableName} 已存在，跳过创建。");
@@ -111,13 +111,16 @@ namespace ZR.Common
 
         public void InsertToTable(string tableName, string[] tableColumns, DataTable dataTable)
         {
-            LogHelper.Logger.Information($"表 {tableName} 数据更新成功！");
 
             //var sql = db.Insertable(dynamics).ToSqlString();
 
+            // 在 BulkCopy 前设置批量大小
             db.Fastest<dynamic>()
-                        .AS(tableName)
-                        .BulkCopy(dataTable);
+                .AS(tableName)
+                .PageSize(50000).BulkCopy(dataTable);
+
+            LogHelper.Logger.Information($"表 {tableName} 数据更新成功！");
+                
         }
 
     }

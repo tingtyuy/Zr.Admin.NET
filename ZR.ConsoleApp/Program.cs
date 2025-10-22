@@ -74,23 +74,54 @@ void Test()
         }
         // 2. 拿到表头 和 表名
 
-        var tableColumns =npoiExcelHelper.GetFirstRowAsStringArray(sheet).Select(s=>s.Value).ToArray();
-        var tableName =Path.GetFileNameWithoutExtension(filePath).FilterSpecial();
+        var tableColumns = npoiExcelHelper.GetFirstRowAsStringArray(sheet).Select(s => s.Value).ToArray();
+        var tableName = Path.GetFileNameWithoutExtension(filePath).FilterSpecial();
 
         // 3. 创建表
+        try
+        {
 
-        dbHelper.CreateTable(tableName, tableColumns, EnumDbHelperCreateTableModel.CreateNew);
+            dbHelper.CreateTable(tableName, tableColumns, EnumDbHelperCreateTableModel.CreateNew);
+        }
+        catch (Exception ex)
+        {
+
+            logHelper.Logger.Error($"创建表失败：{filePath}=》{ex.Message}");
+        }
+
 
         // 5. 读取数据
 
         //var tableData = MiniExcel.QueryAsDataTable(filePath,useHeaderRow:true, sheetName: sheet.SheetName);
-        var tableData = npoiExcelHelper.GetTableData(sheet);
+
+        var tableData = new System.Data.DataTable();
+
+        try
+        {
+
+            tableData = npoiExcelHelper.GetTableData(sheet);
+        }
+        catch (Exception ex)
+        {
+
+            logHelper.Logger.Error($"读取数据失败：{filePath}=》{ex.Message}");
+        }
+
 
         // 4. 插入数据
 
         //dbHelper.db.Insertable(tableData).AS(tableName).ExecuteCommand();
 
-        dbHelper.InsertToTable(tableName, tableColumns, tableData);
+        try
+        {
+
+            dbHelper.InsertToTable(tableName, tableColumns, tableData);
+        }
+        catch (Exception ex)
+        {
+
+            logHelper.Logger.Error($"插入数据失败：{filePath}=》{ex.Message}");
+        }
 
         #endregion
     }

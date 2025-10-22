@@ -114,13 +114,17 @@ namespace ZR.Common.ExcelHelper
             if (firstRow == null)
                 return result;
 
+            // 使用 Dictionary 记录已出现的 Value，避免重复
+            var seenValues = new HashSet<string>();
+
             return firstRow.Cells
                   .Select(cell => new
                   {
                       Value = cell?.ToString().FilterSpecial(), // 处理 null 并去除空格
                       ColumnIndex = cell.ColumnIndex
                   })
-                  .Where(x => !string.IsNullOrEmpty(x.Value) ) // 可选：过滤掉值为 null 的列
+                  .Where(x => !string.IsNullOrEmpty(x.Value)) // 可选：过滤掉值为 null 的列
+                   .Where(x => seenValues.Add(x.Value)) // HashSet.Add() 返回 bool，false 表示已存在
                   .ToDictionary(x => x.ColumnIndex, x => x.Value);
         }
 
@@ -132,25 +136,44 @@ namespace ZR.Common.ExcelHelper
             var firstRow = GetFirstRowAsStringArray(sheet);
 
             var dataTable = new System.Data.DataTable();
-
-            dataTable.Columns.AddRange(firstRow.Values.Select(s => new  System.Data.DataColumn(s)).ToArray());
-
-            for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)
+            try
             {
-                var cells = sheet.GetRow(rowIndex).Cells.Where(s => firstRow.Keys.Contains(s.ColumnIndex)).Select(s=> GetCellValue(s)).ToArray();
 
-                DataRow newRow = dataTable.NewRow();
-                for (int i = 0; i < cells.Length; i++)
+                dataTable.Columns.AddRange(firstRow.Values.Select(s => new System.Data.DataColumn(s)).ToArray());
+
+                for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)
                 {
-                    if (i < dataTable.Columns.Count)
+                    var row = sheet.GetRow(rowIndex);
+                    if (row is null)
                     {
-                        newRow[i] = string.IsNullOrEmpty(cells[i].ToString()) ? DBNull.Value : (object)cells[i];
+                        continue;
                     }
-                }
 
-                dataTable.Rows.Add(newRow);
+                    var cells = sheet.GetRow(rowIndex).Cells.Where(s => firstRow.Keys.Contains(s.ColumnIndex)).Select(s => GetCellValue(s)).ToArray();
+
+                    DataRow newRow = dataTable.NewRow();
+                    for (int i = 0; i < cells.Length; i++)
+                    {
+                        if (i < dataTable.Columns.Count)
+                        {
+                            newRow[i] = string.IsNullOrEmpty(cells[i].ToString()) ? DBNull.Value : (object)cells[i];
+                        }
+                    }
+
+                    dataTable.Rows.Add(newRow);
+                }
             }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
             return dataTable;
+
+
+
         }
 
 
