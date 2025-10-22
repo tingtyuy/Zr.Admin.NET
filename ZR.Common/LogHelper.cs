@@ -11,8 +11,25 @@ namespace ZR.Common
     public class LogHelper
     {
         public readonly ILogger Logger;
+
+        public LogHelper()
+        {
+            var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+            if (!Directory.Exists(logFilePath))
+            {
+                Directory.CreateDirectory(logFilePath);
+            }
+
+            Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        }
         public LogHelper(string logFilePath)
         {
+
             if (!Directory.Exists(logFilePath))
             {
                 Directory.CreateDirectory(logFilePath);

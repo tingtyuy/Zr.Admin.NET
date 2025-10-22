@@ -45,11 +45,12 @@ namespace ZR.Common.ExcelHelper
         }
 
         /// <summary>
-        /// 从下往上遍历 Sheet 的每一行（避免操作时索引变化问题）
+        /// 遍历 Sheet的每一
         /// </summary>
         /// <param name="sheet">要遍历的 Sheet</param>
         /// <param name="action">对每一行执行的操作（参数是当前行 IRow）</param>
-        public void ForeachRow(ISheet sheet, Action<IRow> action)
+        /// <param name="isForward">是不是正向遍历（false的时候可避免操作引起的索引问题）</param>
+        public void ForeachRow(ISheet sheet, Action<IRow> action, bool isForward = false)
         {
             if (sheet == null)
                 throw new ArgumentNullException(nameof(sheet));
@@ -57,15 +58,61 @@ namespace ZR.Common.ExcelHelper
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            // 从下往上遍历（避免删除行时索引变化问题）
-            for (int rowIndex = sheet.LastRowNum; rowIndex >= 0; rowIndex--)
+            if (isForward)
             {
-                IRow row = sheet.GetRow(rowIndex);
-                if (row != null) // 跳过空行
+                for (int rowIndex = 0; rowIndex <= sheet.LastRowNum; rowIndex++)
                 {
-                    action.Invoke(row); // 执行传入的 Action
+                    IRow row = sheet.GetRow(rowIndex);
+                    if (row != null)
+                    {
+                        action.Invoke(row);
+                    }
+                }
+
+            }
+            else
+            {
+                // 从下往上遍历（避免删除行时索引变化问题）
+                for (int rowIndex = sheet.LastRowNum; rowIndex >= 0; rowIndex--)
+                {
+                    IRow row = sheet.GetRow(rowIndex);
+                    if (row != null)
+                    {
+                        action.Invoke(row);
+                    }
+                }
+
+            }
+
+        }
+
+        public ISheet GetSheet(string[] sheetNames)
+        {
+            ISheet sheet = null;
+            foreach (var name in sheetNames)
+            {
+                sheet = Workbook.GetSheet(name);
+                if (sheet != null)
+                {
+                    return sheet;
                 }
             }
+            return sheet;
+
+        }
+
+        public  string[] GetFirstRowAsStringArray(ISheet sheet)
+        {
+            if (sheet == null)
+                throw new ArgumentNullException(nameof(sheet), "工作表不能为 null！");
+
+            IRow firstRow = sheet.GetRow(0);
+            if (firstRow == null)
+                return Array.Empty<string>(); // 返回空数组而非 null
+
+            return firstRow.Cells
+                .Select(cell => cell.ToString()?.Trim()) // 处理可能的 null 值并去除空格
+                .ToArray();
         }
     }
 }

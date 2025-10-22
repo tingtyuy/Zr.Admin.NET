@@ -5,33 +5,42 @@ using SqlSugar;
 using ZR.Common;
 using ZR.Common.ExcelHelper;
 
-SqlSugarClient db;
+
 Test();
 void Test()
 {
-    InitDb();
 
-    #region 日志
-    var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
-    var logHelper = new LogHelper(logFilePath); 
+
+    #region 引入
+
+    var dbHelper = new DbHelper();
+    var logHelper = new LogHelper();
+
     #endregion
 
     #region 创建实体类
-    //db.DbFirst.IsCreateAttribute().CreateClassFile(@"D:\123456789\kai\Zr.Admin.NET\ZR.ConsoleApp\models");
+    dbHelper.db.DbFirst.IsCreateAttribute().CreateClassFile(@"D:\123456789\kai\Zr.Admin.NET\ZR.ConsoleApp\models");
 
     //return; 
     #endregion
 
     //db.Deleteable<TempUserOrderData>().ExecuteCommand();
 
+    //var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
+    //var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
+
     var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
-    var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
+
 
     var filePaths = new List<string>();
-    GetAllFiles(targetDir, filePaths);
+    GetAllFiles(fileDir, filePaths);
+
+
 
     foreach (var filePath in filePaths)
     {
+        var npoiExcelHelper = new ExcelHelper(filePath);
+
         #region 导出客户、总单量、总金额
         //ExportTatalStatistic(filePath); 
         #endregion
@@ -55,8 +64,20 @@ void Test()
 
         #region 导入所有仓外
 
-        /// 1. 确定sheet(快递费或账单明细)
-        /// 2. 获取表头
+        // 1. 确定sheet
+        var sheet = npoiExcelHelper.GetSheet(new string[] { "快递费", "账单明细", "账单明细总", "申通" });
+        if (sheet is null)
+        {
+            logHelper.Logger.Error($"未找到指定工作表：{filePath}");
+            continue;
+        }
+        // 2. 拿到表头
+
+        var headers = npoiExcelHelper.GetFirstRowAsStringArray(sheet);
+
+        // 2. 获取表头
+
+        dbHelper.CreateTable(Path.GetFileNameWithoutExtension(filePath), headers);
 
         #endregion
     }
@@ -125,27 +146,11 @@ void GetAllFiles(string path, List<string> files)
     }
 }
 
-void InitDb()
-{
-    db = new SqlSugarClient(new ConnectionConfig()
-    {
-        ConnectionString = "Data Source=47.105.65.51;Initial Catalog=mdtwo_dev;Encrypt=True;TrustServerCertificate=True;User ID=mdtwo_dbadmin;Password=Mdtwo2025;Connection Timeout=1200"
-        ,
-        DbType = DbType.SqlServer,
-        IsAutoCloseConnection = true
-    }, configAction: db =>
-    {
-        db.Aop.OnLogExecuting = (sql, pars) =>
-        {
-            Console.WriteLine(sql);
-        };
-    });
 
-}
 
 static bool MakeDateData(LogHelper logHelper, string targetDir, string filePath)
 {
-    var npoiExcelHelper = new NpoiExcelHelper(filePath);
+    var npoiExcelHelper = new ExcelHelper(filePath);
     if (npoiExcelHelper.Workbook is null)
     {
 
