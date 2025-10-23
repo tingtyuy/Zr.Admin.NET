@@ -33,6 +33,8 @@
             button2 = new Button();
             button3 = new Button();
             panel1 = new Panel();
+            button4 = new Button();
+            button5 = new Button();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -76,11 +78,34 @@
             panel1.Size = new Size(125, 251);
             panel1.TabIndex = 3;
             // 
+            // button4
+            // 
+            button4.Location = new Point(195, 33);
+            button4.Name = "button4";
+            button4.Size = new Size(114, 23);
+            button4.TabIndex = 4;
+            button4.Text = "总数核对";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(436, 33);
+            button5.Name = "button5";
+            button5.Size = new Size(88, 23);
+            button5.TabIndex = 5;
+            button5.Text = "导入账单数据";
+            button5.TextAlign = ContentAlignment.MiddleLeft;
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1173, 690);
+            Controls.Add(button5);
+            Controls.Add(button4);
             Controls.Add(panel1);
             Name = "Form1";
             Text = "Form1";
@@ -95,5 +120,7 @@
         private Button button2;
         private Button button3;
         private Panel panel1;
+        private Button button4;
+        private Button button5;
     }
 }

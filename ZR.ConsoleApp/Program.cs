@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Extensions;
 using MiniExcelLibs;
-using Models;
+//using Models;
 using NPOI.SS.UserModel;
 using SqlSugar;
 using ZR.Common;
@@ -29,20 +29,13 @@ void Test()
 
     //var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
 
-    var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
-    var fileDir2 = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单";
+    //var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
+    //var fileDir2 = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单";
 
-    // 创建两个任务并行处理
-    //var task1 = Task.Run(() => NewMethod(dbHelper, logHelper, fileDir, "out"));
-    //var task2 = Task.Run(() => NewMethod(dbHelper, logHelper, fileDir2, "in"));
 
-    TableCreateAndInsert(dbHelper, logHelper, fileDir, "out");
-    TableCreateAndInsert(dbHelper, logHelper, fileDir2, "in");
+    //TableCreateAndInsert(dbHelper, logHelper, fileDir, "out");
+    //TableCreateAndInsert(dbHelper, logHelper, fileDir2, "in");
 
-    // 等待两个任务都完成
-    //Task.WaitAll(task1, task2);
-
-    Console.WriteLine("所有任务完成");
 }
 
 
@@ -69,16 +62,7 @@ void TableCreateAndInsert(DbHelper dbHelper, LogHelper logHelper, string fileDir
         //} 
         #endregion
 
-        #region 对比申通总单量
-
-
-        #endregion
-
-        #region 导入所有仓内
-
-        #endregion
-
-        #region 导入所有仓外
+        #region 导入所有
 
         // 1. 确定sheet
         var sheet = npoiExcelHelper.GetSheet(new string[] { "快递费", "账单明细", "账单明细总", "申通" });
