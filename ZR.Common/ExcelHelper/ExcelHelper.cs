@@ -14,6 +14,15 @@ using System.Threading.Tasks;
 using ZR.Infrastructure.Extensions;
 namespace ZR.Common.ExcelHelper
 {
+    /// <summary>
+    /// 选择的列
+    /// </summary>
+    public class SelectColumn
+    {
+        public string Name { get; set; }
+
+        public string[] MaybeName { get; set; }
+    }
     public class ExcelHelper
     {
         public readonly string ExcelFilePath;
@@ -128,18 +137,39 @@ namespace ZR.Common.ExcelHelper
                   .ToDictionary(x => x.ColumnIndex, x => x.Value);
         }
 
-        public DataTable GetTableData(ISheet sheet)
+        public DataTable GetTableData(ISheet sheet, List<SelectColumn> selectColumns = null)
         {
             if (sheet == null)
                 throw new ArgumentNullException(nameof(sheet));
 
             var firstRow = GetFirstRowAsStringArray(sheet);
 
+            if (selectColumns is not null)
+            {
+                firstRow = firstRow.Where(kv =>
+                {
+                    var match = selectColumns.Any(sc => sc.MaybeName.Contains(kv.Value));
+                    return match;
+                }
+                ).ToDictionary(kv => kv.Key, kv => kv.Value);
+            }
+
             var dataTable = new System.Data.DataTable();
             try
             {
 
-                dataTable.Columns.AddRange(firstRow.Values.Select(s => new System.Data.DataColumn(s)).ToArray());
+
+                if (selectColumns is not null)
+                {
+                    dataTable.Columns.AddRange(firstRow.Values.Select(s => new System.Data.DataColumn(
+                        selectColumns.Where(w => w.MaybeName.Contains(s)).FirstOrDefault().Name
+                        )).ToArray());
+                }
+                else
+                {
+                    dataTable.Columns.AddRange(firstRow.Values.Select(s => new System.Data.DataColumn(s)).ToArray());
+
+                }
 
                 // 预计算列索引，避免在循环中重复查询
                 var validColumnIndices = firstRow.Keys.OrderBy(x => x).ToArray();

@@ -35,6 +35,7 @@
             panel1 = new Panel();
             button4 = new Button();
             button5 = new Button();
+            button6 = new Button();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -99,11 +100,23 @@
             button5.UseVisualStyleBackColor = true;
             button5.Click += button5_Click;
             // 
+            // button6
+            // 
+            button6.Location = new Point(578, 33);
+            button6.Name = "button6";
+            button6.Size = new Size(102, 23);
+            button6.TabIndex = 6;
+            button6.Text = "导入账单数据2";
+            button6.TextAlign = ContentAlignment.MiddleLeft;
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1173, 690);
+            Controls.Add(button6);
             Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(panel1);
@@ -122,5 +135,6 @@
         private Panel panel1;
         private Button button4;
         private Button button5;
+        private Button button6;
     }
 }
