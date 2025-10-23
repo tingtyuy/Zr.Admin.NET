@@ -27,7 +27,7 @@ namespace ZR.Common
 
         public DbHelper()
         {
-            InitDb2();
+            InitDb();
             LogHelper = new LogHelper();
         }
         private void InitDb()

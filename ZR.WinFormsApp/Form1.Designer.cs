@@ -30,14 +30,15 @@
         {
             button1 = new Button();
             folderBrowserDialog1 = new FolderBrowserDialog();
-            flowLayoutPanel1 = new FlowLayoutPanel();
-            listView1 = new ListView();
-            flowLayoutPanel1.SuspendLayout();
+            button2 = new Button();
+            button3 = new Button();
+            panel1 = new Panel();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(96, 30);
+            button1.Location = new Point(20, 110);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 0;
@@ -45,32 +46,45 @@
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
-            // flowLayoutPanel1
+            // button2
             // 
-            flowLayoutPanel1.Controls.Add(listView1);
-            flowLayoutPanel1.Location = new Point(56, 84);
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(1092, 436);
-            flowLayoutPanel1.TabIndex = 1;
+            button2.Location = new Point(20, 21);
+            button2.Name = "button2";
+            button2.Size = new Size(88, 23);
+            button2.TabIndex = 1;
+            button2.Text = "仓外（揽收）";
+            button2.TextAlign = ContentAlignment.MiddleLeft;
+            button2.UseVisualStyleBackColor = true;
             // 
-            // listView1
+            // button3
             // 
-            listView1.Location = new Point(3, 3);
-            listView1.Name = "listView1";
-            listView1.Size = new Size(1089, 433);
-            listView1.TabIndex = 0;
-            listView1.UseCompatibleStateImageBehavior = false;
+            button3.Location = new Point(20, 62);
+            button3.Name = "button3";
+            button3.Size = new Size(88, 23);
+            button3.TabIndex = 2;
+            button3.Text = "仓内";
+            button3.TextAlign = ContentAlignment.MiddleLeft;
+            button3.UseVisualStyleBackColor = true;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(button1);
+            panel1.Controls.Add(button3);
+            panel1.Controls.Add(button2);
+            panel1.Location = new Point(12, 12);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(125, 251);
+            panel1.TabIndex = 3;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1173, 690);
-            Controls.Add(flowLayoutPanel1);
-            Controls.Add(button1);
+            Controls.Add(panel1);
             Name = "Form1";
             Text = "Form1";
-            flowLayoutPanel1.ResumeLayout(false);
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -78,7 +92,8 @@
 
         private Button button1;
         private FolderBrowserDialog folderBrowserDialog1;
-        private FlowLayoutPanel flowLayoutPanel1;
-        private ListView listView1;
+        private Button button2;
+        private Button button3;
+        private Panel panel1;
     }
 }

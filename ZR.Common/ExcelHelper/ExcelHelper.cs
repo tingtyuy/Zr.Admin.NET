@@ -141,27 +141,54 @@ namespace ZR.Common.ExcelHelper
 
                 dataTable.Columns.AddRange(firstRow.Values.Select(s => new System.Data.DataColumn(s)).ToArray());
 
+                // 预计算列索引，避免在循环中重复查询
+                var validColumnIndices = firstRow.Keys.OrderBy(x => x).ToArray();
+
                 for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)
                 {
+                    // 1. 一次性获取行，避免重复调用 GetRow
                     var row = sheet.GetRow(rowIndex);
-                    if (row is null)
+                    if (row == null) continue;
+
+                    // 2. 直接读取目标单元格，避免 Where + Select
+                    var cells = new object[validColumnIndices.Length];
+                    for (int i = 0; i < validColumnIndices.Length; i++)
                     {
-                        continue;
+                        var cell = row.GetCell(validColumnIndices[i]);
+                        cells[i] = cell == null ? DBNull.Value : GetCellValue(cell);
                     }
 
-                    var cells = sheet.GetRow(rowIndex).Cells.Where(s => firstRow.Keys.Contains(s.ColumnIndex)).Select(s => GetCellValue(s)).ToArray();
-
+                    // 3. 批量填充 DataRow
                     DataRow newRow = dataTable.NewRow();
-                    for (int i = 0; i < cells.Length; i++)
+                    for (int i = 0; i < cells.Length && i < dataTable.Columns.Count; i++)
                     {
-                        if (i < dataTable.Columns.Count)
-                        {
-                            newRow[i] = string.IsNullOrEmpty(cells[i].ToString()) ? DBNull.Value : (object)cells[i];
-                        }
+                        newRow[i] = cells[i] ?? DBNull.Value; // 直接赋值，避免 ToString()
                     }
 
                     dataTable.Rows.Add(newRow);
                 }
+
+                //for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)
+                //{
+                //    var row = sheet.GetRow(rowIndex);
+                //    if (row is null)
+                //    {
+                //        continue;
+                //    }
+
+                //    var cells = sheet.GetRow(rowIndex).Cells.Where(s => firstRow.Keys.Contains(s.ColumnIndex)).Select(s => GetCellValue(s)).ToArray();
+
+                //    DataRow newRow = dataTable.NewRow();
+                //    for (int i = 0; i < cells.Length; i++)
+                //    {
+                //        if (i < dataTable.Columns.Count)
+                //        {
+                //            newRow[i] = string.IsNullOrEmpty(cells[i].ToString()) ? DBNull.Value : (object)cells[i];
+                //        }
+                //    }
+
+                //    dataTable.Rows.Add(newRow);
+                //}
             }
             catch (Exception)
             {
