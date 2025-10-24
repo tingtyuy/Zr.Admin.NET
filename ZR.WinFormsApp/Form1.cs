@@ -108,7 +108,7 @@ namespace ZR.WinFormsApp
             //    ImportShortInfos = s.Select(x => x.OrderNo).ToList().Except(s.Select(x => x.F运单编号).ToList()).ToList()
             //}).ToList();
 
-           MiniExcel.
+            MiniExcel.
 
         }
 
@@ -140,7 +140,7 @@ namespace ZR.WinFormsApp
 
             public List<string> ImportShortInfos { get; set; } = new List<string>();
             public List<string> MdShortInfos { get; set; } = new List<string>();
-            
+
             public int ImportShortInfosCount => ImportShortInfos.Count;
             public int MdShortInfosCount => MdShortInfos.Count;
 
@@ -469,6 +469,16 @@ namespace ZR.WinFormsApp
 
             }
             logHelper.Logger.Error($"全部导入完成");
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

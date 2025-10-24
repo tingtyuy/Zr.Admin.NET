@@ -29,11 +29,11 @@ void Test()
 
     //var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
 
-    //var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
+    var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单222";
     //var fileDir2 = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单";
 
 
-    //TableCreateAndInsert(dbHelper, logHelper, fileDir, "out");
+    TableCreateAndInsert(dbHelper, logHelper, fileDir, "out");
     //TableCreateAndInsert(dbHelper, logHelper, fileDir2, "in");
 
 }
@@ -176,7 +176,7 @@ void GetAllFiles(string path, List<string> files)
     {
         foreach (string file in Directory.GetFiles(path))
         {
-            if (file.Contains("xlsx"))
+            if (file.Contains(".xlsx"))
             {
                 files.Add(file);
             }
