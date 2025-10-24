@@ -1,13 +1,17 @@
 using Infrastructure.Extensions;
 using Infrastructure.Helper;
+using Masuit.Tools;
 using Masuit.Tools.Database;
 using MiniExcelLibs;
 using Models;
+using Serilog.Events;
 using SharpCompress.Common;
+using SqlSugar;
 using System.Data;
 using ZR.Common;
 using ZR.Common.ExcelHelper;
 using ZR.WinFormsApp.models;
+using static NPOI.SS.Formula.Functions.Countif;
 namespace ZR.WinFormsApp
 {
     public partial class Form1 : Form
@@ -78,47 +82,81 @@ namespace ZR.WinFormsApp
             }
         }
         /// <summary>
-        /// 查询所有仓内的订单
+        /// 总数核对
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button4_Click(object sender, EventArgs e)
         {
             var result = new button4_Click_Result();
-            result.RealTotalImportOrderInfos = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>().Select(s => s.F运单编号).ToList();
+            result.RealTotalImportOrderInfos = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>().Distinct().Select(s => s.F运单编号).ToList();
+            result.RealTotalMdOrderInfos = dbHelper.db.Queryable<BillBak>().Distinct().Select(s => s.OrderNo).ToList();
+            result.ImportShortInfos = result.RealTotalImportOrderInfos.Except(result.RealTotalMdOrderInfos).ToList();
+            result.MdShortInfos = result.RealTotalMdOrderInfos.Except(result.RealTotalMdOrderInfos).ToList();
 
 
-            //var info = new Info();
-            //dbHelper.db.Queryable<Bill>().Distinct()
-            //    .LeftJoin<FIN快递出港账单_运单计算数据>((b, f) => b.OrderNo == f.F运单编号)
-            //    .Where(w=>w.OrderDate >= new DateTime(2025, 9, 5))
-            //    .Select((b,f) => new { b.UserName,  b.UserGroup,b.OrderNo,f.F运单编号})
-            //    .MergeTable()
-            //    .GroupBy(g=>g.UserName).Select(s=>new Info() { 
-            //             UserName=s.UserName,
-            //             ImportOrderCount= SqlFunc.AggregateCount(s.F运单编号),
-            //    });
+            var list = dbHelper.db.Queryable<BillBak>().Distinct()
+                  .LeftJoin<FIN快递出港账单_运单计算数据>((b, f) => b.OrderNo == f.F运单编号)
+                  .Where(b => b.OrderDate >= new DateTime(2025, 9, 5))
+                  .Select((b, f) => new InfoList() { UserName = b.UserName, UserGroup = b.UserGroup, OrderNo = b.OrderNo, F运单编号 = f.F运单编号 })
+                  .ToList();
+            //result.Infos= list.GroupBy(g => g.UserName).Select(s => new Info()
+            //{
+            //    UserName = s.Key,
+            //    MdOrders = s.Select(x => x.OrderNo).ToList(),
+            //    ImportOrders = s.Select(x => x.F运单编号).ToList(),
+            //    ImportShortInfos = s.Select(x => x.OrderNo).ToList().Except(s.Select(x => x.F运单编号).ToList()).ToList()
+            //}).ToList();
+
+           MiniExcel.
+
+        }
+
+
+
+        public class InfoList
+        {
+
+            public string OrderNo { get; set; }
+            public string UserName { get; set; }
+
+            public string UserGroup { get; set; }
+
+            public string F运单编号 { get; set; }
+
         }
 
         public class button4_Click_Result
         {
-            public List<Info> Infos { get; set; }
+            //public List<Info> Infos { get; set; }
             public int RealTotalImportOrderCount => RealTotalImportOrderInfos.Count;
+            public int RealTotalMdOrderCount => RealTotalMdOrderInfos.Count;
+
             public List<string> RealTotalImportOrderInfos { get; set; }
-            public int TotalMdOrderCount => Infos.Sum(i => i.MdOrderCount);
-            public int TotalImportOrderCount => Infos.Sum(i => i.ImportOrderCount);
-            public bool IsAllSame => TotalMdOrderCount == TotalImportOrderCount;
+            public List<string> RealTotalMdOrderInfos { get; set; }
+            //public int TotalMdOrderCount => Infos.Sum(i => i.MdOrders.Count);
+            //public int TotalImportOrderCount => Infos.Sum(i => i.ImportOrders.Count);
+            //public bool IsAllSame => TotalMdOrderCount == TotalImportOrderCount;
+
+            public List<string> ImportShortInfos { get; set; } = new List<string>();
+            public List<string> MdShortInfos { get; set; } = new List<string>();
+            
+            public int ImportShortInfosCount => ImportShortInfos.Count;
+            public int MdShortInfosCount => MdShortInfos.Count;
+
 
         }
 
         public class Info
         {
             public string UserName { get; set; }
-            public int MdOrderCount { get; set; }
-            public int ImportOrderCount { get; set; }
-            public bool IsSame => MdOrderCount == ImportOrderCount;
-            List<string> MdShortInfos { get; set; }
-            List<string> ImportShortInfos { get; set; }
+            public List<string> MdOrders { get; set; } = new List<string>();
+            public List<string> ImportOrders { get; set; } = new List<string>();
+            public bool IsSame => MdOrders.Count == ImportOrders.Count;
+            //List<string> MdShortInfos { get; set; } 
+            public List<string> ImportShortInfos { get; set; } = new List<string>();
+
+
         }
 
 
@@ -364,6 +402,8 @@ namespace ZR.WinFormsApp
             try
             {
                 dbHelper.db.Insertable(listBill).ExecuteCommand();
+
+                file.MoveTo(file.FullName + ".bak");
 
                 //var count =   dbHelper.db.Fastest<Bill>().PageSize(5000).BulkCopy(listBill);
                 logHelper.Logger.Information($"表 {UserName} 数据更新成功！");

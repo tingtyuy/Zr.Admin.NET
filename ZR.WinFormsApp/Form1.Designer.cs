@@ -85,28 +85,28 @@
             button4.Name = "button4";
             button4.Size = new Size(114, 23);
             button4.TabIndex = 4;
-            button4.Text = "总数核对";
+            button4.Text = "总数核对（停止）";
             button4.UseVisualStyleBackColor = true;
             button4.Click += button4_Click;
             // 
             // button5
             // 
-            button5.Location = new Point(436, 33);
+            button5.Location = new Point(356, 33);
             button5.Name = "button5";
-            button5.Size = new Size(88, 23);
+            button5.Size = new Size(117, 23);
             button5.TabIndex = 5;
-            button5.Text = "导入账单数据";
+            button5.Text = "导入账单订单号数据";
             button5.TextAlign = ContentAlignment.MiddleLeft;
             button5.UseVisualStyleBackColor = true;
             button5.Click += button5_Click;
             // 
             // button6
             // 
-            button6.Location = new Point(578, 33);
+            button6.Location = new Point(517, 33);
             button6.Name = "button6";
             button6.Size = new Size(102, 23);
             button6.TabIndex = 6;
-            button6.Text = "导入账单数据2";
+            button6.Text = "导入账单完整数据";
             button6.TextAlign = ContentAlignment.MiddleLeft;
             button6.UseVisualStyleBackColor = true;
             button6.Click += button6_Click;

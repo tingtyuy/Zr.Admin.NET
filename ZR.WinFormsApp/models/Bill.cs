@@ -19,6 +19,21 @@ namespace ZR.WinFormsApp.models
         public string UserGroup { get; set; }
     }
 
+
+    [SugarTable("BillBak")]
+    public class BillBak
+    {
+        //[SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+        //public int Id { get; set; }
+
+
+        public string OrderNo { get; set; }
+        public DateTime OrderDate { get; set; }
+        public string UserName { get; set; }
+
+        public string UserGroup { get; set; }
+    }
+
     [SugarTable("Bill2")]
     public class Bill2
     {
