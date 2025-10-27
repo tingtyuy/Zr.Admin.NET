@@ -213,7 +213,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "运单编号",
-                 MaybeName = new string[] { "运单编号", "运单号" }
+                 MaybeName = new string[] { "运单编号", "运单号","物流编号" }
              }
              ,
              new SelectColumn()
