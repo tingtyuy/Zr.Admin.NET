@@ -1,7 +1,9 @@
 using Infrastructure.Extensions;
 using Infrastructure.Helper;
+using Mapster;
 using Masuit.Tools;
 using Masuit.Tools.Database;
+using Microsoft.VisualBasic.ApplicationServices;
 using MiniExcelLibs;
 using Models;
 using Serilog.Events;
@@ -108,7 +110,6 @@ namespace ZR.WinFormsApp
             //    ImportShortInfos = s.Select(x => x.OrderNo).ToList().Except(s.Select(x => x.F运单编号).ToList()).ToList()
             //}).ToList();
 
-            MiniExcel.
 
         }
 
@@ -168,9 +169,14 @@ namespace ZR.WinFormsApp
         private void button5_Click(object sender, EventArgs e)
         {
 
+            //var directoryPaths = new List<string> {
+            //    @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
+            //  , @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单" };
+
+
             var directoryPaths = new List<string> {
-                @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
-              , @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单" };
+                @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单3"
+            };
             //遍历目录
             foreach (var directoryPath in directoryPaths)
             {
@@ -194,6 +200,104 @@ namespace ZR.WinFormsApp
             }
             logHelper.Logger.Error($"全部导入完成");
         }
+
+        private bool FillBill3(FileInfo file)
+        {
+
+            var maybeSheets = new List<string>()
+            {
+                "快递费", "账单明细", "账单明细总", "申通"
+            };
+            var selectColumns = new List<SelectColumn>();
+            selectColumns.AddRange(
+             new SelectColumn()
+             {
+                 Name = "运单编号",
+                 MaybeName = new string[] { "运单编号", "运单号" }
+             }
+             ,
+             new SelectColumn()
+             {
+                 Name = "业务日期",
+                 MaybeName = new string[] { "业务时间", "业务日期", }
+             },
+             new SelectColumn()
+             {
+                 Name = "目的省份",
+                 MaybeName = new string[] { "目的省份", "省份", }
+             }
+              ,
+             new SelectColumn()
+             {
+                 Name = "目的城市",
+                 MaybeName = new string[] { "目的城市", "城市", }
+             }
+              ,
+             new SelectColumn()
+             {
+                 Name = "结算重量",
+                 MaybeName = new string[] { "结算重量", "重量", }
+             }
+              ,
+             new SelectColumn()
+             {
+                 Name = "业务日期",
+                 MaybeName = new string[] { "业务时间", "业务日期", }
+             }
+              ,
+             new SelectColumn()
+             {
+                 Name = "快递运费",
+                 MaybeName = new string[] { "快递运费", "结算金额", "金额" }
+             }
+              ,
+             new SelectColumn()
+             {
+                 Name = "加收费用",
+                 MaybeName = new string[] { "加收费用", "加收", }
+             }
+                 ,
+             new SelectColumn()
+             {
+                 Name = "店铺账号",
+                 MaybeName = new string[] { "店铺账号", "店铺", }
+             }
+                 ,
+             new SelectColumn()
+             {
+                 Name = "退回状态",
+                 MaybeName = new string[] { "退回状态", "状态", }
+             }
+            );
+            var list = ExcelHelper.GetDynamicData(file.FullName, maybeSheets, selectColumns);
+            var listBill2 = list.Adapt<List<Bill2>>();
+            listBill2.ForEach(bill =>
+            {
+                var UserName = file.Name.FilterSpecial();
+                var UserGroup = file.DirectoryName?.Split(Path.DirectorySeparatorChar).Last() ?? "";
+                bill.UserName = UserName;
+                bill.UserGroup = UserGroup;
+            });
+
+            try
+            {
+                //              dbHelper.db.Insertable(list)
+                //.AS("Bill2")
+                //.ExecuteCommand();
+                dbHelper.db.Insertable<Bill2>(listBill2).PageSize(50000).ExecuteCommand();
+
+                //var count = dbHelper.db.Fastest<Bill2>().AS("Bill2").PageSize(50000).BulkCopy(listBill2);
+                logHelper.Logger.Information($"表 {file.FullName} 数据更新成功！");
+                file.MoveTo(file.FullName + ".bak");
+            }
+            catch (Exception ex)
+            {
+
+                logHelper.Logger.Error($"插入数据失败：{file.FullName}=》{ex.Message}");
+            }
+
+            return true;
+        }
         private bool FillBill2(FileInfo file)
         {
             var npoiExcelHelper = new ExcelHelper(file.FullName);
@@ -213,7 +317,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "运单编号",
-                 MaybeName = new string[] { "运单编号" }
+                 MaybeName = new string[] { "运单编号", "运单号" }
              }
              ,
              new SelectColumn()
@@ -306,10 +410,10 @@ namespace ZR.WinFormsApp
                 bill.店铺账号 = item.店铺账号;
                 bill.退回状态 = item.退回状态;
 
-                if (DateTime.TryParse(item.业务日期, out DateTime businessDate))
-                {
-                    bill.业务日期 = businessDate;
-                }
+                //if (DateTime.TryParse(item.业务日期, out DateTime businessDate))
+                //{
+                //    bill.业务日期 = businessDate;
+                //}
                 bill.UserName = UserName;
                 bill.UserGroup = UserGroup;
                 listBill.Add(bill);
@@ -351,7 +455,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "运单编号",
-                 MaybeName = new string[] { "运单编号" }
+                 MaybeName = new string[] { "运单编号" , "运单号" }
              }
              ,
              new SelectColumn()
@@ -441,7 +545,11 @@ namespace ZR.WinFormsApp
             public string 店铺账号 { get; set; }
             public string 退回状态 { get; set; }
         }
-
+        /// <summary>
+        /// 导入账单完整数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button6_Click(object sender, EventArgs e)
         {
             var directoryPaths = new List<string> {
@@ -457,7 +565,7 @@ namespace ZR.WinFormsApp
                 foreach (var file in directoryFiles)
                 {
                     //bool flowControl = FillBill(file);
-                    bool flowControl = FillBill2(file);
+                    bool flowControl = FillBill3(file);
                     if (!flowControl)
                     {
                         continue;
@@ -465,10 +573,10 @@ namespace ZR.WinFormsApp
 
                 }
 
-                logHelper.Logger.Error($"导入完成：{directoryPath}");
+                logHelper.Logger.Information($"导入完成：{directoryPath}");
 
             }
-            logHelper.Logger.Error($"全部导入完成");
+            logHelper.Logger.Information($"全部导入完成");
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -479,6 +587,11 @@ namespace ZR.WinFormsApp
         private void button2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            dbHelper.db.CodeFirst.InitTables(typeof(Bill2));
         }
     }
 }

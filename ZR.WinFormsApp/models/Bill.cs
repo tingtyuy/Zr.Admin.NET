@@ -39,23 +39,27 @@ namespace ZR.WinFormsApp.models
     {
         //[SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         //public int Id { get; set; }
-
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string 运单编号 { get; set; }
-        public DateTime 业务日期 { get; set; }
+        [SqlSugar.SugarColumn(IsNullable = true)]
+        public string 业务日期 { get; set; }
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string 目的省份 { get; set; }
-
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string 目的城市 { get; set; }
-
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string 结算重量 { get; set; }
-
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string 快递运费 { get; set; }
-
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string 加收费用 { get; set; }
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string 店铺账号 { get; set; }
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string 退回状态 { get; set; }
-
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string UserName { get; set; }
-
+        [SqlSugar.SugarColumn(IsNullable = true)]
         public string UserGroup { get; set; }
 
     }

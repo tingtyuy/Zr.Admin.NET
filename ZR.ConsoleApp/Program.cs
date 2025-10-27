@@ -29,8 +29,10 @@ void Test()
 
     //var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
 
-    var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单222";
-    //var fileDir2 = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单";
+    var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
+    var fileDir2 = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单";
+
+
 
 
     TableCreateAndInsert(dbHelper, logHelper, fileDir, "out");
@@ -63,7 +65,6 @@ void TableCreateAndInsert(DbHelper dbHelper, LogHelper logHelper, string fileDir
         #endregion
 
         #region 导入所有
-
         // 1. 确定sheet
         var sheet = npoiExcelHelper.GetSheet(new string[] { "快递费", "账单明细", "账单明细总", "申通" });
         if (sheet is null)
@@ -129,16 +130,8 @@ void TableCreateAndInsert(DbHelper dbHelper, LogHelper logHelper, string fileDir
 }
 
 
-void SyncTable(string file)
-{
-    MiniExcel.Query(file).ToList();
-    IEnumerable<dynamic>? list;
-    ReadSheetByIndex(file, 1, out list);
-    if (list != null)
-    {
-        //db.Insertable(list).ExecuteCommand();
-    }
-}
+
+
 
 void ReadSheetByIndex(string filePath, int sheetIndex, out IEnumerable<dynamic>? list)
 {

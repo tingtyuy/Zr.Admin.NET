@@ -30,12 +30,11 @@
         {
             button1 = new Button();
             folderBrowserDialog1 = new FolderBrowserDialog();
-            button2 = new Button();
-            button3 = new Button();
             panel1 = new Panel();
             button4 = new Button();
             button5 = new Button();
             button6 = new Button();
+            button2 = new Button();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -49,33 +48,9 @@
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
-            // button2
-            // 
-            button2.Location = new Point(20, 21);
-            button2.Name = "button2";
-            button2.Size = new Size(88, 23);
-            button2.TabIndex = 1;
-            button2.Text = "仓外（揽收）";
-            button2.TextAlign = ContentAlignment.MiddleLeft;
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
-            // 
-            // button3
-            // 
-            button3.Location = new Point(20, 62);
-            button3.Name = "button3";
-            button3.Size = new Size(88, 23);
-            button3.TabIndex = 2;
-            button3.Text = "仓内";
-            button3.TextAlign = ContentAlignment.MiddleLeft;
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
-            // 
             // panel1
             // 
             panel1.Controls.Add(button1);
-            panel1.Controls.Add(button3);
-            panel1.Controls.Add(button2);
             panel1.Location = new Point(12, 12);
             panel1.Name = "panel1";
             panel1.Size = new Size(125, 251);
@@ -113,11 +88,22 @@
             button6.UseVisualStyleBackColor = true;
             button6.Click += button6_Click;
             // 
+            // button2
+            // 
+            button2.Location = new Point(668, 33);
+            button2.Name = "button2";
+            button2.Size = new Size(145, 23);
+            button2.TabIndex = 7;
+            button2.Text = "生成表Bill2结构";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click_1;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1173, 690);
+            Controls.Add(button2);
             Controls.Add(button6);
             Controls.Add(button5);
             Controls.Add(button4);
@@ -132,11 +118,10 @@
 
         private Button button1;
         private FolderBrowserDialog folderBrowserDialog1;
-        private Button button2;
-        private Button button3;
         private Panel panel1;
         private Button button4;
         private Button button5;
         private Button button6;
+        private Button button2;
     }
 }

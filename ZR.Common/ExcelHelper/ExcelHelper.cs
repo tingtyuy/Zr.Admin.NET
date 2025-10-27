@@ -1,5 +1,8 @@
 ﻿using Infrastructure.Extensions;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Logging;
+using MiniExcelLibs;
+using MiniExcelLibs.OpenXml;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
@@ -7,6 +10,7 @@ using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -232,6 +236,72 @@ namespace ZR.Common.ExcelHelper
 
 
         }
+        public static List<dynamic> GetDynamicData(
+           string excelFilePath,
+           List<string> selectMaybeSheetNames,
+           List<SelectColumn> selectColumns = null)
+        {
+            // 1. 获取所有 Sheet 名称
+            var sheetAllNames = MiniExcel.GetSheetNames(excelFilePath);
+
+            // 2. 筛选出用户指定的 Sheet
+            var selectSheetNames = sheetAllNames.Intersect(selectMaybeSheetNames);
+            if (!selectSheetNames.Any())
+            {
+                throw new ArgumentNullException($"Excel 文件不包含指定的 Sheet 名称,excel 全部sheet名称为=》{sheetAllNames.ToString()}");
+            }
+
+            // 3. 获取第一个匹配的 Sheet 的所有列名（原始列名）
+            var sheetName = selectSheetNames.First();
+            var excelAllColumnNames = MiniExcel.GetColumns(excelFilePath, useHeaderRow: true, sheetName: sheetName);
+
+            // 4. 如果 selectColumns 为 null，则默认返回所有列（不重命名）
+            if (selectColumns == null || !selectColumns.Any())
+            {
+                return MiniExcel.Query(excelFilePath, useHeaderRow: true, sheetName: sheetName).ToList();
+            }
+
+            // 5. 构建原始列名 → 新列名（Name）的映射字典
+            var columnMapping = excelAllColumnNames
+                .Where(originalCol => selectColumns.Any(sc => sc.MaybeName.Contains(originalCol.FilterSpecial())))
+                .ToDictionary(
+                    originalCol => originalCol, // 原始列名
+                    originalCol => selectColumns
+                        .First(sc => sc.MaybeName.Contains(originalCol.FilterSpecial()))
+                        .Name // 映射到 selectColumns 的 Name
+                );
+
+            // 6. 读取 Excel 数据并动态修改列名
+            var excelData = MiniExcel.Query(excelFilePath, useHeaderRow: true, sheetName: sheetName);
+            var result = new List<dynamic>();
+
+            foreach (IDictionary<string, object> row in excelData)
+            {
+                // 使用 ExpandoObject 动态构建新行
+                dynamic newRow = new ExpandoObject();
+                var newRowDict = (IDictionary<string, object>)newRow;
+
+                foreach (var mapping in columnMapping)
+                {
+                    var originalCol = mapping.Key;
+                    var newCol = mapping.Value;
+
+                    if (row.TryGetValue(originalCol, out var value))
+                    {
+                        newRowDict[newCol] = value?.ToString()??""; // 使用新列名
+                    }
+                    newRowDict["UserName"] = "";
+                    newRowDict["UserGroup"] = "";
+
+                }
+
+                result.Add(newRow);
+            }
+
+            return result;
+        }
+
+ 
 
 
         private object GetCellValue(ICell cell)
