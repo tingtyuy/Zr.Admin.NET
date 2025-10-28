@@ -248,7 +248,7 @@ namespace ZR.Common.ExcelHelper
             var selectSheetNames = sheetAllNames.Intersect(selectMaybeSheetNames);
             if (!selectSheetNames.Any())
             {
-                throw new ArgumentNullException($"Excel 文件不包含指定的 Sheet 名称,excel 全部sheet名称为=》{sheetAllNames.ToString()}");
+                throw new ArgumentNullException($"Excel 文件不包含指定的 Sheet 名称");
             }
 
             // 3. 获取第一个匹配的 Sheet 的所有列名（原始列名）

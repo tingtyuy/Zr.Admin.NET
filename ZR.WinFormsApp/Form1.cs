@@ -213,13 +213,13 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "运单编号",
-                 MaybeName = new string[] { "运单编号", "运单号","物流编号" }
+                 MaybeName = new string[] { "运单编号", "运单号", "物流编号", "物流单号", "快递单号" }
              }
              ,
              new SelectColumn()
              {
                  Name = "业务日期",
-                 MaybeName = new string[] { "业务时间", "业务日期", }
+                 MaybeName = new string[] { "业务时间", "业务日期", "打单时间", }
              },
              new SelectColumn()
              {
@@ -248,7 +248,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "快递运费",
-                 MaybeName = new string[] { "快递运费", "结算金额", "金额" }
+                 MaybeName = new string[] { "快递运费", "结算金额", "金额", "费用" }
              }
               ,
              new SelectColumn()
@@ -260,7 +260,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "店铺账号",
-                 MaybeName = new string[] { "店铺账号", "店铺", }
+                 MaybeName = new string[] { "店铺账号", "店铺", "店铺名称" }
              }
                  ,
              new SelectColumn()
@@ -455,7 +455,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "运单编号",
-                 MaybeName = new string[] { "运单编号" , "运单号" }
+                 MaybeName = new string[] { "运单编号", "运单号" }
              }
              ,
              new SelectColumn()
@@ -592,6 +592,11 @@ namespace ZR.WinFormsApp
         private void button2_Click_1(object sender, EventArgs e)
         {
             dbHelper.db.CodeFirst.InitTables(typeof(Bill2));
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -35,6 +35,7 @@
             button5 = new Button();
             button6 = new Button();
             button2 = new Button();
+            button3 = new Button();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -98,11 +99,22 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click_1;
             // 
+            // button3
+            // 
+            button3.Location = new Point(195, 122);
+            button3.Name = "button3";
+            button3.Size = new Size(104, 23);
+            button3.TabIndex = 8;
+            button3.Text = "对比总运单量";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click_1;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1173, 690);
+            Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(button6);
             Controls.Add(button5);
@@ -123,5 +135,6 @@
         private Button button5;
         private Button button6;
         private Button button2;
+        private Button button3;
     }
 }

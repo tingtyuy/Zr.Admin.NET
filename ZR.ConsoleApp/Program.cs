@@ -169,7 +169,7 @@ void GetAllFiles(string path, List<string> files)
     {
         foreach (string file in Directory.GetFiles(path))
         {
-            if (file.Contains(".xlsx"))
+            if (file.Contains(".bak"))
             {
                 files.Add(file);
             }
