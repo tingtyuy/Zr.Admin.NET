@@ -39,9 +39,14 @@
             button7 = new Button();
             splitContainer1 = new SplitContainer();
             leftBox = new RichTextBox();
+            rightBox = new RichTextBox();
+            button8 = new Button();
+            button9 = new Button();
+            button10 = new Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
             SuspendLayout();
             // 
@@ -133,6 +138,10 @@
             // splitContainer1.Panel1
             // 
             splitContainer1.Panel1.Controls.Add(leftBox);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(rightBox);
             splitContainer1.Size = new Size(1149, 476);
             splitContainer1.SplitterDistance = 597;
             splitContainer1.TabIndex = 10;
@@ -145,11 +154,52 @@
             leftBox.TabIndex = 0;
             leftBox.Text = "";
             // 
+            // rightBox
+            // 
+            rightBox.Location = new Point(2, 21);
+            rightBox.Name = "rightBox";
+            rightBox.Size = new Size(543, 452);
+            rightBox.TabIndex = 0;
+            rightBox.Text = "";
+            // 
+            // button8
+            // 
+            button8.Location = new Point(752, 33);
+            button8.Name = "button8";
+            button8.Size = new Size(199, 23);
+            button8.TabIndex = 11;
+            button8.Text = "给所有客户添加全部的共享店铺";
+            button8.UseVisualStyleBackColor = true;
+            button8.Click += button8_Click;
+            // 
+            // button9
+            // 
+            button9.Location = new Point(1002, 35);
+            button9.Name = "button9";
+            button9.Size = new Size(121, 23);
+            button9.TabIndex = 12;
+            button9.Text = "没有计算的运单";
+            button9.UseVisualStyleBackColor = true;
+            button9.Click += button9_Click;
+            // 
+            // button10
+            // 
+            button10.Location = new Point(1005, 71);
+            button10.Name = "button10";
+            button10.Size = new Size(134, 23);
+            button10.TabIndex = 13;
+            button10.Text = "且没有发运表的运单";
+            button10.UseVisualStyleBackColor = true;
+            button10.Click += button10_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1173, 690);
+            Controls.Add(button10);
+            Controls.Add(button9);
+            Controls.Add(button8);
             Controls.Add(button7);
             Controls.Add(button3);
             Controls.Add(button2);
@@ -162,6 +212,7 @@
             Text = "Form1";
             panel1.ResumeLayout(false);
             splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
             ResumeLayout(false);
@@ -180,5 +231,9 @@
         private Button button7;
         private SplitContainer splitContainer1;
         private RichTextBox leftBox;
+        private Button button8;
+        private Button button9;
+        private RichTextBox rightBox;
+        private Button button10;
     }
 }

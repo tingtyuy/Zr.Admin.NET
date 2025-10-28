@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Extensions;
+using JinianNet.JNTemplate.Caching;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
@@ -25,8 +26,11 @@ namespace ZR.Common
 
         public LogHelper LogHelper;
 
+        public SqlSugarCache sugarCache;
+
         public DbHelper()
         {
+            sugarCache = new SqlSugarCache();
             InitDb();
             LogHelper = new LogHelper();
         }
@@ -37,13 +41,18 @@ namespace ZR.Common
                 ConnectionString = "Data Source=47.105.65.51;Initial Catalog=mdtwo_dev;Encrypt=True;TrustServerCertificate=True;User ID=mdtwo_dbadmin;Password=Mdtwo2025;Connection Timeout=1200"
                 ,
                 DbType = SqlSugar.DbType.SqlServer,
-                IsAutoCloseConnection = true
+                IsAutoCloseConnection = true,
+                ConfigureExternalServices = new ConfigureExternalServices()
+                {
+                    DataInfoCacheService = sugarCache //配置我们创建的缓存类，具体用法看标题5
+                }
             }, configAction: db =>
             {
                 db.Aop.OnLogExecuting = (sql, pars) =>
                 {
                     Console.WriteLine(sql);
                 };
+
             });
 
         }
@@ -69,7 +78,7 @@ namespace ZR.Common
         public void CreateTable(string tableName, string[] tableColumns, EnumDbHelperCreateTableModel enumCreateTableModel = EnumDbHelperCreateTableModel.CreateIfNotExists)
         {
             // 检查表是否已存在
-    
+
             if (db.DbMaintenance.IsAnyTable(tableName))
             {
                 if (enumCreateTableModel == EnumDbHelperCreateTableModel.CreateIfNotExists)
@@ -87,7 +96,7 @@ namespace ZR.Common
 
             }
 
-       
+
 
             // 构建列定义
             var columns = new List<DbColumnInfo>();
@@ -120,7 +129,7 @@ namespace ZR.Common
                 .PageSize(50000).BulkCopy(dataTable);
 
             LogHelper.Logger.Information($"表 {tableName} 数据更新成功！");
-                
+
         }
 
     }

@@ -212,14 +212,20 @@ namespace ZR.WinFormsApp
         private bool FillBill3(FileInfo file)
         {
 
-            //var maybeSheets = new List<string>()
-            //{
-            //    "快递费", "账单明细", "账单明细总", "申通",
-            //};
             var maybeSheets = new List<string>()
             {
-                "3-5.5公斤中货", "重货六部","定州四部"
+                "快递费", "账单明细", "账单明细总", "申通",
             };
+            //var maybeSheets = new List<string>()
+            //{
+            //    "3-5.5公斤中货", "重货六部","定州四部"
+            //};
+
+            //var maybeSheets = new List<string>()
+            //{
+            //    "小胖哥优选",
+            //};
+
             var selectColumns = new List<SelectColumn>();
             selectColumns.AddRange(
              new SelectColumn()
@@ -231,7 +237,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "业务日期",
-                 MaybeName = new string[] { "业务时间", "业务日期", "打单时间", }
+                 MaybeName = new string[] { "业务时间", "业务日期", "打单时间", "发货时间"}
              },
              new SelectColumn()
              {
@@ -627,6 +633,10 @@ namespace ZR.WinFormsApp
         private void button3_Click_1(object sender, EventArgs e)
         {
             //美达全部客户的总运单量对比
+            var billList = dbHelper.db.Queryable<Bill2>().Where(w => w.UserGroup == "揽收账单");
+
+
+
 
 
         }
@@ -644,6 +654,54 @@ namespace ZR.WinFormsApp
             var shortList = importList.Except(wdList).ToList();
 
             leftBox.Text = string.Join(Environment.NewLine, shortList);
+
+        }
+        /// <summary>
+        /// 给所有客户添加全部的共享店铺
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button8_Click(object sender, EventArgs e)
+        {
+
+        }
+        /// <summary>
+        /// 没有计算的运单
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button9_Click(object sender, EventArgs e)
+        {
+            var list = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                  .Where(w => w.F计算状态 == 1)
+                   .WithCache(60 * 30)
+                  .ToList();
+
+            var take10 = list.Select(s => s.F运单编号).Take(10);
+            leftBox.Text = string.Join(Environment.NewLine, "取出10条");
+            leftBox.Text += string.Join(Environment.NewLine, take10);
+
+            rightBox.Text = string.Join(Environment.NewLine, $"全部数据{list.Count()}");
+
+        }
+        /// <summary>
+        /// 且没有发运表的运单
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button10_Click(object sender, EventArgs e)
+        {
+            var list = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+            .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
+            .Where((j, f) => j.F计算状态 == -1 && string.IsNullOrEmpty(f.F运单编号))
+            .WithCache(60 * 30)
+            .ToList();
+            var take10 = list.Select(s => s.F运单编号).Take(10);
+
+            leftBox.Text = string.Join(Environment.NewLine, "取出10条");
+            leftBox.Text += string.Join(Environment.NewLine, take10);
+
+            rightBox.Text = string.Join(Environment.NewLine, $"全部数据{list.Count()}");
 
         }
     }
