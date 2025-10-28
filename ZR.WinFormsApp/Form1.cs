@@ -212,9 +212,13 @@ namespace ZR.WinFormsApp
         private bool FillBill3(FileInfo file)
         {
 
+            //var maybeSheets = new List<string>()
+            //{
+            //    "快递费", "账单明细", "账单明细总", "申通",
+            //};
             var maybeSheets = new List<string>()
             {
-                "快递费", "账单明细", "账单明细总", "申通"
+                "3-5.5公斤中货", "重货六部","定州四部"
             };
             var selectColumns = new List<SelectColumn>();
             selectColumns.AddRange(
@@ -622,6 +626,24 @@ namespace ZR.WinFormsApp
         /// <param name="e"></param>
         private void button3_Click_1(object sender, EventArgs e)
         {
+            //美达全部客户的总运单量对比
+
+
+        }
+        /// <summary>
+        /// 查看缺失的网点公司信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button7_Click(object sender, EventArgs e)
+        {
+            var importList = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>().GroupBy(s => s.F所属网点).Select(s => s.F所属网点).ToList();
+
+            var wdList = dbHelper.db.Queryable<BU网点公司>().Select(s => s.F网点全称).ToList();
+
+            var shortList = importList.Except(wdList).ToList();
+
+            leftBox.Text = string.Join(Environment.NewLine, shortList);
 
         }
     }

@@ -36,7 +36,13 @@
             button6 = new Button();
             button2 = new Button();
             button3 = new Button();
+            button7 = new Button();
+            splitContainer1 = new SplitContainer();
+            leftBox = new RichTextBox();
             panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.SuspendLayout();
             SuspendLayout();
             // 
             // button1
@@ -54,7 +60,7 @@
             panel1.Controls.Add(button1);
             panel1.Location = new Point(12, 12);
             panel1.Name = "panel1";
-            panel1.Size = new Size(125, 251);
+            panel1.Size = new Size(117, 175);
             panel1.TabIndex = 3;
             // 
             // button4
@@ -69,7 +75,7 @@
             // 
             // button5
             // 
-            button5.Location = new Point(356, 33);
+            button5.Location = new Point(192, 76);
             button5.Name = "button5";
             button5.Size = new Size(117, 23);
             button5.TabIndex = 5;
@@ -80,7 +86,7 @@
             // 
             // button6
             // 
-            button6.Location = new Point(517, 33);
+            button6.Location = new Point(195, 122);
             button6.Name = "button6";
             button6.Size = new Size(102, 23);
             button6.TabIndex = 6;
@@ -91,9 +97,9 @@
             // 
             // button2
             // 
-            button2.Location = new Point(668, 33);
+            button2.Location = new Point(192, 164);
             button2.Name = "button2";
-            button2.Size = new Size(145, 23);
+            button2.Size = new Size(105, 23);
             button2.TabIndex = 7;
             button2.Text = "生成表Bill2结构";
             button2.UseVisualStyleBackColor = true;
@@ -101,7 +107,7 @@
             // 
             // button3
             // 
-            button3.Location = new Point(195, 122);
+            button3.Location = new Point(401, 33);
             button3.Name = "button3";
             button3.Size = new Size(104, 23);
             button3.TabIndex = 8;
@@ -109,20 +115,55 @@
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click_1;
             // 
+            // button7
+            // 
+            button7.Location = new Point(560, 33);
+            button7.Name = "button7";
+            button7.Size = new Size(155, 23);
+            button7.TabIndex = 9;
+            button7.Text = "查看缺失的网点公司信息";
+            button7.UseVisualStyleBackColor = true;
+            button7.Click += button7_Click;
+            // 
+            // splitContainer1
+            // 
+            splitContainer1.Location = new Point(12, 202);
+            splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(leftBox);
+            splitContainer1.Size = new Size(1149, 476);
+            splitContainer1.SplitterDistance = 597;
+            splitContainer1.TabIndex = 10;
+            // 
+            // leftBox
+            // 
+            leftBox.Location = new Point(25, 21);
+            leftBox.Name = "leftBox";
+            leftBox.Size = new Size(544, 440);
+            leftBox.TabIndex = 0;
+            leftBox.Text = "";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1173, 690);
+            Controls.Add(button7);
             Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(button6);
             Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(panel1);
+            Controls.Add(splitContainer1);
             Name = "Form1";
             Text = "Form1";
             panel1.ResumeLayout(false);
+            splitContainer1.Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -136,5 +177,8 @@
         private Button button6;
         private Button button2;
         private Button button3;
+        private Button button7;
+        private SplitContainer splitContainer1;
+        private RichTextBox leftBox;
     }
 }
