@@ -26,7 +26,11 @@ namespace ZR.WinFormsApp
             dbHelper = new DbHelper();
             logHelper = new LogHelper();
         }
-
+        /// <summary>
+        /// 选择目录
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             folderBrowserDialog1.Description = "请选择文件夹";
@@ -84,7 +88,7 @@ namespace ZR.WinFormsApp
             }
         }
         /// <summary>
-        /// 总数核对
+        /// 总数核对（停止）
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -162,7 +166,7 @@ namespace ZR.WinFormsApp
 
 
         /// <summary>
-        /// 导入账单数据
+        /// 导入账单订单号数据
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -200,7 +204,11 @@ namespace ZR.WinFormsApp
             }
             logHelper.Logger.Error($"全部导入完成");
         }
-
+        /// <summary>
+        /// dynamic再转list导入完整账单数据（速度快，处理大数据）
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         private bool FillBill3(FileInfo file)
         {
 
@@ -298,6 +306,11 @@ namespace ZR.WinFormsApp
 
             return true;
         }
+        /// <summary>
+        /// datatable方式导入完整账单数据(数据量一大会卡死)（可以弃用）
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         private bool FillBill2(FileInfo file)
         {
             var npoiExcelHelper = new ExcelHelper(file.FullName);
@@ -436,6 +449,11 @@ namespace ZR.WinFormsApp
 
             return true;
         }
+        /// <summary>
+        /// 导入账单订单号数据
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         private bool FillBill(FileInfo file)
         {
             var npoiExcelHelper = new ExcelHelper(file.FullName);
@@ -588,12 +606,20 @@ namespace ZR.WinFormsApp
         {
 
         }
-
+        /// <summary>
+        /// 生成表Bill2结构
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button2_Click_1(object sender, EventArgs e)
         {
             dbHelper.db.CodeFirst.InitTables(typeof(Bill2));
         }
-
+        /// <summary>
+        /// 对比总运单量
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button3_Click_1(object sender, EventArgs e)
         {
 
