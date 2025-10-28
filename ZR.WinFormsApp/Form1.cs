@@ -237,7 +237,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "业务日期",
-                 MaybeName = new string[] { "业务时间", "业务日期", "打单时间", "发货时间"}
+                 MaybeName = new string[] { "业务时间", "业务日期", "打单时间", "发货时间" }
              },
              new SelectColumn()
              {
@@ -666,43 +666,62 @@ namespace ZR.WinFormsApp
 
         }
         /// <summary>
-        /// 没有计算的运单
+        /// 没计算
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button9_Click(object sender, EventArgs e)
         {
+            var total = 0;
             var list = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
                   .Where(w => w.F计算状态 == 1)
-                   .WithCache(60 * 30)
-                  .ToList();
+                  .Select(s => s.F运单编号)
+                  .ToPageList(0, 10, ref total);
 
-            var take10 = list.Select(s => s.F运单编号).Take(10);
             leftBox.Text = string.Join(Environment.NewLine, "取出10条");
-            leftBox.Text += string.Join(Environment.NewLine, take10);
+            leftBox.Text += string.Join(Environment.NewLine, list);
 
-            rightBox.Text = string.Join(Environment.NewLine, $"全部数据{list.Count()}");
+            rightBox.Text = string.Join(Environment.NewLine, $"全部数据{total}");
 
         }
         /// <summary>
-        /// 且没有发运表的运单
+        /// 没计算+没发运
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button10_Click(object sender, EventArgs e)
         {
+            var total = 0;
             var list = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
-            .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
-            .Where((j, f) => j.F计算状态 == -1 && string.IsNullOrEmpty(f.F运单编号))
-            .WithCache(60 * 30)
-            .ToList();
-            var take10 = list.Select(s => s.F运单编号).Take(10);
+                        .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
+                        .Where((j, f) => j.F计算状态 == 1 && string.IsNullOrEmpty(f.F运单编号))
+                        .Select(j => j.F运单编号)
+                        .ToPageList(0, 10, ref total);
 
             leftBox.Text = string.Join(Environment.NewLine, "取出10条");
-            leftBox.Text += string.Join(Environment.NewLine, take10);
+            leftBox.Text += string.Join(Environment.NewLine, list);
 
-            rightBox.Text = string.Join(Environment.NewLine, $"全部数据{list.Count()}");
+            rightBox.Text = string.Join(Environment.NewLine, $"全部数据{total}");
 
+        }
+        /// <summary>
+        /// 没计算+没发运+没店铺
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button11_Click(object sender, EventArgs e)
+        {
+            var total = 0;
+            var list = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                        .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
+                        .Where((j, f) => j.F计算状态 == 1 && string.IsNullOrEmpty(f.F运单编号) && string.IsNullOrEmpty(j.F店铺账号))
+                        .Select(j => j.F运单编号)
+                        .ToPageList(0, 10, ref total);
+
+            leftBox.Text = string.Join(Environment.NewLine, "取出10条");
+            leftBox.Text += string.Join(Environment.NewLine, list);
+
+            rightBox.Text = string.Join(Environment.NewLine, $"全部数据{total}");
         }
     }
 }
