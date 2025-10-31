@@ -3,6 +3,7 @@ using Infrastructure.Helper;
 using Mapster;
 using Masuit.Tools;
 using Masuit.Tools.Database;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.VisualBasic.ApplicationServices;
 using MiniExcelLibs;
 using Models;
@@ -22,12 +23,12 @@ namespace ZR.WinFormsApp
     public partial class Form1 : Form
     {
         public readonly DbHelper dbHelper;
-        public readonly LogHelper logHelper;
+        public readonly Common.LogHelper logHelper;
         public Form1()
         {
             InitializeComponent();
             dbHelper = new DbHelper();
-            logHelper = new LogHelper();
+            logHelper = new Common.LogHelper(false);
         }
         /// <summary>
         /// 选择目录
@@ -630,7 +631,7 @@ namespace ZR.WinFormsApp
             //美达全部客户的总运单量对比
             var billList = dbHelper.db.Queryable<Bill2>().Where(w => w.UserGroup == "揽收账单");
 
-            var rList= dbHelper.db.Queryable<FIN快递出港账单_结算对象价格>();
+            var rList = dbHelper.db.Queryable<FIN快递出港账单_结算对象价格>();
 
 
 
@@ -726,7 +727,7 @@ namespace ZR.WinFormsApp
                 .LeftJoin<FIN发运表>((j, g, d, f) => f.F运单编号 == j.F运单编号)
                 .Where((j, g, d, f) =>
                 j.F计算状态 == 1
-                  && ((!string.IsNullOrEmpty(d.F店铺账号) && d.F是否共享店铺 == true) )      //共享店铺
+                  && ((!string.IsNullOrEmpty(d.F店铺账号) && d.F是否共享店铺 == true))      //共享店铺
                   && string.IsNullOrEmpty(f.F运单编号) // 没有发运表
                   && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
                 );
@@ -744,7 +745,7 @@ namespace ZR.WinFormsApp
 
 
             ///没有店铺
-            
+
 
             var baseList2 = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
                         .LeftJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
@@ -796,7 +797,7 @@ namespace ZR.WinFormsApp
             leftBox.Text += string.Join(Environment.NewLine, list);
 
 
-       
+
             var list2 = baseList.Select((j, f, g, d) => new { f.F客户名, f.F店铺名称 }).Distinct().MergeTable().OrderBy(o => new { o.F客户名, o.F店铺名称 }).ToList();
 
             leftBox2.Text = string.Join(Environment.NewLine, $"共享店铺-缺少的业务关系{list2.Count()}\n");
@@ -825,7 +826,7 @@ namespace ZR.WinFormsApp
 
 
 
-            var list4 = baseList.Select((j, f, g, d) => new { f.F客户名, f.F店铺名称 }).Distinct().MergeTable().OrderBy(o=>new { o.F客户名 ,o.F店铺名称}).ToList();
+            var list4 = baseList.Select((j, f, g, d) => new { f.F客户名, f.F店铺名称 }).Distinct().MergeTable().OrderBy(o => new { o.F客户名, o.F店铺名称 }).ToList();
 
             rightBox2.Text = string.Join(Environment.NewLine, $"没有店铺-缺少的业务关系{list4.Count()}\n");
             rightBox2.Text += string.Join(Environment.NewLine, list4);
@@ -919,6 +920,305 @@ namespace ZR.WinFormsApp
 
             rightBox2.Text = string.Join(Environment.NewLine, $"没有店铺-缺少的业务关系：{list4.Count()}\n");
             rightBox2.Text += string.Join(Environment.NewLine, list4);
+        }
+        /// <summary>
+        /// 差异报告
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button10_Click(object sender, EventArgs e)
+        {
+            logHelper.Logger.Information("差异报告start\n");
+
+            //有真实店铺 ，没报价关系
+
+            NewMethod1();
+
+            //没有店铺或者是共享店铺 ，没有发运表  ，没报价关系
+
+            NewMethod2();
+
+
+            //没有店铺或者是共享店铺 ，有发运表 ，没报价关系(没发运表客户 和 没发运表店铺)
+
+            NewMethod3();
+
+
+            //共享店铺，有发运表 ， 没报价关系(没发运表客户 和 没计算表店铺)
+            NewMethod4();
+
+            //没有店铺或者是共享店铺 ， 有发运表，没报价关系(没发运表店铺)
+
+            NewMethod5();
+
+            logHelper.Logger.Information("差异报告end\n");
+        }
+
+        private void NewMethod5()
+        {
+            ///共享店铺
+            var baseList = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                   .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
+                   .LeftJoin<CRM店铺业务关系>((j, f, g) => g.F店铺名称 == f.F店铺名称)
+                   .LeftJoin<CRM平台店铺账号>((j, f, g, d) => d.F店铺账号 == j.F店铺账号)
+                   .Where((j, f, g, d) =>
+                   j.F计算状态 == 1
+                     && ((!string.IsNullOrEmpty(d.F店铺账号) && d.F是否共享店铺 == true))      //没有店铺或者是共享店铺
+                     && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
+                     && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+                   );
+            var total = 0;
+            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+
+            //logHelper.Logger.Information($"共享店铺，有发运表，没报价关系(没发运表店铺)-全部数据{total}\n");
+            //logHelper.Logger.Information("取出10条\n");
+            //foreach (var item in list)
+            //{
+            //    logHelper.Logger.Information(item);
+            //}
+
+
+            var list2 = baseList.Select((j, f, g, d) => f.F店铺名称).Distinct().ToList();
+
+            logHelper.Logger.Information($"\n有共享店铺，有发运表，发运表店铺没有设置报价关系：{list2.Count()}");
+            foreach (var item in list2)
+            {
+                logHelper.Logger.Information(item);
+            }
+
+            ///没有店铺
+            var baseList2 = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+          .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
+          .LeftJoin<CRM店铺业务关系>((j, f, g) => g.F店铺名称 == f.F店铺名称)
+          .LeftJoin<CRM平台店铺账号>((j, f, g, d) => d.F店铺账号 == j.F店铺账号)
+          .Where((j, f, g, d) =>
+          j.F计算状态 == 1
+            && (string.IsNullOrEmpty(d.F店铺账号))      //没有店铺或者是共享店铺
+            && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
+            && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+          );
+            var total3 = 0;
+            var list3 = baseList2.Select(j => j.F运单编号).ToPageList(0, 10, ref total3);
+
+            //logHelper.Logger.Information($"没有店铺，有发运表，没报价关系(没发运表店铺)-全部数据{total3}\n");
+            //logHelper.Logger.Information("取出10条\n");
+            //foreach (var item in list3)
+            //{
+            //    logHelper.Logger.Information(item);
+            //}
+
+
+            var list4 = baseList.Select((j, f, g, d) => f.F店铺名称).Distinct().ToList();
+
+            logHelper.Logger.Information($"\n没有店铺，有发运表，发运表店铺没有设置报价关系：{list4.Count()}");
+            foreach (var item in list4)
+            {
+                logHelper.Logger.Information(item);
+            }
+        }
+
+        private void NewMethod4()
+        {
+            //共享店铺
+            var baseList = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                 .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
+                 .LeftJoin<CRM店铺业务关系>((j, f, g) => g.F店铺名称 == j.F店铺账号 && g.F业务对象名称 == f.F客户名)
+                 .LeftJoin<CRM平台店铺账号>((j, f, g, d) => d.F店铺账号 == j.F店铺账号)
+                 .Where((j, f, g, d) =>
+                 j.F计算状态 == 1
+                   && ((!string.IsNullOrEmpty(d.F店铺账号) && d.F是否共享店铺 == true))    //共享店铺
+                   && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
+                   && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+                 );
+            var total = 0;
+            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+            //logHelper.Logger.Information($"共享店铺，有发运表 ， 没报价关系(没发运表客户 和 没计算表店铺)-全部数据{total}\n");
+            //logHelper.Logger.Information("取出10条\n");
+            //foreach (var item in list)
+            //{
+            //    logHelper.Logger.Information(item);
+            //}
+
+
+            var list2 = baseList.Select((j, f, g, d) => new { f.F客户名, j.F店铺账号 }).Distinct().MergeTable().OrderBy(o => new { o.F客户名, o.F店铺账号 }).ToList();
+
+            logHelper.Logger.Information($"\n有共享店铺，有发运表 ，发运表客户和共享店铺没有设置报价关系{list2.Count()}");
+
+            foreach (var item in list2)
+            {
+                logHelper.Logger.Information($"F客户名:{item.F客户名} --- F店铺账号:{item.F店铺账号}");
+            }
+        }
+
+        private void NewMethod3()
+        {
+            //共享店铺
+            var baseList = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
+                .LeftJoin<CRM店铺业务关系>((j, f, g) => g.F店铺名称 == f.F店铺名称 && g.F业务对象名称 == f.F客户名)
+                .LeftJoin<CRM平台店铺账号>((j, f, g, d) => d.F店铺账号 == j.F店铺账号)
+                .Where((j, f, g, d) =>
+                j.F计算状态 == 1
+                  && ((!string.IsNullOrEmpty(d.F店铺账号) && d.F是否共享店铺 == true))      //共享店铺
+                  && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
+                  && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+                );
+            var total = 0;
+            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+
+
+            //logHelper.Logger.Information($"共享店铺，有发运表 ，没报价关系(没发运表客户 和 没发运表店铺)-全部数据{total}\n");
+ 
+            //logHelper.Logger.Information("取出10条\n");
+
+            //foreach (var item in list)
+            //{
+            //    logHelper.Logger.Information(item);
+            //}
+
+
+
+            var list2 = baseList.Select((j, f, g, d) => new { f.F客户名, f.F店铺名称 }).Distinct().MergeTable().OrderBy(o => new { o.F客户名, o.F店铺名称 }).ToList();
+
+
+            logHelper.Logger.Information($"\n有共享店铺，有发运表 ，发运表客户和发运表店铺没有设置报价关系{list2.Count()}");
+
+            foreach (var item in list2)
+            {
+                logHelper.Logger.Information($"F客户名:{item.F客户名}---F店铺名称:{item.F店铺名称}");
+            }
+
+
+
+            ///没有店铺
+            var baseList2 = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                                        .LeftJoin<FIN发运表>((j, f) => f.F运单编号 == j.F运单编号)
+                                        .LeftJoin<CRM店铺业务关系>((j, f, g) => g.F店铺名称 == f.F店铺名称 && g.F业务对象名称 == f.F客户名)
+                                        .LeftJoin<CRM平台店铺账号>((j, f, g, d) => d.F店铺账号 == j.F店铺账号)
+                                        .Where((j, f, g, d) =>
+                                        j.F计算状态 == 1
+                                          && (string.IsNullOrEmpty(d.F店铺账号))      //没有店铺
+                                          && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
+                                          && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+                                        );
+            var total2 = 0;
+            var list3 = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total2);
+
+            //logHelper.Logger.Information($"没有店铺，有发运表 ，没报价关系(没发运表客户 和 没发运表店铺)-全部数据{total2}\n");
+            //logHelper.Logger.Information("取出10条\n");
+            //foreach (var item in list3)
+            //{
+            //    logHelper.Logger.Information(item);
+            //}
+
+            var list4 = baseList.Select((j, f, g, d) => new { f.F客户名, f.F店铺名称 }).Distinct().MergeTable().OrderBy(o => new { o.F客户名, o.F店铺名称 }).ToList();
+
+
+            logHelper.Logger.Information($"\n没有店铺，有发运表 ，发运表客户和发运表店铺没有设置报价关系{list4.Count()}");
+
+            foreach (var item in list4)
+            {
+                logHelper.Logger.Information($"F客户名:{item.F客户名}---F店铺名称:{item.F店铺名称}");
+            }
+
+        }
+
+        private void NewMethod2()
+        {
+
+            //共享店铺
+            var baseList = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                .LeftJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
+                .LeftJoin<CRM平台店铺账号>((j, g, d) => d.F店铺账号 == j.F店铺账号)
+                .LeftJoin<FIN发运表>((j, g, d, f) => f.F运单编号 == j.F运单编号)
+                .Where((j, g, d, f) =>
+                j.F计算状态 == 1
+                  && ((!string.IsNullOrEmpty(d.F店铺账号) && d.F是否共享店铺 == true))      //共享店铺
+                  && string.IsNullOrEmpty(f.F运单编号) // 没有发运表
+                  && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+                );
+            var total = 0;
+            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+            logHelper.Logger.Information($"\n共享店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系:共{total}运单");
+            logHelper.Logger.Information("取出10条");
+
+            foreach (var item in list)
+            {
+                logHelper.Logger.Information(item);
+            }
+
+
+
+            //var list2 = baseList.Select(j => j.F店铺账号).Distinct().ToList();
+
+            //logHelper.Logger.Information($"\n共享店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系{list2.Count()}\n");
+            //foreach (var item in list2)
+            //{
+            //    logHelper.Logger.Information(item);
+            //}
+
+
+            ///没有店铺
+
+
+            var baseList2 = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                        .LeftJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
+                        .LeftJoin<CRM平台店铺账号>((j, g, d) => d.F店铺账号 == j.F店铺账号)
+                        .LeftJoin<FIN发运表>((j, g, d, f) => f.F运单编号 == j.F运单编号)
+                        .Where((j, g, d, f) =>
+                        j.F计算状态 == 1
+                          && (string.IsNullOrEmpty(d.F店铺账号))      //没有店铺
+                          && string.IsNullOrEmpty(f.F运单编号) // 没有发运表
+                          && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+                        );
+            var total3 = 0;
+            var list3 = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total3);
+
+            logHelper.Logger.Information($"\n没有店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系:共{total3}运单");
+            logHelper.Logger.Information($"取出10条");
+            foreach (var item in list3)
+            {
+                logHelper.Logger.Information(item);
+            }
+
+            //var list4 = baseList.Select(j => j.F店铺账号).Distinct().ToList();
+            //logHelper.Logger.Information($"\n没有店铺，没有发运表  ，没报价关系-缺少的业务关系:{list2.Count()}\n");
+            //foreach (var item in list4)
+            //{
+            //    logHelper.Logger.Information(item);
+            //}
+
+        }
+
+        private void NewMethod1()
+        {
+            var baseList = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                         .LeftJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
+                         .LeftJoin<CRM平台店铺账号>((j, g, d) => d.F店铺账号 == j.F店铺账号)
+                         .Where((j, g, d) =>
+                         j.F计算状态 == 1
+                           && !string.IsNullOrEmpty(d.F店铺账号) // 有店铺
+                           && d.F是否共享店铺 == false // 真实店铺
+                           && string.IsNullOrEmpty(g.F店铺名称) // 没报价
+                         );
+            var total = 0;
+            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+
+            //logHelper.Logger.Information($"\n有真实店铺 ，没报价关系-全部数据{total}");
+            //logHelper.Logger.Information("\n有真实店铺 ，没报价关系-取出10条");
+            //foreach (var item in list)
+            //{
+            //    logHelper.Logger.Information(item);
+            //}
+
+            var list2 = baseList.Select(j => j.F店铺账号).Distinct().ToList();
+
+            logHelper.Logger.Information($"\n有真实店铺 ，真实店铺没有设置报价关系：{list2.Count()}");
+            foreach (var item in list2)
+            {
+
+                logHelper.Logger.Information(item);
+            }
         }
     }
 }

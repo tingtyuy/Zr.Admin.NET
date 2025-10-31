@@ -38,6 +38,7 @@
             button3 = new Button();
             button7 = new Button();
             splitContainer1 = new SplitContainer();
+            leftBox2 = new RichTextBox();
             leftBox = new RichTextBox();
             rightBox2 = new RichTextBox();
             rightBox = new RichTextBox();
@@ -48,7 +49,7 @@
             button15 = new Button();
             button16 = new Button();
             button17 = new Button();
-            leftBox2 = new RichTextBox();
+            button10 = new Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -154,6 +155,14 @@
             splitContainer1.SplitterDistance = 916;
             splitContainer1.TabIndex = 10;
             // 
+            // leftBox2
+            // 
+            leftBox2.Location = new Point(366, 21);
+            leftBox2.Name = "leftBox2";
+            leftBox2.Size = new Size(301, 559);
+            leftBox2.TabIndex = 1;
+            leftBox2.Text = "";
+            // 
             // leftBox
             // 
             leftBox.Location = new Point(25, 21);
@@ -248,19 +257,22 @@
             button17.UseVisualStyleBackColor = true;
             button17.Click += button17_Click;
             // 
-            // leftBox2
+            // button10
             // 
-            leftBox2.Location = new Point(366, 21);
-            leftBox2.Name = "leftBox2";
-            leftBox2.Size = new Size(301, 559);
-            leftBox2.TabIndex = 1;
-            leftBox2.Text = "";
+            button10.Location = new Point(480, 55);
+            button10.Name = "button10";
+            button10.Size = new Size(75, 23);
+            button10.TabIndex = 21;
+            button10.Text = "差异报告";
+            button10.UseVisualStyleBackColor = true;
+            button10.Click += button10_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1852, 816);
+            Controls.Add(button10);
             Controls.Add(button17);
             Controls.Add(button16);
             Controls.Add(button15);
@@ -309,5 +321,6 @@
         private Button button17;
         private RichTextBox rightBox2;
         private RichTextBox leftBox2;
+        private Button button10;
     }
 }

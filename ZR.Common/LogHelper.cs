@@ -12,7 +12,7 @@ namespace ZR.Common
     {
         public readonly ILogger Logger;
 
-        public LogHelper()
+        public LogHelper(bool hasTime = true)
         {
             var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
             if (!Directory.Exists(logFilePath))
@@ -20,14 +20,22 @@ namespace ZR.Common
                 Directory.CreateDirectory(logFilePath);
             }
 
-            Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Console()
-            .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
-            .CreateLogger();
+            var config = new LoggerConfiguration()
+              .MinimumLevel.Debug()
+              .WriteTo.Console();
+
+            if (!hasTime)
+            {
+                config.WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day, outputTemplate: "{Message:lj}{NewLine}");
+            }
+            else
+            {
+                config.WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day);
+            }
+            Logger = config.CreateLogger();
 
         }
-        public LogHelper(string logFilePath)
+        public LogHelper(string logFilePath, bool hasTime = true)
         {
 
             if (!Directory.Exists(logFilePath))
@@ -35,11 +43,19 @@ namespace ZR.Common
                 Directory.CreateDirectory(logFilePath);
             }
 
-            Logger = new LoggerConfiguration()
+            var config = new LoggerConfiguration()
             .MinimumLevel.Debug()
-            .WriteTo.Console()
-            .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
-            .CreateLogger();
+            .WriteTo.Console();
+
+            if (!hasTime)
+            {
+                config.WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day, outputTemplate: "{Message:lj}{NewLine}");
+            }
+            else
+            {
+                config.WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day);
+            }
+            Logger = config.CreateLogger();
         }
 
     }
