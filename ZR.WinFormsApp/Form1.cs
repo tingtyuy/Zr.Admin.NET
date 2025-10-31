@@ -630,7 +630,7 @@ namespace ZR.WinFormsApp
             //美达全部客户的总运单量对比
             var billList = dbHelper.db.Queryable<Bill2>().Where(w => w.UserGroup == "揽收账单");
 
-
+            var rList= dbHelper.db.Queryable<FIN快递出港账单_结算对象价格>();
 
 
 

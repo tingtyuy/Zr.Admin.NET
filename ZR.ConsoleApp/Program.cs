@@ -1,5 +1,7 @@
 ﻿using Infrastructure.Extensions;
 using MiniExcelLibs;
+using Models;
+
 //using Models;
 using NPOI.SS.UserModel;
 using SqlSugar;
@@ -25,18 +27,28 @@ void Test()
     //return; 
     #endregion
 
-    //db.Deleteable<TempUserOrderData>().ExecuteCommand();
+    dbHelper.db.Deleteable<TempUserOrderData>().ExecuteCommand();
 
     //var targetDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单1021";
 
     var fileDir = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单";
-    var fileDir2 = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单";
+    //var fileDir2 = @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单";
 
 
 
 
-    TableCreateAndInsert(dbHelper, logHelper, fileDir, "out");
+    //TableCreateAndInsert(dbHelper, logHelper, fileDir, "out");
     //TableCreateAndInsert(dbHelper, logHelper, fileDir2, "in");
+    var filePaths = new List<string>();
+    GetAllFiles(fileDir, filePaths);
+
+
+
+    foreach (var filePath in filePaths)
+    {
+        ExportTatalStatistic(dbHelper,logHelper,filePath);
+        //MakeDateData(logHelper, fileDir, filePath);
+    }
 
 }
 
@@ -169,7 +181,7 @@ void GetAllFiles(string path, List<string> files)
     {
         foreach (string file in Directory.GetFiles(path))
         {
-            if (file.Contains(".bak"))
+            if (file.Contains(".xlsx"))
             {
                 files.Add(file);
             }
@@ -229,22 +241,26 @@ static bool MakeDateData(LogHelper logHelper, string targetDir, string filePath)
     return true;
 }
 
-static void ExportTatalStatistic(string filePath)
+static void ExportTatalStatistic(DbHelper dbHelper, LogHelper logHelper, string filePath)
 {
     var rows = MiniExcel.Query(filePath).ToList();
     // 获取 A1 单元格的值（第0行第0列）
     if (rows.Count > 6)
     {
-        var userName = rows[2].B;
-        var orderCount = rows[5].D;
-        var orderMoney = rows[5].F;
-        //db.Insertable(new TempUserOrderData
-        //{
-        //    UserName = userName,
-        //    OrderCount = orderCount,
-        //    OrderMoney =orderMoney
-        //}).ExecuteCommand();
+        object userName = rows[2].B;
+        object orderCount = rows[5].D;
+        object orderMoney = rows[5].F;
+       dbHelper.db.Insertable(new TempUserOrderData
+        {
+            UserName = userName?.ToString()??string.Empty,
+            OrderCount = orderCount?.ToString() ?? string.Empty,
+           OrderMoney = orderMoney?.ToString() ?? string.Empty
+       }).ExecuteCommand();
         //logHelper.Logger.Information($"{filePath}=>userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
-        Console.WriteLine($"userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
+        //Console.WriteLine($"userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
+    }
+    else
+    {
+        Console.WriteLine($"文件数据行数不足：{filePath}");
     }
 }

@@ -27,14 +27,14 @@ namespace Models
            /// Default:
            /// Nullable:True
            /// </summary>           
-           public long? OrderCount {get;set;}
+           public string OrderCount {get;set;}
 
            /// <summary>
            /// Desc:
            /// Default:
            /// Nullable:True
            /// </summary>           
-           public decimal? OrderMoney {get;set;}
+           public string OrderMoney {get;set;}
 
     }
 }

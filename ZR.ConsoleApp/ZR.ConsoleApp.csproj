@@ -8,12 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="models\**" />
-    <EmbeddedResource Remove="models\**" />
-    <None Remove="models\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ZR.Common\ZR.Common.csproj" />
   </ItemGroup>
 
