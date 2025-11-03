@@ -36,5 +36,7 @@ namespace Models
            /// </summary>           
            public string OrderMoney {get;set;}
 
+        public string Source { get; set; }
+
     }
 }

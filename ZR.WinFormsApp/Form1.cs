@@ -3,6 +3,7 @@ using Infrastructure.Helper;
 using Mapster;
 using Masuit.Tools;
 using Masuit.Tools.Database;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.VisualBasic.ApplicationServices;
 using MiniExcelLibs;
@@ -208,6 +209,105 @@ namespace ZR.WinFormsApp
             }
             logHelper.Logger.Error($"全部导入完成");
         }
+
+
+        private bool FillBill4(FileInfo file)
+        {
+
+            var maybeSheets = new List<string>()
+            {
+                "运单明细_1"
+            };
+
+            var selectColumns = new List<SelectColumn>();
+            selectColumns.AddRange(
+             new SelectColumn()
+             {
+                 Name = "运单编号",
+                 MaybeName = new string[] { "运单编号", "运单号", "物流编号", "物流单号", "快递单号" }
+             }
+             ,
+            new SelectColumn()
+            {
+                Name = "所属网点",
+                MaybeName = new string[] { "所属网点" }
+            }
+
+             ,
+             new SelectColumn()
+             {
+                 Name = "业务日期",
+                 MaybeName = new string[] { "业务时间", "业务日期", "打单时间", "发货时间" }
+             },
+             new SelectColumn()
+             {
+                 Name = "目的省份",
+                 MaybeName = new string[] { "目的省份", "省份", "目的份" }
+             }
+              ,
+             new SelectColumn()
+             {
+                 Name = "目的城市",
+                 MaybeName = new string[] { "目的城市", "城市", }
+             }
+              ,
+             new SelectColumn()
+             {
+                 Name = "结算重量",
+                 MaybeName = new string[] { "结算重量", "重量", }
+             }
+
+              ,
+             new SelectColumn()
+             {
+                 Name = "结算价格",
+                 MaybeName = new string[] { "结算价格" }
+             }
+              ,
+
+             new SelectColumn()
+             {
+                 Name = "退回状态",
+                 MaybeName = new string[] { "退回状态", "状态", "退件状态" }
+             }
+                       ,
+
+             new SelectColumn()
+             {
+                 Name = "退回费用",
+                 MaybeName = new string[] { "退回费用", "状态", "退件状态" }
+             }
+            );
+            var list = ExcelHelper.GetDynamicData(file.FullName, maybeSheets, selectColumns);
+            var listBill2 = list.Adapt<List<Bill3>>();
+            listBill2.ForEach(bill =>
+            {
+                var UserName = Path.GetFileNameWithoutExtension(file.Name).FilterSpecial();
+                //var UserGroup = file.DirectoryName?.Split(Path.DirectorySeparatorChar).Last() ?? "";
+                bill.UserName = UserName;
+                //bill.UserGroup = UserGroup;
+            });
+
+            try
+            {
+                //              dbHelper.db.Insertable(list)
+                //.AS("Bill2")
+                //.ExecuteCommand();
+                dbHelper.db.Storageable<Bill3>(listBill2).PageSize(2000).ExecuteCommand();
+
+                //var count = dbHelper.db.Fastest<Bill2>().AS("Bill2").PageSize(50000).BulkCopy(listBill2);
+                logHelper.Logger.Information($"表 {file.FullName} 数据更新成功！");
+                file.MoveTo(file.FullName + ".bak");
+            }
+            catch (Exception ex)
+            {
+
+                logHelper.Logger.Error($"插入数据失败：{file.FullName}=》{ex.Message}");
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// dynamic再转list导入完整账单数据（速度快，处理大数据）
         /// </summary>
@@ -218,17 +318,8 @@ namespace ZR.WinFormsApp
 
             var maybeSheets = new List<string>()
             {
-                "快递费", "账单明细", "账单明细总", "申通",
+                "快递费", "账单明细", "账单明细总", "申通", "3-5.5公斤中货", "重货六部","定州四部","小胖哥优选"
             };
-            //var maybeSheets = new List<string>()
-            //{
-            //    "3-5.5公斤中货", "重货六部","定州四部"
-            //};
-
-            //var maybeSheets = new List<string>()
-            //{
-            //    "小胖哥优选",
-            //};
 
             var selectColumns = new List<SelectColumn>();
             selectColumns.AddRange(
@@ -246,7 +337,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "目的省份",
-                 MaybeName = new string[] { "目的省份", "省份", }
+                 MaybeName = new string[] { "目的省份", "省份", "目的份" }
              }
               ,
              new SelectColumn()
@@ -270,13 +361,13 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "快递运费",
-                 MaybeName = new string[] { "快递运费", "结算金额", "金额", "费用" }
+                 MaybeName = new string[] { "快递运费", "结算金额", "金额", "费用", "快递费", "基础运费", "成本" }
              }
               ,
              new SelectColumn()
              {
                  Name = "加收费用",
-                 MaybeName = new string[] { "加收费用", "加收", }
+                 MaybeName = new string[] { "加收费用", "加收", "加收费", "加收运费" }
              }
                  ,
              new SelectColumn()
@@ -288,7 +379,7 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "退回状态",
-                 MaybeName = new string[] { "退回状态", "状态", }
+                 MaybeName = new string[] { "退回状态", "状态", "退件状态" }
              }
             );
             var list = ExcelHelper.GetDynamicData(file.FullName, maybeSheets, selectColumns);
@@ -584,9 +675,14 @@ namespace ZR.WinFormsApp
         /// <param name="e"></param>
         private void button6_Click(object sender, EventArgs e)
         {
+            //var directoryPaths = new List<string> {
+            //    @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
+            //  , @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单" };
+
+
             var directoryPaths = new List<string> {
                 @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
-              , @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单" };
+         };
             //遍历目录
             foreach (var directoryPath in directoryPaths)
             {
@@ -928,6 +1024,7 @@ namespace ZR.WinFormsApp
         /// <param name="e"></param>
         private void button10_Click(object sender, EventArgs e)
         {
+            dbHelper.db.Deleteable<Bill10>();
             logHelper.Logger.Information("差异报告start\n");
 
             //有真实店铺 ，没报价关系
@@ -967,8 +1064,12 @@ namespace ZR.WinFormsApp
                      && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
                      && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
                    );
-            var total = 0;
-            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+            //var total = 0;
+            //var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+
+            var newList = baseList.Select(j => new Bill10() { 运单编号 = j.F运单编号, Remark = "有共享店铺，有发运表，发运表店铺没有设置报价关系" }).ToList();
+
+            dbHelper.db.Insertable(newList).ExecuteCommand();
 
             //logHelper.Logger.Information($"共享店铺，有发运表，没报价关系(没发运表店铺)-全部数据{total}\n");
             //logHelper.Logger.Information("取出10条\n");
@@ -997,8 +1098,12 @@ namespace ZR.WinFormsApp
             && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
             && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
           );
-            var total3 = 0;
-            var list3 = baseList2.Select(j => j.F运单编号).ToPageList(0, 10, ref total3);
+            //var total3 = 0;
+            //var list3 = baseList2.Select(j => j.F运单编号).ToPageList(0, 10, ref total3);
+
+            var newList2 = baseList2.Select(j => new Bill10() { 运单编号 = j.F运单编号, Remark = "没有店铺，有发运表，发运表店铺没有设置报价关系" }).ToList();
+
+            dbHelper.db.Insertable(newList2).ExecuteCommand();
 
             //logHelper.Logger.Information($"没有店铺，有发运表，没报价关系(没发运表店铺)-全部数据{total3}\n");
             //logHelper.Logger.Information("取出10条\n");
@@ -1030,8 +1135,12 @@ namespace ZR.WinFormsApp
                    && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
                    && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
                  );
-            var total = 0;
-            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+            //var total = 0;
+            //var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+
+            var newList = baseList.Select(j => new Bill10() { 运单编号 = j.F运单编号, Remark = "有共享店铺，有发运表 ，发运表客户和共享店铺没有设置报价关系" }).ToList();
+
+            dbHelper.db.Insertable(newList).ExecuteCommand();
             //logHelper.Logger.Information($"共享店铺，有发运表 ， 没报价关系(没发运表客户 和 没计算表店铺)-全部数据{total}\n");
             //logHelper.Logger.Information("取出10条\n");
             //foreach (var item in list)
@@ -1063,12 +1172,14 @@ namespace ZR.WinFormsApp
                   && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
                   && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
                 );
-            var total = 0;
-            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+            //var total = 0;
+            //var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
 
+            var newList = baseList.Select(j => new Bill10() { 运单编号 = j.F运单编号, Remark = "有共享店铺，有发运表 ，发运表客户和发运表店铺没有设置报价关系" }).ToList();
 
+            dbHelper.db.Insertable(newList).ExecuteCommand();
             //logHelper.Logger.Information($"共享店铺，有发运表 ，没报价关系(没发运表客户 和 没发运表店铺)-全部数据{total}\n");
- 
+
             //logHelper.Logger.Information("取出10条\n");
 
             //foreach (var item in list)
@@ -1101,8 +1212,13 @@ namespace ZR.WinFormsApp
                                           && !string.IsNullOrEmpty(f.F运单编号) // 有发运表
                                           && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
                                         );
-            var total2 = 0;
-            var list3 = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total2);
+            //var total2 = 0;
+            //var list3 = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total2);
+
+
+            var newList2 = baseList2.Select(j => new Bill10() { 运单编号 = j.F运单编号, Remark = "没有店铺，有发运表 ，发运表客户和发运表店铺没有设置报价关系" }).ToList();
+
+            dbHelper.db.Insertable(newList2).ExecuteCommand();
 
             //logHelper.Logger.Information($"没有店铺，有发运表 ，没报价关系(没发运表客户 和 没发运表店铺)-全部数据{total2}\n");
             //logHelper.Logger.Information("取出10条\n");
@@ -1111,7 +1227,7 @@ namespace ZR.WinFormsApp
             //    logHelper.Logger.Information(item);
             //}
 
-            var list4 = baseList.Select((j, f, g, d) => new { f.F客户名, f.F店铺名称 }).Distinct().MergeTable().OrderBy(o => new { o.F客户名, o.F店铺名称 }).ToList();
+            var list4 = baseList2.Select((j, f, g, d) => new { f.F客户名, f.F店铺名称 }).Distinct().MergeTable().OrderBy(o => new { o.F客户名, o.F店铺名称 }).ToList();
 
 
             logHelper.Logger.Information($"\n没有店铺，有发运表 ，发运表客户和发运表店铺没有设置报价关系{list4.Count()}");
@@ -1128,25 +1244,33 @@ namespace ZR.WinFormsApp
 
             //共享店铺
             var baseList = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
-                .LeftJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
-                .LeftJoin<CRM平台店铺账号>((j, g, d) => d.F店铺账号 == j.F店铺账号)
-                .LeftJoin<FIN发运表>((j, g, d, f) => f.F运单编号 == j.F运单编号)
-                .Where((j, g, d, f) =>
+                //.LeftJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
+                .LeftJoin<CRM平台店铺账号>((j, d) => d.F店铺账号 == j.F店铺账号)
+                .LeftJoin<FIN发运表>((j, d, f) => f.F运单编号 == j.F运单编号)
+                .Where((j, d, f) =>
                 j.F计算状态 == 1
                   && ((!string.IsNullOrEmpty(d.F店铺账号) && d.F是否共享店铺 == true))      //共享店铺
                   && string.IsNullOrEmpty(f.F运单编号) // 没有发运表
-                  && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+                                                   //&& string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
                 );
-            var total = 0;
-            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
-            logHelper.Logger.Information($"\n共享店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系:共{total}运单");
+
+            //var sql = baseList.ToSql().ToString();
+            //logHelper.Logger.Information(sql);
+            //var total = 0;
+            //var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+
+
+            var newList = baseList.Select(j => new Bill10() { 运单编号 = j.F运单编号, Remark = "共享店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系" }).ToList();
+
+            dbHelper.db.Insertable(newList).ExecuteCommand();
+
+            logHelper.Logger.Information($"\n共享店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系:共{newList.Count()}运单");
             logHelper.Logger.Information("取出10条");
 
-            foreach (var item in list)
+            foreach (var item in newList.Take(10))
             {
-                logHelper.Logger.Information(item);
+                logHelper.Logger.Information(item.运单编号);
             }
-
 
 
             //var list2 = baseList.Select(j => j.F店铺账号).Distinct().ToList();
@@ -1162,24 +1286,32 @@ namespace ZR.WinFormsApp
 
 
             var baseList2 = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
-                        .LeftJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
-                        .LeftJoin<CRM平台店铺账号>((j, g, d) => d.F店铺账号 == j.F店铺账号)
-                        .LeftJoin<FIN发运表>((j, g, d, f) => f.F运单编号 == j.F运单编号)
-                        .Where((j, g, d, f) =>
+                        //.LeftJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
+                        .LeftJoin<CRM平台店铺账号>((j, d) => d.F店铺账号 == j.F店铺账号)
+                        .LeftJoin<FIN发运表>((j, d, f) => f.F运单编号 == j.F运单编号)
+                        .Where((j, d, f) =>
                         j.F计算状态 == 1
                           && (string.IsNullOrEmpty(d.F店铺账号))      //没有店铺
                           && string.IsNullOrEmpty(f.F运单编号) // 没有发运表
-                          && string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
+                                                           //&& string.IsNullOrEmpty(g.F店铺名称) // ，没报价关系
                         );
-            var total3 = 0;
-            var list3 = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total3);
+            //var total3 = 0;
+            //var list3 = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total3);
 
-            logHelper.Logger.Information($"\n没有店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系:共{total3}运单");
+            var newList2 = baseList2.Select(j => new Bill10() { 运单编号 = j.F运单编号, Remark = "没有店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系" }).ToList();
+
+            dbHelper.db.Insertable(newList2).ExecuteCommand();
+
+            logHelper.Logger.Information($"\n没有店铺，没有发运表 ，共享店铺缺少发运表信息导致找不到报价关系:共{newList2.Count()}运单");
             logHelper.Logger.Information($"取出10条");
-            foreach (var item in list3)
+            foreach (var item in newList2.Take(10))
             {
-                logHelper.Logger.Information(item);
+                logHelper.Logger.Information(item.运单编号);
             }
+
+
+
+
 
             //var list4 = baseList.Select(j => j.F店铺账号).Distinct().ToList();
             //logHelper.Logger.Information($"\n没有店铺，没有发运表  ，没报价关系-缺少的业务关系:{list2.Count()}\n");
@@ -1201,9 +1333,11 @@ namespace ZR.WinFormsApp
                            && d.F是否共享店铺 == false // 真实店铺
                            && string.IsNullOrEmpty(g.F店铺名称) // 没报价
                          );
-            var total = 0;
-            var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+            //var total = 0;
+            //var list = baseList.Select(j => j.F运单编号).ToPageList(0, 10, ref total);
+            var newList = baseList.Select(j => new Bill10() { 运单编号 = j.F运单编号, Remark = "有真实店铺 ，真实店铺没有设置报价关系" }).ToList();
 
+            dbHelper.db.Insertable(newList).ExecuteCommand();
             //logHelper.Logger.Information($"\n有真实店铺 ，没报价关系-全部数据{total}");
             //logHelper.Logger.Information("\n有真实店铺 ，没报价关系-取出10条");
             //foreach (var item in list)
@@ -1219,6 +1353,62 @@ namespace ZR.WinFormsApp
 
                 logHelper.Logger.Information(item);
             }
+        }
+
+        /// <summary>
+        /// 生成表Bill10
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button11_Click(object sender, EventArgs e)
+        {
+            dbHelper.db.CodeFirst.InitTables(typeof(Bill10));
+        }
+
+        /// <summary>
+        /// 导入2.0账单完整数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button12_Click(object sender, EventArgs e)
+        {
+            var directoryPaths = new List<string> {
+                @"D:\123456789\md\运单-账单计算\2.0账单"
+         };
+            //遍历目录
+            foreach (var directoryPath in directoryPaths)
+            {
+
+                var directoryFiles = new DirectoryInfo(directoryPath).GetFiles("*.xlsx", SearchOption.AllDirectories);
+
+                //遍历文件
+                foreach (var file in directoryFiles)
+                {
+                    //bool flowControl = FillBill(file);
+                    bool flowControl = FillBill4(file);
+                    if (!flowControl)
+                    {
+                        continue;
+                    }
+
+                }
+
+                logHelper.Logger.Information($"导入完成：{directoryPath}");
+
+            }
+            logHelper.Logger.Information($"全部导入完成");
+        }
+        /// <summary>
+        /// 生成表Bill3结构
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button18_Click(object sender, EventArgs e)
+        {
+           
+            dbHelper.db.CodeFirst.InitTables(typeof(Bill3));
+            dbHelper.db.Deleteable<Bill3>().ExecuteCommand();
+
         }
     }
 }

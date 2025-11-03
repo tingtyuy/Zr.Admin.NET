@@ -32,6 +32,7 @@ namespace ZR.Common.ExcelHelper
         public readonly string ExcelFilePath;
 
         public readonly IWorkbook Workbook;
+        public static Common.LogHelper logHelper= new Common.LogHelper(false);
 
         public ExcelHelper(string _excelFilePath)
         {
@@ -248,7 +249,7 @@ namespace ZR.Common.ExcelHelper
             var selectSheetNames = sheetAllNames.Intersect(selectMaybeSheetNames);
             if (!selectSheetNames.Any())
             {
-                throw new ArgumentNullException($"Excel 文件不包含指定的 Sheet 名称");
+                logHelper.Logger.Error($"{excelFilePath}不包含指定的 Sheet 名称");
             }
 
             // 3. 处理每个选中的 Sheet
@@ -257,6 +258,11 @@ namespace ZR.Common.ExcelHelper
             foreach (var sheetName in selectSheetNames)
             {
                 var excelAllColumnNames = MiniExcel.GetColumns(excelFilePath, useHeaderRow: true, sheetName: sheetName);
+                if (excelAllColumnNames is null)
+                {
+                    logHelper.Logger.Error($"{excelFilePath}的{sheetName}工作表中,没有获取到任何列名");
+                    continue;
+                }
 
                 // 4. 如果 selectColumns 为 null，则默认返回所有列（不重命名）
                 if (selectColumns == null || !selectColumns.Any())
@@ -273,6 +279,12 @@ namespace ZR.Common.ExcelHelper
                             .First(sc => sc.MaybeName.Contains(originalCol.FilterSpecial()))
                             .Name // 映射到 selectColumns 的 Name
                     );
+                //没有拿到的列
+                var shortColumns = selectColumns.Select(s => s.Name).Except(columnMapping.Select(s => s.Value));
+                foreach (var shortCol in shortColumns)
+                {
+                    logHelper.Logger.Error($"{excelFilePath}的{sheetName}工作表中不包含必需的列，缺失列：{shortCol}");
+                }
 
                 // 6. 读取 Excel 数据并动态修改列名
                 var excelData = MiniExcel.Query(excelFilePath, useHeaderRow: true, sheetName: sheetName);

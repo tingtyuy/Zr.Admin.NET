@@ -4,6 +4,7 @@ using Models;
 
 //using Models;
 using NPOI.SS.UserModel;
+using OfficeOpenXml;
 using SqlSugar;
 using ZR.Common;
 using ZR.Common.ExcelHelper;
@@ -46,7 +47,7 @@ void Test()
 
     foreach (var filePath in filePaths)
     {
-        ExportTatalStatistic(dbHelper,logHelper,filePath);
+        ExportTatalStatistic(dbHelper, logHelper, filePath);
         //MakeDateData(logHelper, fileDir, filePath);
     }
 
@@ -229,38 +230,47 @@ static bool MakeDateData(LogHelper logHelper, string targetDir, string filePath)
 
 
     });
-
     // 保存修改
     using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
     {
         npoiExcelHelper.Workbook.Write(fs);
     }
-    var targetFilePath = Path.Combine(targetDir, Path.GetFileName(filePath));
-    File.Move(filePath, targetFilePath);
+    //var targetFilePath = Path.Combine(targetDir, Path.GetFileName(filePath));
+    //File.Move(filePath, targetFilePath);
     logHelper.Logger.Information($"修改完成：{filePath}");
     return true;
 }
 
 static void ExportTatalStatistic(DbHelper dbHelper, LogHelper logHelper, string filePath)
 {
-    var rows = MiniExcel.Query(filePath).ToList();
-    // 获取 A1 单元格的值（第0行第0列）
-    if (rows.Count > 6)
+
+    ExcelPackage.License.SetNonCommercialPersonal("mengkai");
+
+    using (var package = new ExcelPackage(new FileInfo(filePath)))
     {
-        object userName = rows[2].B;
-        object orderCount = rows[5].D;
-        object orderMoney = rows[5].F;
-       dbHelper.db.Insertable(new TempUserOrderData
+        var worksheet = package.Workbook.Worksheets[0];
+
+        // 强制重新计算所有公式
+        package.Workbook.CalcMode = ExcelCalcMode.Automatic;
+        package.Workbook.Calculate(); // 手动触发计算
+
+        if (worksheet.Rows.Count() > 6)
         {
-            UserName = userName?.ToString()??string.Empty,
-            OrderCount = orderCount?.ToString() ?? string.Empty,
-           OrderMoney = orderMoney?.ToString() ?? string.Empty
-       }).ExecuteCommand();
-        //logHelper.Logger.Information($"{filePath}=>userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
-        //Console.WriteLine($"userName:{userName},orderCount:{orderCount},orderMoney:{orderMoney}");
-    }
-    else
-    {
-        Console.WriteLine($"文件数据行数不足：{filePath}");
+            object userName = worksheet.Cells[3, 2].Value;
+            object orderCount = worksheet.Cells[6, 4].Value;
+            object orderMoney = worksheet.Cells[6, 6].Value;
+            dbHelper.db.Insertable(new TempUserOrderData
+            {
+                UserName = userName?.ToString() ?? string.Empty,
+                OrderCount = orderCount?.ToString() ?? string.Empty,
+                OrderMoney = orderMoney?.ToString() ?? string.Empty,
+                Source= Path.GetFileNameWithoutExtension(filePath)
+            }).ExecuteCommand();
+        }
+
+        else
+        {
+            Console.WriteLine($"文件数据行数不足：{filePath}");
+        }
     }
 }
