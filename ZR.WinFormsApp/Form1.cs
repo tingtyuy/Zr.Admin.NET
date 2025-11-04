@@ -1363,6 +1363,7 @@ namespace ZR.WinFormsApp
         private void button11_Click(object sender, EventArgs e)
         {
             dbHelper.db.CodeFirst.InitTables(typeof(Bill10));
+            dbHelper.db.Deleteable<Bill10>().ExecuteCommand();
         }
 
         /// <summary>
