@@ -28,80 +28,31 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
             folderBrowserDialog1 = new FolderBrowserDialog();
-            panel1 = new Panel();
-            button4 = new Button();
-            button5 = new Button();
             button6 = new Button();
             button2 = new Button();
-            button3 = new Button();
             button7 = new Button();
             splitContainer1 = new SplitContainer();
             leftBox2 = new RichTextBox();
             leftBox = new RichTextBox();
             rightBox2 = new RichTextBox();
             rightBox = new RichTextBox();
-            button8 = new Button();
-            button9 = new Button();
-            button13 = new Button();
-            button14 = new Button();
-            button15 = new Button();
-            button16 = new Button();
-            button17 = new Button();
             button10 = new Button();
             button11 = new Button();
             button12 = new Button();
             button18 = new Button();
-            panel1.SuspendLayout();
+            button1 = new Button();
+            panel1 = new Panel();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
+            panel1.SuspendLayout();
             SuspendLayout();
-            // 
-            // button1
-            // 
-            button1.Location = new Point(0, 3);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 0;
-            button1.Text = "选择目录";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
-            // 
-            // panel1
-            // 
-            panel1.Controls.Add(button1);
-            panel1.Location = new Point(12, 12);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(88, 175);
-            panel1.TabIndex = 3;
-            // 
-            // button4
-            // 
-            button4.Location = new Point(134, 12);
-            button4.Name = "button4";
-            button4.Size = new Size(114, 23);
-            button4.TabIndex = 4;
-            button4.Text = "总数核对（停止）";
-            button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_Click;
-            // 
-            // button5
-            // 
-            button5.Location = new Point(131, 46);
-            button5.Name = "button5";
-            button5.Size = new Size(117, 23);
-            button5.TabIndex = 5;
-            button5.Text = "导入账单订单号数据";
-            button5.TextAlign = ContentAlignment.MiddleLeft;
-            button5.UseVisualStyleBackColor = true;
-            button5.Click += button5_Click;
             // 
             // button6
             // 
-            button6.Location = new Point(131, 101);
+            button6.Location = new Point(451, 31);
             button6.Name = "button6";
             button6.Size = new Size(102, 23);
             button6.TabIndex = 6;
@@ -112,7 +63,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(128, 72);
+            button2.Location = new Point(448, 2);
             button2.Name = "button2";
             button2.Size = new Size(105, 23);
             button2.TabIndex = 7;
@@ -120,19 +71,9 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click_1;
             // 
-            // button3
-            // 
-            button3.Location = new Point(304, 12);
-            button3.Name = "button3";
-            button3.Size = new Size(104, 23);
-            button3.TabIndex = 8;
-            button3.Text = "对比总运单量";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click_1;
-            // 
             // button7
             // 
-            button7.Location = new Point(304, 84);
+            button7.Location = new Point(602, 2);
             button7.Name = "button7";
             button7.Size = new Size(155, 23);
             button7.TabIndex = 9;
@@ -190,79 +131,9 @@
             rightBox.TabIndex = 0;
             rightBox.Text = "";
             // 
-            // button8
-            // 
-            button8.Location = new Point(304, 46);
-            button8.Name = "button8";
-            button8.Size = new Size(199, 23);
-            button8.TabIndex = 11;
-            button8.Text = "给所有客户添加全部的共享店铺";
-            button8.UseVisualStyleBackColor = true;
-            button8.Click += button8_Click;
-            // 
-            // button9
-            // 
-            button9.Location = new Point(1101, 2);
-            button9.Name = "button9";
-            button9.Size = new Size(55, 23);
-            button9.TabIndex = 12;
-            button9.Text = "没计算";
-            button9.UseVisualStyleBackColor = true;
-            button9.Click += button9_Click;
-            // 
-            // button13
-            // 
-            button13.Location = new Point(587, 46);
-            button13.Name = "button13";
-            button13.Size = new Size(168, 23);
-            button13.TabIndex = 16;
-            button13.Text = "有真实店铺 ，没报价关系";
-            button13.UseVisualStyleBackColor = true;
-            button13.Click += button13_Click;
-            // 
-            // button14
-            // 
-            button14.Location = new Point(587, 72);
-            button14.Name = "button14";
-            button14.Size = new Size(320, 23);
-            button14.TabIndex = 17;
-            button14.Text = "没有店铺或者是共享店铺 ，没有发运表  ，没报价关系";
-            button14.UseVisualStyleBackColor = true;
-            button14.Click += button14_Click;
-            // 
-            // button15
-            // 
-            button15.Location = new Point(587, 101);
-            button15.Name = "button15";
-            button15.Size = new Size(480, 23);
-            button15.TabIndex = 18;
-            button15.Text = "没有店铺或者是共享店铺 ，有发运表  ，没报价关系(没发运表客户 和 没发运表店铺)";
-            button15.UseVisualStyleBackColor = true;
-            button15.Click += button15_Click;
-            // 
-            // button16
-            // 
-            button16.Location = new Point(587, 130);
-            button16.Name = "button16";
-            button16.Size = new Size(410, 23);
-            button16.TabIndex = 19;
-            button16.Text = "有共享店铺，有发运表 ， 没报价关系(没发运表客户 和 没计算表店铺)";
-            button16.UseVisualStyleBackColor = true;
-            button16.Click += button16_Click;
-            // 
-            // button17
-            // 
-            button17.Location = new Point(587, 164);
-            button17.Name = "button17";
-            button17.Size = new Size(393, 23);
-            button17.TabIndex = 20;
-            button17.Text = "没有店铺或者是共享店铺 ， 有发运表，没报价关系(没发运表店铺)";
-            button17.UseVisualStyleBackColor = true;
-            button17.Click += button17_Click;
-            // 
             // button10
             // 
-            button10.Location = new Point(587, 17);
+            button10.Location = new Point(812, 31);
             button10.Name = "button10";
             button10.Size = new Size(75, 23);
             button10.TabIndex = 21;
@@ -272,7 +143,7 @@
             // 
             // button11
             // 
-            button11.Location = new Point(938, 2);
+            button11.Location = new Point(812, 2);
             button11.Name = "button11";
             button11.Size = new Size(157, 23);
             button11.TabIndex = 22;
@@ -282,7 +153,7 @@
             // 
             // button12
             // 
-            button12.Location = new Point(128, 155);
+            button12.Location = new Point(1019, 31);
             button12.Name = "button12";
             button12.Size = new Size(130, 23);
             button12.TabIndex = 23;
@@ -293,13 +164,31 @@
             // 
             // button18
             // 
-            button18.Location = new Point(128, 126);
+            button18.Location = new Point(1044, 2);
             button18.Name = "button18";
             button18.Size = new Size(105, 23);
             button18.TabIndex = 24;
             button18.Text = "生成表Bill3结构";
             button18.UseVisualStyleBackColor = true;
             button18.Click += button18_Click;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(0, 3);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 0;
+            button1.Text = "选择目录";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(button1);
+            panel1.Location = new Point(12, 12);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(88, 175);
+            panel1.TabIndex = 3;
             // 
             // Form1
             // 
@@ -310,57 +199,36 @@
             Controls.Add(button12);
             Controls.Add(button11);
             Controls.Add(button10);
-            Controls.Add(button17);
-            Controls.Add(button16);
-            Controls.Add(button15);
-            Controls.Add(button14);
-            Controls.Add(button13);
-            Controls.Add(button9);
-            Controls.Add(button8);
             Controls.Add(button7);
-            Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(button6);
-            Controls.Add(button5);
-            Controls.Add(button4);
             Controls.Add(panel1);
             Controls.Add(splitContainer1);
             Name = "Form1";
             Text = "Form1";
-            panel1.ResumeLayout(false);
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-
-        private Button button1;
         private FolderBrowserDialog folderBrowserDialog1;
-        private Panel panel1;
-        private Button button4;
-        private Button button5;
         private Button button6;
         private Button button2;
-        private Button button3;
         private Button button7;
         private SplitContainer splitContainer1;
         private RichTextBox leftBox;
-        private Button button8;
-        private Button button9;
         private RichTextBox rightBox;
-        private Button button13;
-        private Button button14;
-        private Button button15;
-        private Button button16;
-        private Button button17;
         private RichTextBox rightBox2;
         private RichTextBox leftBox2;
         private Button button10;
         private Button button11;
         private Button button12;
         private Button button18;
+        private Button button1;
+        private Panel panel1;
     }
 }
