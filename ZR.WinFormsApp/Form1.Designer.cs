@@ -43,6 +43,7 @@
             button18 = new Button();
             button1 = new Button();
             panel1 = new Panel();
+            button3 = new Button();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -190,11 +191,22 @@
             panel1.Size = new Size(88, 175);
             panel1.TabIndex = 3;
             // 
+            // button3
+            // 
+            button3.Location = new Point(272, 12);
+            button3.Name = "button3";
+            button3.Size = new Size(75, 23);
+            button3.TabIndex = 25;
+            button3.Text = "button3";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1852, 816);
+            Controls.Add(button3);
             Controls.Add(button18);
             Controls.Add(button12);
             Controls.Add(button11);
@@ -230,5 +242,6 @@
         private Button button18;
         private Button button1;
         private Panel panel1;
+        private Button button3;
     }
 }

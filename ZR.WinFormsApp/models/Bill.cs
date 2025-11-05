@@ -100,9 +100,18 @@ namespace ZR.WinFormsApp.models
     {
         [SugarColumn(IsPrimaryKey = true)]
         public string 运单编号 { get; set; }
-
-
         public string Remark { get; set; }
+        [SqlSugar.SugarColumn(IsNullable = true)]
+        public string 发运表客户 { get; set; }
+
+        [SqlSugar.SugarColumn(IsNullable = true)]
+        public string 发运表店铺 { get; set; }
+        [SqlSugar.SugarColumn(IsNullable = true)]
+
+        public string 计算表店铺 { get; set; }
+        [SqlSugar.SugarColumn(IsNullable = true)]
+        public string 店铺账号表店铺 { get; set; }
+
 
     }
 }
