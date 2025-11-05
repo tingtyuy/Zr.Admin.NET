@@ -98,7 +98,7 @@ namespace ZR.WinFormsApp.models
 
     public class Bill10
     {
-
+        [SugarColumn(IsPrimaryKey = true)]
         public string 运单编号 { get; set; }
 
 
