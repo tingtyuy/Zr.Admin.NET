@@ -875,6 +875,7 @@ namespace ZR.WinFormsApp
         /// <param name="e"></param>
         private void button12_Click(object sender, EventArgs e)
         {
+            dbHelper.db.Deleteable<Bill3>().ExecuteCommand();
             var directoryPaths = new List<string> {
                 @"D:\123456789\md\运单-账单计算\2.0账单"
          };
