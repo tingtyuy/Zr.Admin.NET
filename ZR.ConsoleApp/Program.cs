@@ -246,6 +246,8 @@ static void ExportTatalStatistic(DbHelper dbHelper, LogHelper logHelper, string 
 {
 
     ExcelPackage.License.SetNonCommercialPersonal("mengkai");
+    // 7.0.10 写法
+    //ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial; 
 
     using (var package = new ExcelPackage(new FileInfo(filePath)))
     {

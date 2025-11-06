@@ -22,6 +22,7 @@ namespace ZR.Common
 
             var config = new LoggerConfiguration()
               .MinimumLevel.Debug()
+              .WriteTo.Seq("http://localhost:5341")
               .WriteTo.Console();
 
             if (!hasTime)
@@ -45,6 +46,7 @@ namespace ZR.Common
 
             var config = new LoggerConfiguration()
             .MinimumLevel.Debug()
+              .WriteTo.Seq("http://localhost:5341")
             .WriteTo.Console();
 
             if (!hasTime)
