@@ -371,32 +371,39 @@ namespace ZR.WinFormsApp
             dbHelper.db.Deleteable<Bill10>();
 
             //多个用户使用了同一个店铺账号 
-
             NewMethod6();
+            logHelper.Logger.Information("NewMethod6");
+            MessageBox.Show("NewMethod6");
 
             //有真实店铺 ，没报价关系
-
             NewMethod1();
+            logHelper.Logger.Information("NewMethod1");
+            MessageBox.Show("NewMethod1");
 
             //没有店铺或者是共享店铺 ，没有发运表  ，没报价关系
-
             NewMethod2();
+            logHelper.Logger.Information("NewMethod2");
+            MessageBox.Show("NewMethod2");
 
             //没有店铺或者是共享店铺 ， 有发运表，没报价关系(没发运表店铺)
-
             NewMethod5();
+            logHelper.Logger.Information("NewMethod5");
+            MessageBox.Show("NewMethod5");
 
             //共享店铺，有发运表 ， 没报价关系(没发运表客户 和 没计算表店铺)
-
             NewMethod4();
+            logHelper.Logger.Information("NewMethod4");
+            MessageBox.Show("NewMethod4");
 
             //没有店铺或者是共享店铺 ，有发运表 ，没报价关系(没发运表客户 和 没发运表店铺)
-
             NewMethod3();
+            logHelper.Logger.Information("NewMethod3");
+            MessageBox.Show("NewMethod3");
 
             //其他错误
-
             NewMethod7();
+            logHelper.Logger.Information("差异报告完成");
+            MessageBox.Show("差异报告完成");
 
         }
 
