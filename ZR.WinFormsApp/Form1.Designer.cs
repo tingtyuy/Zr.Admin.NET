@@ -44,6 +44,8 @@
             button1 = new Button();
             panel1 = new Panel();
             button3 = new Button();
+            button4 = new Button();
+            button5 = new Button();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -53,7 +55,7 @@
             // 
             // button6
             // 
-            button6.Location = new Point(451, 31);
+            button6.Location = new Point(109, 44);
             button6.Name = "button6";
             button6.Size = new Size(102, 23);
             button6.TabIndex = 6;
@@ -64,7 +66,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(448, 2);
+            button2.Location = new Point(106, 15);
             button2.Name = "button2";
             button2.Size = new Size(105, 23);
             button2.TabIndex = 7;
@@ -74,7 +76,7 @@
             // 
             // button7
             // 
-            button7.Location = new Point(602, 2);
+            button7.Location = new Point(260, 15);
             button7.Name = "button7";
             button7.Size = new Size(155, 23);
             button7.TabIndex = 9;
@@ -134,7 +136,7 @@
             // 
             // button10
             // 
-            button10.Location = new Point(812, 31);
+            button10.Location = new Point(470, 44);
             button10.Name = "button10";
             button10.Size = new Size(75, 23);
             button10.TabIndex = 21;
@@ -144,7 +146,7 @@
             // 
             // button11
             // 
-            button11.Location = new Point(812, 2);
+            button11.Location = new Point(470, 15);
             button11.Name = "button11";
             button11.Size = new Size(157, 23);
             button11.TabIndex = 22;
@@ -154,7 +156,7 @@
             // 
             // button12
             // 
-            button12.Location = new Point(1019, 31);
+            button12.Location = new Point(677, 44);
             button12.Name = "button12";
             button12.Size = new Size(130, 23);
             button12.TabIndex = 23;
@@ -165,7 +167,7 @@
             // 
             // button18
             // 
-            button18.Location = new Point(1044, 2);
+            button18.Location = new Point(702, 15);
             button18.Name = "button18";
             button18.Size = new Size(105, 23);
             button18.TabIndex = 24;
@@ -193,19 +195,41 @@
             // 
             // button3
             // 
-            button3.Location = new Point(272, 12);
+            button3.Location = new Point(863, 15);
             button3.Name = "button3";
-            button3.Size = new Size(75, 23);
+            button3.Size = new Size(204, 23);
             button3.TabIndex = 25;
-            button3.Text = "button3";
+            button3.Text = "多个用户使用了同一个店铺账号 ";
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click;
+            // 
+            // button4
+            // 
+            button4.Location = new Point(863, 44);
+            button4.Name = "button4";
+            button4.Size = new Size(265, 23);
+            button4.TabIndex = 26;
+            button4.Text = "设置仓里数据关系到一个仓里客户(白超)身上";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(865, 72);
+            button5.Name = "button5";
+            button5.Size = new Size(123, 23);
+            button5.TabIndex = 27;
+            button5.Text = "删除临时白超关系";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1852, 816);
+            Controls.Add(button5);
+            Controls.Add(button4);
             Controls.Add(button3);
             Controls.Add(button18);
             Controls.Add(button12);
@@ -243,5 +267,7 @@
         private Button button1;
         private Panel panel1;
         private Button button3;
+        private Button button4;
+        private Button button5;
     }
 }
