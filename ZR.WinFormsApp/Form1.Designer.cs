@@ -46,6 +46,8 @@
             button3 = new Button();
             button4 = new Button();
             button5 = new Button();
+            button8 = new Button();
+            button9 = new Button();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -223,11 +225,33 @@
             button5.UseVisualStyleBackColor = true;
             button5.Click += button5_Click;
             // 
+            // button8
+            // 
+            button8.Location = new Point(677, 159);
+            button8.Name = "button8";
+            button8.Size = new Size(383, 23);
+            button8.TabIndex = 28;
+            button8.Text = "每个客户和店铺拿出一个运单放到\"CRM共享店铺_寄件人店铺关系表\"";
+            button8.UseVisualStyleBackColor = true;
+            button8.Click += button8_Click;
+            // 
+            // button9
+            // 
+            button9.Location = new Point(677, 139);
+            button9.Name = "button9";
+            button9.Size = new Size(220, 23);
+            button9.TabIndex = 29;
+            button9.Text = "initCRM共享店铺_寄件人店铺关系表";
+            button9.UseVisualStyleBackColor = true;
+            button9.Click += button9_Click_1;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1852, 816);
+            Controls.Add(button9);
+            Controls.Add(button8);
             Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(button3);
@@ -269,5 +293,7 @@
         private Button button3;
         private Button button4;
         private Button button5;
+        private Button button8;
+        private Button button9;
     }
 }

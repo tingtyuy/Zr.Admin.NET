@@ -932,5 +932,63 @@ namespace ZR.WinFormsApp
             logHelper.Logger.Information("删除完成");
             MessageBox.Show("删除完成");
         }
+        /// <summary>
+        /// 每个客户和店铺拿出一个运单放到"CRM共享店铺_寄件人店铺关系表"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            var result = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+                  .InnerJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
+                  .InnerJoin<CRM平台店铺账号>((j, g, d) => d.F店铺账号 == j.F店铺账号)
+                  //.InnerJoin<CRM客户>((j, g, d, u) => u.FUID == g.F业务对象UID)
+                  .Where((j, g, d) =>
+                    !string.IsNullOrEmpty(j.F店铺账号) && d.F是否共享店铺 == false     //真实店铺
+                  ).GroupBy((j, g, d) => new
+                  {
+                      j.F所属网点UID,
+                      g.F业务对象UID,
+                      j.F所属网点,
+                      j.F店铺账号
+                  }).Select((j, g, d) => new
+                  {
+                      F运单编号 = SqlFunc.AggregateMin(j.F运单编号),
+                      j.F所属网点UID,
+                      g.F业务对象UID,
+                      j.F所属网点,
+                      j.F店铺账号
+                  }).MergeTable().InnerJoin<CRM客户>((x, u) => u.FUID == x.F业务对象UID)
+                   .Select((x, u) => new CRM共享店铺_寄件人店铺关系表
+                   {
+                       F运单编号 = x.F运单编号,
+                       F所属网点UID = x.F所属网点UID,
+                       F所属网点 = x.F所属网点,
+                       F客户类型 = u.F客户类型,
+                       F客户名称 = u.F客户名称,
+                       店铺账号 = x.F店铺账号,
+                       F平台名称 = "",
+                       F寄件人 = null,
+                       F寄件人手机号 = null
+                   }).ToList();
+
+            dbHelper.db.Insertable(result).ExecuteCommand();
+
+            MessageBox.Show("success");
+
+        }
+        /// <summary>
+        /// initCRM共享店铺_寄件人店铺关系表
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
+        private void button9_Click_1(object sender, EventArgs e)
+        {
+            dbHelper.db.DbFirst.Where("CRM共享店铺_寄件人店铺关系表").CreateClassFile(
+            @"D:\123456789\kai\Zr.Admin.NET\ZR.WinFormsApp\models\");
+            MessageBox.Show("success");
+        }
     }
 }
