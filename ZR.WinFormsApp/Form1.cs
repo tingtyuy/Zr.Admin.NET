@@ -858,137 +858,35 @@ namespace ZR.WinFormsApp
             this.NewMethod6();
         }
         /// <summary>
-        /// 设置仓里数据关系到一个仓里客户(白超)身上
+        /// 查询计算状态
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button4_Click(object sender, EventArgs e)
         {
-            // 获取用户信息（只需一次）
-            var user = dbHelper.db.Queryable<CRM客户>().First(w => w.F客户名称 == "白超");
-
-            // 分批处理billNos
-            const int batchSize = 10000;
-            var allBillNos = dbHelper.db.Queryable<Bill2>()
-                .Where(w => w.UserGroup == "仓里账单")
-                .Select(s => s.运单编号)
-                .ToList(); // 如果这里内存不足，考虑使用Take/Skip分页查询
-
-            var list = new List<CRM店铺业务关系>();
-
-            for (int i = 0; i < allBillNos.Count; i += batchSize)
+            var groupList = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
+            .GroupBy(s => s.F计算状态).Select(s => new
             {
-                var batch = allBillNos.Skip(i).Take(batchSize).ToList();
+                计算状态 = s.F计算状态,
+                数量 = SqlFunc.AggregateCount(s.F运单编号)
+            })
+            .ToList();
 
-                // 处理FIN发运表
-                var stores = dbHelper.db.Queryable<FIN发运表>()
-                    .Where(w => batch.Contains(w.F运单编号) && !string.IsNullOrEmpty(w.F店铺名称)).Select(s => s.F店铺名称).Distinct()
-                    .ToList();
-
-
-                // 处理FIN快递出港账单
-                var store2s = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
-                    .Where(w => batch.Contains(w.F运单编号) && !string.IsNullOrEmpty(w.F店铺账号)).Select(s => s.F店铺账号).Distinct()
-                    .ToList();
-
-                stores.AddRange(store2s);
-                stores = stores.Distinct().ToList();
-                foreach (var store in stores)
-                {
-                    list.Add(new CRM店铺业务关系()
-                    {
-                        F生效日期 = new DateTime(2025, 9, 5),
-                        F店铺名称 = store,
-                        F业务对象UID = user.FUID,
-                        F业务对象名称 = user.F客户名称,
-                        F业务对象类型 = "直接客户",
-                        F报价主表ID = 5,
-                        F备注 = "设置仓里数据关系到一个仓里客户(白超)身上"
-                    });
-                }
-
-                // 每批处理完后插入
-                if (list.Count > 0)
-                {
-                    dbHelper.db.Storageable<CRM店铺业务关系>(list).ExecuteCommand();
-                    list.Clear();
-                }
+            foreach (var item in groupList)
+            {
+                leftBox.Text += $"运单计算数据=>计算状态:{item.计算状态};数量{item.数量}\n";
             }
 
-            // 插入剩余记录
-            if (list.Count > 0)
-            {
-                dbHelper.db.Storageable<CRM店铺业务关系>(list).ExecuteCommand();
-            }
-            logHelper.Logger.Information("完成");
-            MessageBox.Show("完成");
-        }
+            var list2All = dbHelper.db.Queryable<FIN快递出港账单_结算对象价格>().Select(s => s.F运单编号).Count();
+            var list2 = dbHelper.db.Queryable<FIN快递出港账单_结算对象价格>().Select(s => s.F运单编号).Distinct().Count();
 
-        private void button5_Click(object sender, EventArgs e)
-        {
-            dbHelper.db.Deleteable<CRM店铺业务关系>()
-                .Where(w => w.F备注 == "设置仓里数据关系到一个仓里客户(白超)身上")
-                .ExecuteCommand();
-            logHelper.Logger.Information("删除完成");
-            MessageBox.Show("删除完成");
-        }
-        /// <summary>
-        /// 每个客户和店铺拿出一个运单放到"CRM共享店铺_寄件人店铺关系表"
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+            leftBox2.Text = $"结算对象价格=>全部数据量:{list2All}\n";
+            leftBox2.Text += $"结算对象价格=>不重复数据量:{list2}\n";
 
-        private void button8_Click(object sender, EventArgs e)
-        {
-            var result = dbHelper.db.Queryable<FIN快递出港账单_运单计算数据>()
-                  .InnerJoin<CRM店铺业务关系>((j, g) => g.F店铺名称 == j.F店铺账号)
-                  .InnerJoin<CRM平台店铺账号>((j, g, d) => d.F店铺账号 == j.F店铺账号)
-                  //.InnerJoin<CRM客户>((j, g, d, u) => u.FUID == g.F业务对象UID)
-                  .Where((j, g, d) =>
-                    !string.IsNullOrEmpty(j.F店铺账号) && d.F是否共享店铺 == false     //真实店铺
-                  ).GroupBy((j, g, d) => new
-                  {
-                      j.F所属网点UID,
-                      g.F业务对象UID,
-                      j.F所属网点,
-                      j.F店铺账号
-                  }).Select((j, g, d) => new
-                  {
-                      F运单编号 = SqlFunc.AggregateMin(j.F运单编号),
-                      j.F所属网点UID,
-                      g.F业务对象UID,
-                      j.F所属网点,
-                      j.F店铺账号
-                  }).MergeTable().InnerJoin<CRM客户>((x, u) => u.FUID == x.F业务对象UID)
-                   .Select((x, u) => new CRM共享店铺_寄件人店铺关系表
-                   {
-                       F运单编号 = x.F运单编号,
-                       F所属网点UID = x.F所属网点UID,
-                       F所属网点 = x.F所属网点,
-                       F客户类型 = u.F客户类型,
-                       F客户名称 = u.F客户名称,
-                       店铺账号 = x.F店铺账号,
-                       F平台名称 = "",
-                       F寄件人 = null,
-                       F寄件人手机号 = null
-                   }).ToList();
 
-            dbHelper.db.Insertable(result).ExecuteCommand();
 
-            MessageBox.Show("success");
 
         }
-        /// <summary>
-        /// initCRM共享店铺_寄件人店铺关系表
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
 
-        private void button9_Click_1(object sender, EventArgs e)
-        {
-            dbHelper.db.DbFirst.Where("CRM共享店铺_寄件人店铺关系表").CreateClassFile(
-            @"D:\123456789\kai\Zr.Admin.NET\ZR.WinFormsApp\models\");
-            MessageBox.Show("success");
-        }
     }
 }

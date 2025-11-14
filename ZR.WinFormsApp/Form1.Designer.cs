@@ -44,20 +44,28 @@
             button1 = new Button();
             panel1 = new Panel();
             button3 = new Button();
+            panel2 = new Panel();
+            panel3 = new Panel();
             button4 = new Button();
-            button5 = new Button();
-            button8 = new Button();
-            button9 = new Button();
+            panel4 = new Panel();
+            panel5 = new Panel();
+            panel6 = new Panel();
+            panel7 = new Panel();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
             panel1.SuspendLayout();
+            panel2.SuspendLayout();
+            panel3.SuspendLayout();
+            panel5.SuspendLayout();
+            panel6.SuspendLayout();
+            panel7.SuspendLayout();
             SuspendLayout();
             // 
             // button6
             // 
-            button6.Location = new Point(109, 44);
+            button6.Location = new Point(6, 44);
             button6.Name = "button6";
             button6.Size = new Size(102, 23);
             button6.TabIndex = 6;
@@ -68,7 +76,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(106, 15);
+            button2.Location = new Point(6, 15);
             button2.Name = "button2";
             button2.Size = new Size(105, 23);
             button2.TabIndex = 7;
@@ -78,7 +86,7 @@
             // 
             // button7
             // 
-            button7.Location = new Point(260, 15);
+            button7.Location = new Point(3, 12);
             button7.Name = "button7";
             button7.Size = new Size(155, 23);
             button7.TabIndex = 9;
@@ -88,7 +96,7 @@
             // 
             // splitContainer1
             // 
-            splitContainer1.Location = new Point(12, 202);
+            splitContainer1.Location = new Point(12, 377);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -100,7 +108,7 @@
             // 
             splitContainer1.Panel2.Controls.Add(rightBox2);
             splitContainer1.Panel2.Controls.Add(rightBox);
-            splitContainer1.Size = new Size(1828, 602);
+            splitContainer1.Size = new Size(1828, 427);
             splitContainer1.SplitterDistance = 916;
             splitContainer1.TabIndex = 10;
             // 
@@ -138,7 +146,7 @@
             // 
             // button10
             // 
-            button10.Location = new Point(470, 44);
+            button10.Location = new Point(3, 41);
             button10.Name = "button10";
             button10.Size = new Size(75, 23);
             button10.TabIndex = 21;
@@ -148,7 +156,7 @@
             // 
             // button11
             // 
-            button11.Location = new Point(470, 15);
+            button11.Location = new Point(3, 12);
             button11.Name = "button11";
             button11.Size = new Size(157, 23);
             button11.TabIndex = 22;
@@ -158,7 +166,7 @@
             // 
             // button12
             // 
-            button12.Location = new Point(677, 44);
+            button12.Location = new Point(7, 42);
             button12.Name = "button12";
             button12.Size = new Size(130, 23);
             button12.TabIndex = 23;
@@ -169,7 +177,7 @@
             // 
             // button18
             // 
-            button18.Location = new Point(702, 15);
+            button18.Location = new Point(7, 13);
             button18.Name = "button18";
             button18.Size = new Size(105, 23);
             button18.TabIndex = 24;
@@ -190,14 +198,14 @@
             // panel1
             // 
             panel1.Controls.Add(button1);
-            panel1.Location = new Point(12, 12);
+            panel1.Location = new Point(1020, 303);
             panel1.Name = "panel1";
-            panel1.Size = new Size(88, 175);
+            panel1.Size = new Size(88, 68);
             panel1.TabIndex = 3;
             // 
             // button3
             // 
-            button3.Location = new Point(863, 15);
+            button3.Location = new Point(3, 41);
             button3.Name = "button3";
             button3.Size = new Size(204, 23);
             button3.TabIndex = 25;
@@ -205,63 +213,78 @@
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click;
             // 
+            // panel2
+            // 
+            panel2.Controls.Add(button2);
+            panel2.Controls.Add(button6);
+            panel2.Location = new Point(3, 3);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(133, 79);
+            panel2.TabIndex = 26;
+            // 
+            // panel3
+            // 
+            panel3.Controls.Add(button4);
+            panel3.Location = new Point(285, 3);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(153, 50);
+            panel3.TabIndex = 27;
+            // 
             // button4
             // 
-            button4.Location = new Point(863, 44);
+            button4.Location = new Point(6, 8);
             button4.Name = "button4";
-            button4.Size = new Size(265, 23);
-            button4.TabIndex = 26;
-            button4.Text = "设置仓里数据关系到一个仓里客户(白超)身上";
+            button4.Size = new Size(110, 23);
+            button4.TabIndex = 0;
+            button4.Text = "查询计算状态";
             button4.UseVisualStyleBackColor = true;
             button4.Click += button4_Click;
             // 
-            // button5
+            // panel4
             // 
-            button5.Location = new Point(865, 72);
-            button5.Name = "button5";
-            button5.Size = new Size(123, 23);
-            button5.TabIndex = 27;
-            button5.Text = "删除临时白超关系";
-            button5.UseVisualStyleBackColor = true;
-            button5.Click += button5_Click;
+            panel4.Location = new Point(956, 27);
+            panel4.Name = "panel4";
+            panel4.Size = new Size(133, 100);
+            panel4.TabIndex = 27;
             // 
-            // button8
+            // panel5
             // 
-            button8.Location = new Point(677, 159);
-            button8.Name = "button8";
-            button8.Size = new Size(383, 23);
-            button8.TabIndex = 28;
-            button8.Text = "每个客户和店铺拿出一个运单放到\"CRM共享店铺_寄件人店铺关系表\"";
-            button8.UseVisualStyleBackColor = true;
-            button8.Click += button8_Click;
+            panel5.Controls.Add(button11);
+            panel5.Controls.Add(button10);
+            panel5.Location = new Point(3, 177);
+            panel5.Name = "panel5";
+            panel5.Size = new Size(165, 83);
+            panel5.TabIndex = 27;
             // 
-            // button9
+            // panel6
             // 
-            button9.Location = new Point(677, 139);
-            button9.Name = "button9";
-            button9.Size = new Size(220, 23);
-            button9.TabIndex = 29;
-            button9.Text = "initCRM共享店铺_寄件人店铺关系表";
-            button9.UseVisualStyleBackColor = true;
-            button9.Click += button9_Click_1;
+            panel6.Controls.Add(button7);
+            panel6.Controls.Add(button3);
+            panel6.Location = new Point(3, 88);
+            panel6.Name = "panel6";
+            panel6.Size = new Size(238, 83);
+            panel6.TabIndex = 27;
+            // 
+            // panel7
+            // 
+            panel7.Controls.Add(button18);
+            panel7.Controls.Add(button12);
+            panel7.Location = new Point(3, 266);
+            panel7.Name = "panel7";
+            panel7.Size = new Size(143, 80);
+            panel7.TabIndex = 27;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1852, 816);
-            Controls.Add(button9);
-            Controls.Add(button8);
-            Controls.Add(button5);
-            Controls.Add(button4);
-            Controls.Add(button3);
-            Controls.Add(button18);
-            Controls.Add(button12);
-            Controls.Add(button11);
-            Controls.Add(button10);
-            Controls.Add(button7);
-            Controls.Add(button2);
-            Controls.Add(button6);
+            ClientSize = new Size(1120, 816);
+            Controls.Add(panel3);
+            Controls.Add(panel4);
+            Controls.Add(panel5);
+            Controls.Add(panel6);
+            Controls.Add(panel7);
+            Controls.Add(panel2);
             Controls.Add(panel1);
             Controls.Add(splitContainer1);
             Name = "Form1";
@@ -271,6 +294,11 @@
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
             panel1.ResumeLayout(false);
+            panel2.ResumeLayout(false);
+            panel3.ResumeLayout(false);
+            panel5.ResumeLayout(false);
+            panel6.ResumeLayout(false);
+            panel7.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -291,9 +319,12 @@
         private Button button1;
         private Panel panel1;
         private Button button3;
+        private Panel panel2;
+        private Panel panel3;
+        private Panel panel4;
+        private Panel panel5;
+        private Panel panel6;
+        private Panel panel7;
         private Button button4;
-        private Button button5;
-        private Button button8;
-        private Button button9;
     }
 }
