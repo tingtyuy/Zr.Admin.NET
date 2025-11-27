@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             folderBrowserDialog1 = new FolderBrowserDialog();
-            button6 = new Button();
-            button2 = new Button();
             button7 = new Button();
             splitContainer1 = new SplitContainer();
             leftBox2 = new RichTextBox();
@@ -44,45 +42,27 @@
             button1 = new Button();
             panel1 = new Panel();
             button3 = new Button();
-            panel2 = new Panel();
             panel3 = new Panel();
             button4 = new Button();
             panel4 = new Panel();
             panel5 = new Panel();
             panel6 = new Panel();
             panel7 = new Panel();
+            button6 = new Button();
+            button2 = new Button();
+            panel2 = new Panel();
+            button5 = new Button();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
             panel1.SuspendLayout();
-            panel2.SuspendLayout();
             panel3.SuspendLayout();
             panel5.SuspendLayout();
             panel6.SuspendLayout();
             panel7.SuspendLayout();
+            panel2.SuspendLayout();
             SuspendLayout();
-            // 
-            // button6
-            // 
-            button6.Location = new Point(6, 44);
-            button6.Name = "button6";
-            button6.Size = new Size(102, 23);
-            button6.TabIndex = 6;
-            button6.Text = "导入账单完整数据";
-            button6.TextAlign = ContentAlignment.MiddleLeft;
-            button6.UseVisualStyleBackColor = true;
-            button6.Click += button6_Click;
-            // 
-            // button2
-            // 
-            button2.Location = new Point(6, 15);
-            button2.Name = "button2";
-            button2.Size = new Size(105, 23);
-            button2.TabIndex = 7;
-            button2.Text = "生成表Bill2结构";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click_1;
             // 
             // button7
             // 
@@ -213,15 +193,6 @@
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click;
             // 
-            // panel2
-            // 
-            panel2.Controls.Add(button2);
-            panel2.Controls.Add(button6);
-            panel2.Location = new Point(3, 3);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(133, 79);
-            panel2.TabIndex = 26;
-            // 
             // panel3
             // 
             panel3.Controls.Add(button4);
@@ -251,7 +222,7 @@
             // 
             panel5.Controls.Add(button11);
             panel5.Controls.Add(button10);
-            panel5.Location = new Point(3, 177);
+            panel5.Location = new Point(409, 155);
             panel5.Name = "panel5";
             panel5.Size = new Size(165, 83);
             panel5.TabIndex = 27;
@@ -260,7 +231,7 @@
             // 
             panel6.Controls.Add(button7);
             panel6.Controls.Add(button3);
-            panel6.Location = new Point(3, 88);
+            panel6.Location = new Point(37, 241);
             panel6.Name = "panel6";
             panel6.Size = new Size(238, 83);
             panel6.TabIndex = 27;
@@ -269,10 +240,51 @@
             // 
             panel7.Controls.Add(button18);
             panel7.Controls.Add(button12);
-            panel7.Location = new Point(3, 266);
+            panel7.Location = new Point(462, 259);
             panel7.Name = "panel7";
             panel7.Size = new Size(143, 80);
             panel7.TabIndex = 27;
+            // 
+            // button6
+            // 
+            button6.Location = new Point(6, 54);
+            button6.Name = "button6";
+            button6.Size = new Size(102, 23);
+            button6.TabIndex = 6;
+            button6.Text = "导入账单完整数据";
+            button6.TextAlign = ContentAlignment.MiddleLeft;
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(6, 15);
+            button2.Name = "button2";
+            button2.Size = new Size(105, 23);
+            button2.TabIndex = 7;
+            button2.Text = "生成表Bill2结构";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click_1;
+            // 
+            // panel2
+            // 
+            panel2.Controls.Add(button5);
+            panel2.Controls.Add(button2);
+            panel2.Controls.Add(button6);
+            panel2.Location = new Point(3, 3);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(133, 153);
+            panel2.TabIndex = 26;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(6, 101);
+            button5.Name = "button5";
+            button5.Size = new Size(102, 23);
+            button5.TabIndex = 8;
+            button5.Text = "bak改为xlsx";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
             // 
             // Form1
             // 
@@ -294,18 +306,16 @@
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
             panel1.ResumeLayout(false);
-            panel2.ResumeLayout(false);
             panel3.ResumeLayout(false);
             panel5.ResumeLayout(false);
             panel6.ResumeLayout(false);
             panel7.ResumeLayout(false);
+            panel2.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
         private FolderBrowserDialog folderBrowserDialog1;
-        private Button button6;
-        private Button button2;
         private Button button7;
         private SplitContainer splitContainer1;
         private RichTextBox leftBox;
@@ -319,12 +329,15 @@
         private Button button1;
         private Panel panel1;
         private Button button3;
-        private Panel panel2;
         private Panel panel3;
         private Panel panel4;
         private Panel panel5;
         private Panel panel6;
         private Panel panel7;
         private Button button4;
+        private Button button6;
+        private Button button2;
+        private Panel panel2;
+        private Button button5;
     }
 }

@@ -50,10 +50,13 @@ namespace ZR.Common
             {
                 db.Aop.OnLogExecuting = (sql, pars) =>
                 {
-                    Console.WriteLine(sql);
+                    //Console.WriteLine(sql);
+                    LogHelper.Logger.Information(sql);
                 };
 
             });
+
+            db.Ado.CommandTimeOut = 0;
 
         }
         private void InitDb2()

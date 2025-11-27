@@ -174,7 +174,7 @@ namespace ZR.WinFormsApp
         }
 
 
-        private bool FillBill3(FileInfo file)
+        private async Task<bool> FillBill3(FileInfo file)
         {
 
             var maybeSheets = new List<string>()
@@ -244,32 +244,39 @@ namespace ZR.WinFormsApp
              }
             );
             var list = ExcelHelper.GetDynamicData(file.FullName, maybeSheets, selectColumns);
-            var listBill2 = list.Adapt<List<Bill2>>();
+            var listBill2 = list.Adapt<List<Bill2>>().Where(w => !string.IsNullOrEmpty(w.运单编号)).ToList(); //去除空运单号的数据
+
+            var AnyDulication = listBill2.GroupBy(g => new { g.运单编号 }).Any(g => g.Count() > 1);
+            if (AnyDulication)
+            {
+                logHelper.Logger.Error($"表 {file.FullName} 主键有重复！");
+                return false;
+            }
             listBill2.ForEach(bill =>
             {
-                var UserName = file.Name.FilterSpecial();
+                var UserName = file.Name.FilterSpecial().Replace("xlsx", "");
                 var UserGroup = file.DirectoryName?.Split(Path.DirectorySeparatorChar).Last() ?? "";
                 bill.UserName = UserName;
                 bill.UserGroup = UserGroup;
             });
 
+
             try
             {
-                //              dbHelper.db.Insertable(list)
-                //.AS("Bill2")
-                //.ExecuteCommand();
-                dbHelper.db.Insertable<Bill2>(listBill2).PageSize(50000).ExecuteCommand();
 
-                //var count = dbHelper.db.Fastest<Bill2>().AS("Bill2").PageSize(50000).BulkCopy(listBill2);
-                logHelper.Logger.Information($"表 {file.FullName} 数据更新成功！");
-                file.MoveTo(file.FullName + ".bak");
+                await Task.Run(() =>
+                {
+                    var ss = dbHelper.db.Fastest<Bill2>().PageSize(10000).BulkMerge(listBill2);
+                    logHelper.Logger.Information($"表 {file.FullName} 数据更新成功{ss}条！");
+                    file.MoveTo(file.FullName.Replace(".xlsx", "") + ".bak"); //防止重复导入
+                });
             }
             catch (Exception ex)
             {
 
                 logHelper.Logger.Error($"插入数据失败：{file.FullName}=》{ex.Message}");
             }
-
+            MessageBox.Show("ok");
             return true;
         }
 
@@ -280,8 +287,9 @@ namespace ZR.WinFormsApp
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button6_Click(object sender, EventArgs e)
+        private async void button6_Click(object sender, EventArgs e)
         {
+            //dbHelper.db.Deleteable<Bill2>().ExecuteCommand();
             //var directoryPaths = new List<string> {
             //    @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
             //  , @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单" };
@@ -300,7 +308,7 @@ namespace ZR.WinFormsApp
                 foreach (var file in directoryFiles)
                 {
                     //bool flowControl = FillBill(file);
-                    bool flowControl = FillBill3(file);
+                    bool flowControl = await FillBill3(file);
                     if (!flowControl)
                     {
                         continue;
@@ -322,7 +330,9 @@ namespace ZR.WinFormsApp
         /// <param name="e"></param>
         private void button2_Click_1(object sender, EventArgs e)
         {
+            dbHelper.db.DbMaintenance.DropTable(typeof(Bill2));
             dbHelper.db.CodeFirst.InitTables(typeof(Bill2));
+            MessageBox.Show("ok");
         }
 
         /// <summary>
@@ -887,6 +897,40 @@ namespace ZR.WinFormsApp
 
 
         }
+        /// <summary>
+        /// bak改为xlsx
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button5_Click(object sender, EventArgs e)
+        {
+            //dbHelper.db.Deleteable<Bill2>().ExecuteCommand();
+            //var directoryPaths = new List<string> {
+            //    @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
+            //  , @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单" };
 
+
+            var directoryPaths = new List<string> {
+                @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
+         };
+            //遍历目录
+            foreach (var directoryPath in directoryPaths)
+            {
+
+                var directoryFiles = new DirectoryInfo(directoryPath).GetFiles("*.bak", SearchOption.AllDirectories);
+
+                //遍历文件
+                foreach (var file in directoryFiles)
+                {
+
+                    file.MoveTo(file.FullName.Replace(".bak", "") + ".xlsx"); //防止重复导入
+                }
+
+                //logHelper.Logger.Information($"导入完成：{directoryPath}");
+
+            }
+            //logHelper.Logger.Information($"全部导入完成");
+            MessageBox.Show("ok");
+        }
     }
 }
