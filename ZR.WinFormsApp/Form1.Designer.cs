@@ -196,7 +196,7 @@
             // panel3
             // 
             panel3.Controls.Add(button4);
-            panel3.Location = new Point(285, 3);
+            panel3.Location = new Point(350, 11);
             panel3.Name = "panel3";
             panel3.Size = new Size(153, 50);
             panel3.TabIndex = 27;
@@ -222,7 +222,7 @@
             // 
             panel5.Controls.Add(button11);
             panel5.Controls.Add(button10);
-            panel5.Location = new Point(409, 155);
+            panel5.Location = new Point(468, 225);
             panel5.Name = "panel5";
             panel5.Size = new Size(165, 83);
             panel5.TabIndex = 27;
@@ -231,7 +231,7 @@
             // 
             panel6.Controls.Add(button7);
             panel6.Controls.Add(button3);
-            panel6.Location = new Point(37, 241);
+            panel6.Location = new Point(198, 225);
             panel6.Name = "panel6";
             panel6.Size = new Size(238, 83);
             panel6.TabIndex = 27;
@@ -240,7 +240,7 @@
             // 
             panel7.Controls.Add(button18);
             panel7.Controls.Add(button12);
-            panel7.Location = new Point(462, 259);
+            panel7.Location = new Point(171, 11);
             panel7.Name = "panel7";
             panel7.Size = new Size(143, 80);
             panel7.TabIndex = 27;

@@ -807,8 +807,9 @@ namespace ZR.WinFormsApp
         /// <param name="e"></param>
         private void button11_Click(object sender, EventArgs e)
         {
+            
+            dbHelper.db.DbMaintenance.DropTable(typeof(Bill10));
             dbHelper.db.CodeFirst.InitTables(typeof(Bill10));
-            dbHelper.db.Deleteable<Bill10>().ExecuteCommand();
             logHelper.Logger.Information($"表Bill10生成完成");
         }
 
