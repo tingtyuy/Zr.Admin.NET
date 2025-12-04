@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import post from '@/utils/request'
 
 /**
  * 分页查询
@@ -110,8 +111,9 @@ export function forwardMessage(pid) {
  */
 export function copyMessage(pid) {
   return request({
-    url: 'business/TbResult/copy/' + pid,
-    method: 'POST'
+    url: 'business/TbResult/copyMessage_2',
+    method: 'post',
+    data:pid
   })
 }
 
@@ -133,6 +135,19 @@ export function matchResult(data) {
 export function reMatchResult(data) {
   return request({
     url: 'business/TbResult/reMatch',
+    method: 'post',
+    data: data,
+  })
+}
+
+
+/**
+ * 记录下用户匹配的次数
+ * @param data
+ */
+export function noteDownUserMatchTimes(data) {
+  return request({
+    url: 'business/TbMatchTimes/Add',
     method: 'post',
     data: data,
   })

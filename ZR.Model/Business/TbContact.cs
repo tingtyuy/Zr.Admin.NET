@@ -75,6 +75,7 @@ namespace ZR.Model.Business
 
         [Navigate(NavigateType.OneToMany,nameof(TbWxGroupMember.ContactId), nameof(Id))]
         public List<TbWxGroupMember> TbWxGroupMembers { get; set; }
+        
 
     }
 }

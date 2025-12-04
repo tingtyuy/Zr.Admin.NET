@@ -69,5 +69,10 @@ namespace ZR.Model.Business
 
         public DateTime  匹配时间{ get; set; }
 
+        /// <summary>
+        /// 使用时间，这是DateTime类型
+        /// </summary>
+        public DateTime operateTime { get; set; }
+
     }
 }

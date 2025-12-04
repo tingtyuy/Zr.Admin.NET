@@ -69,6 +69,7 @@ import {
   forwardMessage,
   copyMessage,
 } from '@/api/business/tbResult.js';
+
 import {
   listTbContact,
   addTbContact,
@@ -77,6 +78,17 @@ import {
   getTbContact,
 } from '@/api/business/tbContact.js';
 
+import {
+  getGroupMatchTimes
+} from '@/api/business/tbMatchTimes.js';
+
+import {
+  formatDate
+} from '@/api/business/warnSetting.js';
+
+import {
+  getProcessOrder
+} from '@/api/business/dataStatistics.js';
 
 export default {
 
@@ -113,7 +125,7 @@ export default {
   ,
   created() {
     // 页面列表数据查询
-    this.getList();
+    this.getList();      
   },
   methods: {
     refreshLeftListCallBack() {
@@ -121,21 +133,35 @@ export default {
       this.$refs.leftComponentRef.getList();
     },
     getList() {
+        
+         //获取id
+      var userId = this.$store.getters.userId;
+      //获取登录信息
+      var userInfo = this.$store.getters.userinfo;
 
       getStatistic().then(response => {
-        const { data } = response;
-        this.statisticForm = data;
-      });
-      // this.loading = true;
-      // listTbContact(this.wxGroupQueryForm).then(response => {
-      //   this.loading = false;
-      //   const { data } = response;
-      //   this.wxGroupList = data.rows;
-      //   this.total = data.total;
-      // }).catch(() => {
-      //   this.loading = false;
-      // });
+        const { data } = response;  
 
+        this.statisticForm.sum=data.sum;
+        this.statisticForm.ju=data.ju;
+        this.statisticForm.po=data.po;        
+      });
+      
+      //已匹配商户群数量
+      var theParam1={"strDate": formatDate(new Date()), "strUserAccount": userInfo.userName};
+      
+      getGroupMatchTimes(theParam1).then(
+        response => {
+          //console.log("getGroupMatchTimes():"+ JSON.stringify(response ));
+          if(response.code == 200)
+          {
+              //已匹配商户群数量
+              this.statisticForm.sendSum=response.data;            
+          }
+
+        }
+      )     
+      
     },
     handleQuery() {
       this.wxGroupQueryForm.pageNum = 1;
@@ -172,6 +198,7 @@ export default {
         }
       });
     }
+
   },
 }
 </script>

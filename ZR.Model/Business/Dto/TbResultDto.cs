@@ -29,6 +29,11 @@ namespace ZR.Model.Business.Dto
         public string 收件人信息 { get; set; }
         public string 平台 { get; set; }
         public string 发件地址 { get; set; }
+
+        /// <summary>
+        /// 结果 
+        /// </summary>
+        public string 结果 { get; set; }
     }
     /// <summary>
     /// 问题件匹配输入对象

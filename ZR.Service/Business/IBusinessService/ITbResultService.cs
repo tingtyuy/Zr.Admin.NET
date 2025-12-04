@@ -1,5 +1,6 @@
 using ZR.Model.Business.Dto;
 using ZR.Model.Business;
+using System.Linq.Expressions;
 
 namespace ZR.Service.Business.IBusinessService
 {
@@ -8,7 +9,7 @@ namespace ZR.Service.Business.IBusinessService
     /// </summary>
     public interface ITbResultService : IBaseService<TbResult>
     {
-        PagedInfo<TbResultDto> GetList(TbResultQueryDto parm);
+        PagedInfo<TbResultDto> GetList(TbResultQueryDto parm);        
 
         TbResult GetInfo(int Id);
 
@@ -16,8 +17,12 @@ namespace ZR.Service.Business.IBusinessService
         TbResult AddTbResult(TbResult parm);
         int UpdateTbResult(TbResult parm);
         int UpdateTbResultStatus(long[] idArr);
+
+        int UpdateTbResultStatus(long[] idArr, string strNickName);
         Task<ReplyMessageDto> GetForwardMessageResult(long[] idArr);
        Task<PagedInfo<TbResultDistinctDto>> GetDistinctList(TbResultQueryDto parm);
         PagedInfo<TbResultDto> GetList2(TbResultQueryDto parm);
+
+
     }
 }

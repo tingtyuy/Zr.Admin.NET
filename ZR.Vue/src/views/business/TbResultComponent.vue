@@ -12,7 +12,7 @@
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick"
       class="height">
       <el-table-column prop="count" label="问题件数量" align="center" :show-overflow-tooltip="true" width="100" />
-      <el-table-column prop="反馈信息" label="待转发信息" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="反馈信息" label="待转发信息" align="left" header-align="center"   :show-overflow-tooltip="true" />
       <el-table-column label="匹配" align="center" width="100">
         <template slot-scope="scope">
           <el-button size="mini" type="success" icon="el-icon-edit" title="匹配客户群"
@@ -24,11 +24,11 @@
       :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="28%">
-      <TbContactMatchComponent ref="matchComponent" @rowClick="rowClickCallBack" @isSet="isSetCallBack">
+    <el-dialog :title="title" :lock-scroll="false" :visible.sync="open" width="28%" >
+      <TbContactMatchComponent ref="matchComponent" @rowClick="rowClickCallBack" @isSet="isSetCallBack" >
       </TbContactMatchComponent>
       <el-button type="primary" @click="matchForm">确 定</el-button>
-      <el-button icon="el-icon-refresh" @click="handleForward">转发商户</el-button>
+      <el-button icon="el-icon-refresh" @click="handleForward">复制并转发商户</el-button>
     </el-dialog>
 
     <!-- 转发对话框 -->
@@ -53,8 +53,10 @@ import {
   getTbResult,
   forwardMessage,
   copyMessage,
+  noteDownUserMatchTimes  
 } from '@/api/business/tbResult.js';
 import TbContactMatchComponent from '@/views/business/TbContactMatchComponent.vue';
+import { MessageBox } from 'element-ui';
 export default {
   name: "TbResultComponent",
   components: {
@@ -68,6 +70,8 @@ export default {
       isSet: false,
       row: {},
       row2: {},
+      //点击匹配按钮时，选中的行
+      selectedRow:{},      
       selectIdModel: {
         name: '',
         phone: ''
@@ -93,7 +97,7 @@ export default {
         处理状态: '',
         问题件类型: '',
         问题件类别: '',
-        收件人信息: '',
+        收件人信息: '',        
         pageNum: 1,
         pageSize: 10,
         sort: undefined,
@@ -168,7 +172,11 @@ export default {
         "label": "有单无货",
         "value": "有单无货"
       }
-      ]
+      ],
+      //用户账号
+      userAccount:'',
+      //用户昵称
+      userNickName:''
     };
   },
   created() {
@@ -216,8 +224,12 @@ export default {
 
 
     // },
-    matchForm() {
+    matchForm() {     
+      
+      //console.log("matchForm():"+JSON.stringify(this.row2));
+
       if (this.row2.群名称 != undefined) {
+        
         if (this.row2.isMatch != 1) {
           this.$refs.matchComponent.handleMatch(this.row2);
         }
@@ -225,15 +237,28 @@ export default {
           this.isSetCallBack(true);
 
         }
-        this.$emit('refreshLeftList');
+
+        var theParam={"fmessage": this.selectedRow.反馈信息, "messageNumber":this.selectedRow.count, "foperator": this.userAccount};
+        
+        //记录用户手动匹配的次数
+        noteDownUserMatchTimes(theParam).then(res=>{
+
+           this.$emit('refreshLeftList');
+            if(res.code==200){
+                
+            }
+        })
+
+        
         this.$emit('refreshTopList');
       }
-
+      else{
+        MessageBox.alert('请先选择一个群名');
+      }
 
     },
     handleRowClick(row) {
-      this.row = row;
-      console.log(row);
+      this.row = row;      
     },
     isSetCallBack(isSet) {
       if (isSet == false) {
@@ -265,7 +290,7 @@ export default {
     rowClickCallBack(row) {
 
       this.row2 = row;
-      console.log(row);
+      
     },
     // 清空选中状态
     clearAllCheck() {
@@ -275,14 +300,18 @@ export default {
       this.multiple = true;
     },
     handleSelectAll(selection) {
-      console.log(selection);
+      //console.log(selection);
 
     },
     // 转发商户
-    handleForward() {
+    handleForward() {  
+          
       this.$confirm('是否确认转发吗？')
         .then(() => {
-          copyMessage(this.row.ids).then(res => {
+         
+          var theParam={"ids": this.row.ids, "strAccount": this.userNickName };
+
+          copyMessage(theParam).then(res => {            
             if (res.code == 200) {
               this.forward = true;
               this.forwardTitle = "";
@@ -290,6 +319,17 @@ export default {
 
             }
           })
+
+          var theParam={"fmessage": this.selectedRow.反馈信息, "messageNumber":this.selectedRow.count, "foperator": this.userAccount};
+        
+        //记录用户手动匹配的次数
+        noteDownUserMatchTimes(theParam).then(res=>{
+            this.$emit('refreshLeftList');          
+            if(res.code==200){
+                
+            }
+        })
+          
         })
         .catch(() => { });
 
@@ -297,9 +337,20 @@ export default {
     },
     // 查询数据
     getList() {
-      this.loading = true;
+
+      //获取id
+      var userId = this.$store.getters.userId;
+      //获取登录信息
+      var userInfo = this.$store.getters.userinfo;
+      this.userAccount=userInfo.userName;
+      this.userNickName=userInfo.nickName;
+
+      this.loading = true;      
       listTbResultdistinctlist(this.queryParams).then(res => {
         if (res.code == 200) {
+
+          //console.log("getList(): "+JSON.stringify(res.data.result));
+
           this.dataList = res.data.result;
           this.total = res.data.totalNum;
           this.loading = false;
@@ -373,11 +424,13 @@ export default {
       this.getList();
     },
     /** 新增按钮操作 */
-    handleAdd() {
+    handleAdd(oneRow) {
       this.reset();
       this.open = true;
       this.title = "匹配";
       this.opertype = 1;
+      this.selectedRow=oneRow ;
+            
     },
     /** 删除按钮操作 */
     handleDelete(row) {

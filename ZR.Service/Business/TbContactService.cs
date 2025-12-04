@@ -23,6 +23,7 @@ namespace ZR.Service.Business
         {
             _sysDictDataService = sysDictDataService;
         }
+
         /// <summary>
         /// 查询列表2
         /// </summary>
@@ -31,45 +32,19 @@ namespace ZR.Service.Business
         public PagedInfo<TbContactDto> GetList2(TbContactQueryDto parm)
         {
             var predicate = QueryExp(parm);
-            predicate.And(w => !string.IsNullOrEmpty(w.客户商家名称));
-            //predicate.And(w => w.IsEnable == false || w.IsEnable == null);
-            //parm.Sort = "群名称";
+            //predicate.And(w => !string.IsNullOrEmpty(w.客户商家名称));
+            predicate.And(w => w.CompanyId==parm.CompanyId);
 
-            //var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression()).OrderBy(o=>o.客户).OrderBy(o=>o.客户商家名称);
             var list = Queryable()
-                .Where(predicate.ToExpression())
-                .LeftJoin<TbContact>((a, b) => a.群名称 == b.群名称 && string.IsNullOrEmpty(b.客户商家名称) && b.CompanyId==parm.CompanyId)
-                .Select((a, b) => new TbContact
-                {
-                    客户 = a.客户,
-                    客户商家名称 = a.客户商家名称,
-                    群名称 = a.群名称,
-                    IsEnable = b.IsEnable,
-                    Id=a.Id
-                },true)
-                .OrderByDescending(a =>a.匹配时间);
+                .Where(predicate.ToExpression())                
+                .OrderByDescending(a => a.匹配时间);
 
             var response = list.ToPage<TbContact, TbContactDto>(parm);
-            response.Result = response.Result
-
-           .ToList();
-
-            //foreach (var result in response.Result)
-            //{
-            //    if (!string.IsNullOrEmpty(result.MatchParam))
-            //    {
-            //        var arr = result.MatchParam.Split(',');
-            //        var num = 1;
-            //        foreach (var item in arr)
-            //        {
-            //            result.MatchParamDes += num + ". " + _sysDictDataService.GetSingle(w => w.DictType == "wx_group_match_param" && w.DictValue == item).DictLabel + " ";
-            //            num++;
-            //        }
-            //    }
-            //}
-
+            response.Result = response.Result.ToList();
+                       
             return response;
         }
+
 
 
         /// <summary>
@@ -80,12 +55,11 @@ namespace ZR.Service.Business
         public PagedInfo<TbContactDto> GetList(TbContactQueryDto parm)
         {
             var predicate = QueryExp(parm);
-            predicate.And(w => string.IsNullOrEmpty(w.客户商家名称));
+            //predicate.And(w => string.IsNullOrEmpty(w.客户商家名称));
             predicate.And(w => w.IsEnable == false || w.IsEnable == null);
             //parm.Sort = "群名称";
 
             var list = Queryable().Includes(a => a.TbWxGroupMembers).Where(predicate.ToExpression()).OrderBy("CONVERT(`群名称` USING gbk)");
-
             var response = list.ToPage<TbContact, TbContactDto>(parm);
             response.Result = response.Result
 

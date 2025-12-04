@@ -53,5 +53,15 @@ namespace ZR.Model.Business
         /// </summary>
         public string CompanyId { get; set; }
 
+        /// <summary>
+        /// 写入时间，该字段类型是DateTime
+        /// </summary>
+        public DateTime writeTime { get; set; }
+
+        /// <summary>
+        /// 使用时间，该字段类型是DateTime
+        /// </summary>
+        public DateTime useTime { get; set; }
+
     }
 }

@@ -1,6 +1,7 @@
 using Aliyun.OSS;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using ZR.Model.Business;
 using ZR.Model.Business.Dto;
@@ -119,6 +120,46 @@ namespace ZR.Admin.WebApi.Controllers.Business
 
             var info = response.Adapt<TbResultDto>();
             return SUCCESS(info);
+        }
+
+        /// <summary>
+        /// 查询处理问题件最多的群，前五名
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        [HttpGet("top5Group")]
+        //[ActionPermissionFilter(Permission = "tbresult:query")]
+        [AllowAnonymous]
+        public IActionResult GetTop5WeiXinGroup(string strStartDate, string strEndDate)
+        {
+            DateTime startDate=Convert.ToDateTime(strStartDate);
+            DateTime endDate=Convert.ToDateTime(strEndDate);
+
+            long userId = HttpContext.GetUId();
+            var user = sysUserService.SelectUserById(userId);           
+
+            string strSql = " select a.问题件类型, a.单号, a.商家名称, a.收件人信息, b.群名称, a.operateTime, a.companyId from tb_result a left join tb_contact b on a.商家名称=b.客户商家名称 and a.收件人信息=b.客户 and a.companyId=b.companyId " +
+                " where a.companyId='"+ user.Remark + "' and a.operateTime>=str_to_date('"+ strStartDate + "', '%Y-%m-%d %H:%i:%s') and a.operateTime<= str_to_date('" + strEndDate + "', '%Y-%m-%d %H:%i:%s') ";
+           
+            List<TbResultQueryDto_2>  dataList= _TbResultService.AsSugarClient().Ado.SqlQuery<TbResultQueryDto_2>(strSql);
+
+            List<WeiXinGroupStatisticsDto> groupList = dataList.GroupBy(x => x.群名称)
+                                                            .Select(g => new WeiXinGroupStatisticsDto
+                                                            {
+                                                                GroupName = g.Key,
+                                                                FNumber = g.Count()
+
+                                                            }).ToList();
+
+            List<WeiXinGroupStatisticsDto> top5List = new List<WeiXinGroupStatisticsDto>();
+
+            var sortedList = groupList.Where(x=> !string.IsNullOrEmpty(x.GroupName)).OrderByDescending(x => x.FNumber).ToList();         //去掉群名称为空的
+            for(int i=0; i<sortedList.Count && i<5; i++)
+            {
+                top5List.Add(sortedList[i]);
+            }
+
+            return SUCCESS(top5List);
         }
 
         /// <summary>
@@ -303,20 +344,21 @@ namespace ZR.Admin.WebApi.Controllers.Business
             return SUCCESS(await _TbResultService.GetForwardMessageResult(idArr));
 
         }
-        /// <summary>
+
+        ///<summary>
         /// 复制信息
         /// </summary>
+        
         /// <returns></returns>
-        [HttpPost("copy/{ids}")]
+        [HttpPost("copyMessage_2")]
         //[ActionPermissionFilter(Permission = "tbresult:copy")]
         [Log(Title = "", BusinessType = BusinessType.UPDATE)]
-        public IActionResult UpdateTbResultStatus([FromRoute] string ids)
+        public IActionResult UpdateTbResultStatus2([FromBody] TbResultQueryDto_3  theParam)
         {
-            var idArr = Tools.SplitAndConvert<long>(ids);
-            var updateNumber = _TbResultService.UpdateTbResultStatus(idArr);
+            var updateNumber = _TbResultService.UpdateTbResultStatus(theParam.ids.ToArray(), theParam.strAccount);
             return ToResponse(updateNumber);
-
         }
+
 
     }
 }

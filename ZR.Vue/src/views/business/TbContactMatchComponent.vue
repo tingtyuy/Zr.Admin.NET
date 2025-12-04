@@ -27,8 +27,8 @@
 
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @row-click="handleRowClick"
       style=" margin-top: 10px;" class="height">
-
-      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
+      
+      <el-table-column prop="群名称" label="群名称" align="left" header-align="center" :show-overflow-tooltip="true" />
 
 
       <!-- <el-table-column label="设置" align="center" width="100">
@@ -251,8 +251,22 @@ export default {
       this.loading = true;
       listTbContact(this.queryParams).then(res => {
         if (res.code == 200) {
-          this.dataList = res.data.result;
-          this.total = res.data.totalNum;
+          //console.log("listTbContact:"+JSON.stringify(res.data.result));
+          var groupArray=new Array();   //存放群名称的数组
+          var resultArray=new Array();  //过滤掉重复的群名称
+
+          for(var i=0; i<res.data.result.length; i++)
+          {
+              var oneRow=res.data.result[i];
+              if(groupArray.indexOf(oneRow.群名称)==-1)
+              {
+                  groupArray.push(oneRow.群名称);   //过滤掉重复的群名称
+                  resultArray.push(oneRow);
+              }            
+          }
+
+          this.dataList = resultArray;
+          this.total = resultArray.length;
           this.loading = false;
         }
       })
@@ -397,8 +411,8 @@ export default {
 </script>
 <style>
 .height {
-  max-height: 500px;
-  min-height: 460px;
+  max-height: 400px;
+  min-height: 400px;
   overflow: scroll;
 }
 

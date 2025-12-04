@@ -21,9 +21,9 @@
         <el-input v-model="queryParams.客户" placeholder="发件人" clearable />
       </el-form-item>
       <el-form-item>
-        <el-select v-model="queryParams.isEnable" placeholder="私人群" clearable>
-          <el-option label="私人群" :value="true"></el-option>
+        <el-select v-model="queryParams.isEnable" placeholder="分类" clearable>          
           <el-option label="办公群" :value="false"></el-option>
+          <el-option label="私人群" :value="true"></el-option>
         </el-select>
       </el-form-item>
       <!-- <el-form-item>
@@ -40,12 +40,9 @@
         <el-button type="primary" v-hasPermi="['tbcontact:add']" plain icon="el-icon-plus" size="mini"
           @click="handleAdd">新增</el-button>
       </el-col>
+      
       <el-col :span="1.5">
-        <el-button type="success" :disabled="single" v-hasPermi="['tbcontact:edit']" plain icon="el-icon-edit"
-          size="mini" @click="handleUpdate">修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button type="danger" :disabled="multiple" v-hasPermi="['tbcontact:delete']" plain icon="el-icon-delete"
+        <el-button type="danger"  v-hasPermi="['tbcontact:delete']" plain icon="el-icon-delete"
           size="mini" @click="handleDelete">删除</el-button>
       </el-col>
       <!-- <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
@@ -54,11 +51,11 @@
     <!-- 数据区域 -->
     <el-table :data="dataList" v-loading="loading" ref="table" border highlight-current-row @sort-change="sortChange"
       @selection-change="handleSelectionChange">
-      <!-- <el-table-column type="selection" width="50" align="center"/> -->
-      <el-table-column prop="群名称" label="群名称" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="客户商家名称" label="商家名称" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="客户" label="发件人" align="center" :show-overflow-tooltip="true" />
-      <el-table-column prop="isEnable" label="私人群" align="center" width="200">
+      <el-table-column type="selection" width="50" align="center"/>
+      <el-table-column prop="群名称" label="群名称" align="left" header-align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="客户商家名称" label="商家名称" align="left" header-align="center"  :show-overflow-tooltip="true" />
+      <el-table-column prop="客户" label="发件人" align="left" header-align="center"  :show-overflow-tooltip="true" />
+      <el-table-column prop="isEnable" label="分类" align="center" width="200">
         <template slot-scope="scope">
           {{ scope.row.isEnable == true ? '私人群' : '办公群' }}
         </template>
@@ -75,12 +72,10 @@
         </template>
       </el-table-column> -->
 
-      <el-table-column label="操作" align="center" width="140">
+      <el-table-column label="修改" align="center" width="140">
         <template slot-scope="scope">
           <el-button size="mini" v-hasPermi="['tbcontact:edit']" type="success" icon="el-icon-edit" title="编辑"
-            @click="handleUpdate(scope.row)"></el-button>
-          <!-- <el-button size="mini" v-hasPermi="['tbcontact:delete']" type="danger" icon="el-icon-delete" title="删除"
-            @click="handleDelete(scope.row)"></el-button> -->
+            @click="handleUpdate(scope.row)"></el-button>          
         </template>
       </el-table-column>
     </el-table>
@@ -241,8 +236,10 @@ export default {
     // 查询数据
     getList() {
       this.loading = true;
+      
       listTbContact2(this.queryParams).then(res => {
         if (res.code == 200) {
+          
           this.dataList = res.data.result;
           this.total = res.data.totalNum;
           this.loading = false;
@@ -278,7 +275,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.id);
+      this.ids = selection.map((item) => item.id);      
       this.single = selection.length != 1
       this.multiple = !selection.length;
     },
@@ -308,8 +305,7 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const Ids = row.id || this.ids;
-
+      const Ids = row.id || this.ids;      
       this.$confirm('是否确认删除参数编号为"' + Ids + '"的数据项？')
         .then(function () {
           return delTbContact(Ids);
@@ -323,7 +319,7 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      debugger
+      
       this.form = { ...row };
       const id = row.id || this.ids;
       this.open = true;

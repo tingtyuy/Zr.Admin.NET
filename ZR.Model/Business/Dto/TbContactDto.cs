@@ -102,5 +102,7 @@ namespace ZR.Model.Business.Dto
         public bool 联系电话匹配 { get; set; }
 
         public bool 地址匹配 { get; set; }
+
+        public string 群名称 { get; set; }
     }
 }

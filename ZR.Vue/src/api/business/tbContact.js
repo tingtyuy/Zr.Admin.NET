@@ -64,7 +64,7 @@ export function updateTbContact(data) {
  */
 export function matchTbContact(data) {
   return request({
-    url: 'business/TbContact/match',
+    url: 'business/TbContact/matchByWeiXinGroup',
     method: 'PUT',
     data: data,
   })
