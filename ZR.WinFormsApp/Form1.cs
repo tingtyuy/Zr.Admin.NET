@@ -198,13 +198,13 @@ namespace ZR.WinFormsApp
              new SelectColumn()
              {
                  Name = "目的省份",
-                 MaybeName = new string[] { "目的省份", "省份", "目的份" }
+                 MaybeName = new string[] { "目的省份", "省份", "目的份", "省" }
              }
               ,
              new SelectColumn()
              {
                  Name = "目的城市",
-                 MaybeName = new string[] { "目的城市", "城市", }
+                 MaybeName = new string[] { "目的城市", "城市", "市" }
              }
               ,
              new SelectColumn()
@@ -290,14 +290,10 @@ namespace ZR.WinFormsApp
         private async void button6_Click(object sender, EventArgs e)
         {
             //dbHelper.db.Deleteable<Bill2>().ExecuteCommand();
-            //var directoryPaths = new List<string> {
-            //    @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
-            //  , @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\仓里账单" };
-
-
             var directoryPaths = new List<string> {
-                @"D:\123456789\md\运单-账单计算\MD-2025-09-账单数据\揽收账单"
-         };
+                 @"C:\Users\ms363\Desktop\11月对账\xiaoqian\仓里",
+                      @"C:\Users\ms363\Desktop\11月对账\xiaoqian\揽收" };
+
             //遍历目录
             foreach (var directoryPath in directoryPaths)
             {
@@ -383,37 +379,37 @@ namespace ZR.WinFormsApp
             //多个用户使用了同一个店铺账号 
             NewMethod6();
             logHelper.Logger.Information("NewMethod6");
-            MessageBox.Show("NewMethod6");
+            //MessageBox.Show("NewMethod6");
 
             //有真实店铺 ，没报价关系
             NewMethod1();
             logHelper.Logger.Information("NewMethod1");
-            MessageBox.Show("NewMethod1");
+            //MessageBox.Show("NewMethod1");
 
             //没有店铺或者是共享店铺 ，没有发运表  ，没报价关系
             NewMethod2();
             logHelper.Logger.Information("NewMethod2");
-            MessageBox.Show("NewMethod2");
+            //MessageBox.Show("NewMethod2");
 
             //没有店铺或者是共享店铺 ， 有发运表，没报价关系(没发运表店铺)
             NewMethod5();
             logHelper.Logger.Information("NewMethod5");
-            MessageBox.Show("NewMethod5");
+            //MessageBox.Show("NewMethod5");
 
             //共享店铺，有发运表 ， 没报价关系(没发运表客户 和 没计算表店铺)
             NewMethod4();
             logHelper.Logger.Information("NewMethod4");
-            MessageBox.Show("NewMethod4");
+            //MessageBox.Show("NewMethod4");
 
             //没有店铺或者是共享店铺 ，有发运表 ，没报价关系(没发运表客户 和 没发运表店铺)
             NewMethod3();
             logHelper.Logger.Information("NewMethod3");
-            MessageBox.Show("NewMethod3");
+            //MessageBox.Show("NewMethod3");
 
             //其他错误
             NewMethod7();
             logHelper.Logger.Information("差异报告完成");
-            MessageBox.Show("差异报告完成");
+            //MessageBox.Show("差异报告完成");
 
         }
 
