@@ -8,7 +8,7 @@
             </el-input>
           </el-form-item>
         </el-col>
-        <el-col>          
+        <el-col>
           <el-tag style="margin-left:70px;">注: 请设置每日固定的启动时间，默认为上午八点半</el-tag>
         </el-col>
 
@@ -19,29 +19,29 @@
         </el-col>
 
         <el-col >
-          <el-form-item label="异常报警抄送邮箱1" prop="emailCC1"   :rules="rules.ccEmail1">
-            <el-input  v-model="form.emailCC1"  placeholder="请输入有效邮箱地址" clearable style="width:300px" >
+          <el-form-item label="异常报警抄送邮箱1" prop="operationEmailCC1"   :rules="rules.ccEmail1">
+            <el-input  v-model="form.operationEmailCC1"  placeholder="请输入有效邮箱地址" clearable style="width:300px" >
             </el-input>
           </el-form-item>
         </el-col>
         <el-col >
-          <el-form-item label="异常报警抄送邮箱2" prop="emailCC2"   :rules="rules.ccEmail1">
-            <el-input v-model="form.emailCC2" placeholder="请输入有效邮箱地址" clearable style="width:300px">
+          <el-form-item label="异常报警抄送邮箱2" prop="operationEmailCC2"   :rules="rules.ccEmail1">
+            <el-input v-model="form.operationEmailCC2" placeholder="请输入有效邮箱地址" clearable style="width:300px">
             </el-input>
           </el-form-item>
         </el-col>
         <el-col >
-          <el-form-item label="异常报警抄送邮箱3" prop="emailCC3"   :rules="rules.ccEmail1">
-            <el-input v-model="form.emailCC3" placeholder="请输入有效邮箱地址" clearable style="width:300px">
+          <el-form-item label="异常报警抄送邮箱3" prop="operationEmailCC3"   :rules="rules.ccEmail1">
+            <el-input v-model="form.operationEmailCC3" placeholder="请输入有效邮箱地址" clearable style="width:300px">
             </el-input>
           </el-form-item>
         </el-col>
         <el-col>
-          
+
           <el-tag style="margin-left:70px;">注: 邮箱用于自动化出现异常后的及时通报，以便能尽快处理</el-tag>
         </el-col>
-           
-        <el-col  :offset="4" style="margin-top:10px;">          
+
+        <el-col  :offset="4" style="margin-top:10px;">
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleSubmit">保存</el-button>
           <el-button icon="el-icon-refresh" size="mini"  @click="handleReset"  >取消</el-button>
         </el-col>
@@ -58,10 +58,10 @@ import {
   modifyData,
   getCompany2,
   formatDate,
-  updateCompanyEmail  
+  updateCompanyEmail
 } from '@/api/business/warnSetting.js';
 import { MessageBox } from 'element-ui';
-    
+
   export default {
   data() {
     // 邮箱格式验证正则表达式
@@ -76,17 +76,17 @@ import { MessageBox } from 'element-ui';
     }
 
     return {
-      form: { 
+      form: {
             startTime:'08:30',
             mainEmail:'',
-            emailCC1:'',
-            emailCC2:'',
-            emailCC3:''
+            operationEmailCC1:'',
+            operationEmailCC2:'',
+            operationEmailCC3:''
        },
       rules: {
         mainEmail: [
           { required: true, trigger: ['blur', 'change'] },
-          { 
+          {
             validator: (rule, value, callback) => {
               if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
                 callback(new Error('请输入有效的邮箱地址'));
@@ -98,33 +98,33 @@ import { MessageBox } from 'element-ui';
           }
         ],
         ccEmail1: [
-          { validator: emailRegex, trigger: ['blur', 'change'] }          
+          { validator: emailRegex, trigger: ['blur', 'change'] }
         ],
         ccEmail2: [
-          { validator: emailRegex, trigger: ['blur', 'change'] }          
+          { validator: emailRegex, trigger: ['blur', 'change'] }
         ],
         ccEmail3: [
-          { validator: emailRegex, trigger: ['blur', 'change'] }          
+          { validator: emailRegex, trigger: ['blur', 'change'] }
         ],
         startTime: [
           // 新增必填验证
-          { 
+          {
             required: true,
             message: '检测工具每日启动时间不能为空',
             trigger: 'blur'
           },
-          { pattern: /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/, 
+          { pattern: /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/,
             message: '请输入正确的时间格式（HH:MM）',
             trigger: 'blur'
           }
         ]
-        
-      },      
-      
+
+      },
+
       //list1 存放机器人数组
       list1:[],
       //Company对象
-      companyRecord:{}      
+      companyRecord:{}
     }
   },
   mounted(){
@@ -132,7 +132,7 @@ import { MessageBox } from 'element-ui';
   },
   methods:{
     handleSubmit(){
-      
+
       this.$refs.queryForm.validate(valid => {
         if (!valid) {
           this.$message.error('请完成必填项填写')
@@ -146,53 +146,53 @@ import { MessageBox } from 'element-ui';
         }
 
         //修改机器人的启动时间
-        modifyData(this.list1).then(res=>{        
+        modifyData(this.list1).then(res=>{
           if(res.code==200)
           {
-            //console.log("result5:"+ JSON.stringify(res.data));   
+            //console.log("result5:"+ JSON.stringify(res.data));
           }
         });
 
         if(this.companyRecord!={})
         {
-          //this.form.mainEmail=res.data.emailTo;
-          this.companyRecord.emailTo= this.form.mainEmail;
-          var EmailCCText='';
-          if(this.form.emailCC1.length>0)
+          //this.form.mainEmail=res.data.operationEmailTo;
+          this.companyRecord.operationEmailTo= this.form.mainEmail;
+          var operationEmailCCText='';
+          if(this.form.operationEmailCC1.length>0)
           {
-              EmailCCText+=";"+this.form.emailCC1;
+              operationEmailCCText+=";"+this.form.operationEmailCC1;
           }
 
-          if(this.form.emailCC2.length>0)
+          if(this.form.operationEmailCC2.length>0)
           {
-              EmailCCText+=";"+this.form.emailCC2;
+              operationEmailCCText+=";"+this.form.operationEmailCC2;
           }
 
-          if(this.form.emailCC3.length>0)
+          if(this.form.operationEmailCC3.length>0)
           {
-              EmailCCText+=";"+this.form.emailCC3;
+              operationEmailCCText+=";"+this.form.operationEmailCC3;
           }
 
-          if(EmailCCText.length>0)
+          if(operationEmailCCText.length>0)
           {
-            this.companyRecord.emailCC=EmailCCText.substring(1);
+            this.companyRecord.operationEmailCC=operationEmailCCText.substring(1);
           }
           else
           {
-            this.companyRecord.emailCC=EmailCCText;
+            this.companyRecord.operationEmailCC=operationEmailCCText;
           }
-          
+
           updateCompanyEmail(this.companyRecord).then(res=>{
             if(res.code==200)
             {
                 //console.log('result6:'+ JSON.stringify(res.data));
-            }          
-          })        
+            }
+          })
 
         };
 
         MessageBox.alert("保存成功!");
-        
+
       });
 
     },
@@ -204,22 +204,22 @@ import { MessageBox } from 'element-ui';
 
     // 获取配置数据
      getData() {
-      
-       getRobotList2().then(res => {        
+
+       getRobotList2().then(res => {
         if (res.code == 200) {
           this.list1=res.data;
 
-          
+
           if(this.list1.length>0)
-          {              
+          {
               if(this.list1[0].startTime.length>10)
               {
                 //取出来分秒
                 var theTime=this.list1[0].startTime.substr(11,5);
-                this.form.startTime=theTime;                
+                this.form.startTime=theTime;
               }
           }
-          
+
         }
       })
 
@@ -231,39 +231,39 @@ import { MessageBox } from 'element-ui';
 
       if(userInfo!=null)
       {
-          getCompany2({strCompanyId: userInfo.remark }).then(res => {         
-            
-            if (res.code == 200) { 
+          getCompany2({strCompanyId: userInfo.remark }).then(res => {
 
-                  this.companyRecord=res.data;         
-                  this.form.mainEmail=res.data.emailTo;
-                  
-                  if(res.data.emailCC!=null && res.data.emailCC.length>0)
+            if (res.code == 200) {
+
+                  this.companyRecord=res.data;
+                  this.form.mainEmail=res.data.operationEmailTo;
+
+                  if(res.data.operationEmailCC!=null && res.data.operationEmailCC.length>0)
                   {
-                      var theArray=res.data.emailCC.split(';');
+                      var theArray=res.data.operationEmailCC.split(';');
                       for(let i=0; i<theArray.length; i++)
                       {
                           if(i==0)
                           {
-                              this.form.emailCC1=theArray[i].trim();
+                              this.form.operationEmailCC1=theArray[i].trim();
                           }
                           if(i==1)
                           {
-                              this.form.emailCC2=theArray[i].trim();
+                              this.form.operationEmailCC2=theArray[i].trim();
                           }
                           if(i==2)
                           {
-                              this.form.emailCC3=theArray[i].trim();
+                              this.form.operationEmailCC3=theArray[i].trim();
                           }
                       }
 
                   }
-                            
+
             }
           })
 
       }
-      
+
     },
 
 

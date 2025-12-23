@@ -116,7 +116,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [Log(Title = "", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateCompanyEmail([FromBody] Company theObject)
         {            
-            var response = _CompanyService.Update(theObject, t => new { t.EmailTo, t.EmailCC });
+            var response = _CompanyService.Update(theObject, t => new { t.OperationEmailTo, t.OperationEmailCC });
 
             return ToResponse(response);
         }

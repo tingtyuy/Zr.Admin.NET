@@ -55,5 +55,16 @@ namespace ZR.Model.Business
         /// </summary>
         public string EmailCC { get; set; }
 
+
+        /// <summary>
+        /// 问题件停止运行报警主邮箱 
+        /// </summary>
+        public string OperationEmailTo { get; set; }
+
+        /// <summary>
+        /// 问题件停止运行报警抄送邮箱 
+        /// </summary>
+        public string OperationEmailCC { get; set; }
+
     }
 }
