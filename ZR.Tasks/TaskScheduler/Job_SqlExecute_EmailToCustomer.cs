@@ -26,12 +26,13 @@ namespace ZR.Tasks.TaskScheduler
         private OptionsSetting OptionsSetting;
         private readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly ICompanyService _CompanyService;
-
-        public Job_SqlExecute_EmailToCustomer(ISysTasksQzService tasksQzService, IOptions<OptionsSetting> options, ICompanyService companyService)
+        private readonly ITbOrderService _TbOrderService;
+        public Job_SqlExecute_EmailToCustomer(ISysTasksQzService tasksQzService, IOptions<OptionsSetting> options, ICompanyService companyService, ITbOrderService tbOrderService)
         {
             this.tasksQzService = tasksQzService;
             OptionsSetting = options.Value;
             _CompanyService = companyService;
+            _TbOrderService = tbOrderService;
         }
         public async Task Execute(IJobExecutionContext context)
         {
@@ -40,11 +41,21 @@ namespace ZR.Tasks.TaskScheduler
         public async Task Run(IJobExecutionContext context)
         {
             MailHelper mailHelper = new(OptionsSetting.MailOptions.FirstOrDefault(w => w.FromName == "客服自动化管理系统管理员"));
-            var allCompany = _CompanyService.GetAll();
+            var allCompany = _CompanyService.GetList(a => !string.IsNullOrEmpty(a.OperationEmailCC));
+            foreach (var company in allCompany)
+            {
+                var order = _TbOrderService.AsQueryable().Where(w => w.CompanyId == company.CompanyId).OrderByDescending(o => o.使用时间).First();
+                if (order is not null)
+                {
+                    TimeSpan ts = DateTime.Now - Convert.ToDateTime(order.使用时间);
+                    if (ts.TotalMinutes > 60)
+                    {
+                        string result = mailHelper.SendMail(company.OperationEmailTo, $"问题件机器人未启动_{DateTime.Now.ToString("yyyy-MM-dd")}", $"{company.CompanyName}_{order.读取机器人}_问题件机器人未启动,检测时间为{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+                        logger.Info($"任务执行结果=" + result);
+                    }
+                }
+            }
             var toUsers = allCompany.Where(w => w.OperationEmailTo.IsNotEmpty()).Select(s => s.OperationEmailTo).ToArray();
-            string result = mailHelper.SendMail(toUsers, "程序停止", "请人工处理");
-            logger.Info($"任务执行结果=" + result);
-
         }
     }
 }
