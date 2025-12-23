@@ -35,13 +35,13 @@ namespace ZR.Common
         /// <param name="subject"></param>
         /// <param name="text"></param>
         /// <param name="path"></param>
-        public string SendMail(string toAddress, string subject, string text, string path = "", string html = "")
+        public string SendMail(string toAddress, string subject, string text, string path = "", string html = "", string cc = "")
         {
             IEnumerable<MailboxAddress> mailboxes = new List<MailboxAddress>() {
                 new MailboxAddress(toAddress, toAddress)
             };
 
-            return SendMail(mailboxes, subject, text, path, html);
+            return SendMail(mailboxes, subject, text, path, html,cc);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace ZR.Common
         /// <param name="subject"></param>
         /// <param name="text"></param>
         /// <param name="path"></param>
-        public string SendMail(string[] toAddress, string subject, string text, string path = "", string html = "")
+        public string SendMail(string[] toAddress, string subject, string text, string path = "", string html = "", string cc = "")
         {
             IList<MailboxAddress> mailboxes = new List<MailboxAddress>() { };
             foreach (var item in toAddress)
@@ -59,7 +59,7 @@ namespace ZR.Common
                 mailboxes.Add(new MailboxAddress(item, item));
             }
 
-            return SendMail(mailboxes, subject, text, path, html);
+            return SendMail(mailboxes, subject, text, path, html,cc);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace ZR.Common
         /// <param name="text"></param>
         /// <param name="path">附件url地址</param>
         /// <param name="html">网页HTML内容</param>
-        private string SendMail(IEnumerable<MailboxAddress> toAddress, string subject, string text, string path = "", string html = "")
+        private string SendMail(IEnumerable<MailboxAddress> toAddress, string subject, string text, string path = "", string html = "", string cc = "")
         {
             MimeMessage message = new MimeMessage();
             //发件人
@@ -79,7 +79,14 @@ namespace ZR.Common
             message.To.AddRange(toAddress);
             message.Subject = subject;
             message.Date = DateTime.Now;
+            if (!string.IsNullOrEmpty(cc))
+            {
+                foreach (var emailAddress in cc.Split(';'))
+                {
+                    message.Cc.Add(new MailboxAddress(emailAddress, emailAddress));
+                }
 
+            }
             //创建附件Multipart
             Multipart multipart = new Multipart("mixed");
             var alternative = new MultipartAlternative();

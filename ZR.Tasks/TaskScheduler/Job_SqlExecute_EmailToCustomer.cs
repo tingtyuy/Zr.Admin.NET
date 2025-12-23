@@ -50,7 +50,7 @@ namespace ZR.Tasks.TaskScheduler
                     TimeSpan ts = DateTime.Now - Convert.ToDateTime(order.使用时间);
                     if (ts.TotalMinutes > 60)
                     {
-                        string result = mailHelper.SendMail(company.OperationEmailTo, $"问题件机器人未启动_{DateTime.Now.ToString("yyyy-MM-dd")}", $"{company.CompanyName}_{order.读取机器人}_问题件机器人未启动,检测时间为{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+                        string result = mailHelper.SendMail(company.OperationEmailTo, $"问题件机器人未启动_{DateTime.Now.ToString("yyyy-MM-dd")}", $"{company.CompanyName}_{order.读取机器人}_问题件机器人未启动,检测时间为{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}", cc: company.OperationEmailCC);
                         logger.Info($"任务执行结果=" + result);
                     }
                 }
