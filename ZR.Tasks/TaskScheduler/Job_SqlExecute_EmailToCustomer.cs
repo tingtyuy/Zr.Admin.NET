@@ -44,10 +44,10 @@ namespace ZR.Tasks.TaskScheduler
             var allCompany = _CompanyService.GetList(a => !string.IsNullOrEmpty(a.OperationEmailCC));
             foreach (var company in allCompany)
             {
-                var order = _TbOrderService.AsQueryable().Where(w => w.CompanyId == company.CompanyId).OrderByDescending(o => o.使用时间).First();
+                var order = _TbOrderService.AsQueryable().Where(w => w.CompanyId == company.CompanyId).OrderByDescending(o => o.useTime).First();
                 if (order is not null)
                 {
-                    TimeSpan ts = DateTime.Now - Convert.ToDateTime(order.使用时间);
+                    TimeSpan ts = DateTime.Now - order.useTime;
                     if (ts.TotalMinutes > 60)
                     {
                         string result = mailHelper.SendMail(company.OperationEmailTo, $"问题件机器人未启动_{DateTime.Now.ToString("yyyy-MM-dd")}", $"{company.CompanyName}_{order.读取机器人}_问题件机器人未启动,检测时间为{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}", cc: company.OperationEmailCC);
