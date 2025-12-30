@@ -24,6 +24,7 @@ namespace ZR.Tasks
         /// <param name="job">业务逻辑方法</param>
         public async Task<SysTasksLog> ExecuteJob(IJobExecutionContext context, Func<Task> job)
         {
+            Console.WriteLine("执行任务开始");
             double elapsed = 0;
             int status = 0;
             string logMsg;
@@ -59,6 +60,7 @@ namespace ZR.Tasks
             };
 
             await RecordTaskLog(context, logModel);
+            Console.WriteLine("结束");
             return logModel;
         }
 
