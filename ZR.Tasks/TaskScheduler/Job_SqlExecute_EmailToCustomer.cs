@@ -19,7 +19,7 @@ using ZR.ServiceCore.Services;
 
 namespace ZR.Tasks.TaskScheduler
 {
-    [AppService(ServiceType = typeof(Job_SqlExecute_EmailToCustomer), ServiceLifetime = LifeTime.Scoped)]
+    [AppService(ServiceType = typeof(Job_SqlExecute_EmailToCustomer), ServiceLifetime = LifeTime.Singleton)]
     public class Job_SqlExecute_EmailToCustomer : JobBase, IJob
     {
         private readonly ISysTasksQzService tasksQzService;
