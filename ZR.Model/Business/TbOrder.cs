@@ -63,5 +63,7 @@ namespace ZR.Model.Business
         /// </summary>
         public DateTime useTime { get; set; }
 
+        public DateTime createOrderTime { get; set; }
+
     }
 }

@@ -32,7 +32,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet("list")]
-        [ActionPermissionFilter(Permission = "company:list")]
+        //[ActionPermissionFilter(Permission = "company:list")]
         public IActionResult QueryCompany([FromQuery] CompanyQueryDto parm)
         {
             var response = _CompanyService.GetList(parm);

@@ -1,28 +1,60 @@
     <template>
       <div class="app-container">
-        <el-header class="bordered" style="min-height: 50px;">
-          <el-row>
+        <el-header class="bordered" style="min-height: 100px; text-align: left;padding-left: 60px;">
+                    <el-row  style="font-size: 20px; font-weight: bold;">
+            <el-col :span="6">
+              本月问题件总数
+              <el-tag effect="dark" size="medium"style="margin-left: 10px;">
+                {{ statisticForm.count1 }}
+              </el-tag>
+            </el-col>
+            <el-col :span="6">
+              处理总数
+              <el-tag effect="dark" size="medium"style="margin-left: 10px;">
+                {{ statisticForm.count2 }}
+              </el-tag>
+            </el-col>
+            <el-col :span="6">
+              占比
+              <el-tag effect="dark" size="medium"style="margin-left: 10px;">
+                {{ statisticForm.count3 }}
+              </el-tag>
+            </el-col>
+            <el-col :span="6" >
+              日均
+              <el-tag effect="dark" size="medium"style="margin-left: 10px;">
+                {{ statisticForm.count4 }}
+              </el-tag>
+            </el-col>
+            <!-- <el-col :span="6">
+              信息有误问题件数量
+              <el-tag effect="dark">
+                {{ statisticForm.num4 }}
+              </el-tag>
+            </el-col> -->
+          </el-row>
+          <el-row style="margin-top: 20px;">
             <el-col :span="6">
               今天问题件处理总数
-              <el-tag effect="dark">
+              <el-tag effect="dark" size="medium" style="margin-left: 10px;">
                 {{ statisticForm.sum }}
               </el-tag>
             </el-col>
             <el-col :span="6">
               拒收问题件数量
-              <el-tag effect="dark">
+              <el-tag effect="dark" size="medium"style="margin-left: 10px;">
                 {{ statisticForm.ju }}
               </el-tag>
             </el-col>
             <el-col :span="6">
               破损问题件数量
-              <el-tag effect="dark">
+              <el-tag effect="dark" size="medium"style="margin-left: 10px;">
                 {{ statisticForm.po }}
               </el-tag>
             </el-col>
             <el-col :span="6">
               已匹配商户群数量
-              <el-tag effect="dark">
+              <el-tag effect="dark" size="medium"style="margin-left: 10px;">
                 {{ statisticForm.sendSum }}
               </el-tag>
             </el-col>
@@ -103,6 +135,10 @@ export default {
         ju: 0,
         po: 0,
         sendSum: 0,
+        count1:0,
+        count2:0,
+        count3:0,
+        count4:0
 
       },
       wxGroupDialogOpen: false,
@@ -125,7 +161,7 @@ export default {
   ,
   created() {
     // 页面列表数据查询
-    this.getList();      
+    this.getList();
   },
   methods: {
     refreshLeftListCallBack() {
@@ -133,35 +169,41 @@ export default {
       this.$refs.leftComponentRef.getList();
     },
     getList() {
-        
+
          //获取id
       var userId = this.$store.getters.userId;
       //获取登录信息
       var userInfo = this.$store.getters.userinfo;
 
       getStatistic().then(response => {
-        const { data } = response;  
+        const { data } = response;
 
         this.statisticForm.sum=data.sum;
         this.statisticForm.ju=data.ju;
-        this.statisticForm.po=data.po;        
+        this.statisticForm.po=data.po;
+
+        this.statisticForm.count1=data.count1;
+        this.statisticForm.count2=data.count2;
+        this.statisticForm.count3=data.count3;
+        this.statisticForm.count4=data.count4;
+
       });
-      
+
       //已匹配商户群数量
       var theParam1={"strDate": formatDate(new Date()), "strUserAccount": userInfo.userName};
-      
+
       getGroupMatchTimes(theParam1).then(
         response => {
           //console.log("getGroupMatchTimes():"+ JSON.stringify(response ));
           if(response.code == 200)
           {
               //已匹配商户群数量
-              this.statisticForm.sendSum=response.data;            
+              this.statisticForm.sendSum=response.data;
           }
 
         }
-      )     
-      
+      )
+
     },
     handleQuery() {
       this.wxGroupQueryForm.pageNum = 1;

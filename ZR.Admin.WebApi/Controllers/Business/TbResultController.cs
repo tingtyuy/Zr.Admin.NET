@@ -26,13 +26,14 @@ namespace ZR.Admin.WebApi.Controllers.Business
         private readonly ITbOrderService _tbOrderService;
         private readonly ITbContactService _tbContactService;
         private readonly ISysUserService sysUserService;
-
-        public TbResultController(ITbResultService TbResultService, ITbContactService tbContactService, ISysUserService sysUserService, ITbOrderService tbOrderService)
+        private readonly IFDataCountService fDataCountService;
+        public TbResultController(ITbResultService TbResultService, ITbContactService tbContactService, ISysUserService sysUserService, ITbOrderService tbOrderService, IFDataCountService fDataCountService)
         {
             _TbResultService = TbResultService;
             _tbContactService = tbContactService;
             this.sysUserService = sysUserService;
             _tbOrderService = tbOrderService;
+            this.fDataCountService = fDataCountService;
         }
 
         /// <summary>
@@ -91,7 +92,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
             long userId = HttpContext.GetUId();
             var user = sysUserService.SelectUserById(userId);
 
-   
+            var count1 = fDataCountService.Queryable().Where(w => w.companyid == user.Remark && w.createtime.Year == DateTime.Now.Year && w.createtime.Month == DateTime.Now.Month).Sum(s => s.allcount);
+            var count2 = _tbOrderService.Queryable().Where(w => w.CompanyId == user.Remark && w.createOrderTime.Year == DateTime.Now.Year && w.createOrderTime.Month == DateTime.Now.Month).Count();
 
             var count = _tbContactService.Queryable().Where(w => w.匹配时间.Date == DateTime.Now.Date && w.CompanyId == user.Remark);
             var orderList = _tbOrderService.Queryable().Where(w => w.状态 == "被读取" && SqlFunc.ToDate(w.使用时间).Date == DateTime.Now.Date && w.CompanyId == user.Remark).ToList();
@@ -101,7 +103,12 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 sum = orderList.Count(),
                 ju = orderList.Where(w => w.问题件类型 == "拒收").Count(),
                 po = orderList.Where(w => w.问题件类型 == "破损件").Count(),
-                sendSum = count.Count()
+                sendSum = count.Count(),
+                count1 = count1,
+                count2 = count2,
+                count3 = count1 == 0 ? 0 : count2 / count1,
+                count4 = count2 / (DateTime.Now.Day)
+
             };
 
             return SUCCESS(info);
@@ -132,16 +139,16 @@ namespace ZR.Admin.WebApi.Controllers.Business
         [AllowAnonymous]
         public IActionResult GetTop5WeiXinGroup(string strStartDate, string strEndDate)
         {
-            DateTime startDate=Convert.ToDateTime(strStartDate);
-            DateTime endDate=Convert.ToDateTime(strEndDate);
+            DateTime startDate = Convert.ToDateTime(strStartDate);
+            DateTime endDate = Convert.ToDateTime(strEndDate);
 
             long userId = HttpContext.GetUId();
-            var user = sysUserService.SelectUserById(userId);           
+            var user = sysUserService.SelectUserById(userId);
 
             string strSql = " select a.问题件类型, a.单号, a.商家名称, a.收件人信息, b.群名称, a.operateTime, a.companyId from tb_result a left join tb_contact b on a.商家名称=b.客户商家名称 and a.收件人信息=b.客户 and a.companyId=b.companyId " +
-                " where a.companyId='"+ user.Remark + "' and a.operateTime>=str_to_date('"+ strStartDate + "', '%Y-%m-%d %H:%i:%s') and a.operateTime<= str_to_date('" + strEndDate + "', '%Y-%m-%d %H:%i:%s') ";
-           
-            List<TbResultQueryDto_2>  dataList= _TbResultService.AsSugarClient().Ado.SqlQuery<TbResultQueryDto_2>(strSql);
+                " where a.companyId='" + user.Remark + "' and a.operateTime>=str_to_date('" + strStartDate + "', '%Y-%m-%d %H:%i:%s') and a.operateTime<= str_to_date('" + strEndDate + "', '%Y-%m-%d %H:%i:%s') ";
+
+            List<TbResultQueryDto_2> dataList = _TbResultService.AsSugarClient().Ado.SqlQuery<TbResultQueryDto_2>(strSql);
 
             List<WeiXinGroupStatisticsDto> groupList = dataList.GroupBy(x => x.群名称)
                                                             .Select(g => new WeiXinGroupStatisticsDto
@@ -153,8 +160,8 @@ namespace ZR.Admin.WebApi.Controllers.Business
 
             List<WeiXinGroupStatisticsDto> top5List = new List<WeiXinGroupStatisticsDto>();
 
-            var sortedList = groupList.Where(x=> !string.IsNullOrEmpty(x.GroupName)).OrderByDescending(x => x.FNumber).ToList();         //去掉群名称为空的
-            for(int i=0; i<sortedList.Count && i<5; i++)
+            var sortedList = groupList.Where(x => !string.IsNullOrEmpty(x.GroupName)).OrderByDescending(x => x.FNumber).ToList();         //去掉群名称为空的
+            for (int i = 0; i < sortedList.Count && i < 5; i++)
             {
                 top5List.Add(sortedList[i]);
             }
@@ -348,12 +355,12 @@ namespace ZR.Admin.WebApi.Controllers.Business
         ///<summary>
         /// 复制信息
         /// </summary>
-        
+
         /// <returns></returns>
         [HttpPost("copyMessage_2")]
         //[ActionPermissionFilter(Permission = "tbresult:copy")]
         [Log(Title = "", BusinessType = BusinessType.UPDATE)]
-        public IActionResult UpdateTbResultStatus2([FromBody] TbResultQueryDto_3  theParam)
+        public IActionResult UpdateTbResultStatus2([FromBody] TbResultQueryDto_3 theParam)
         {
             var updateNumber = _TbResultService.UpdateTbResultStatus(theParam.ids.ToArray(), theParam.strAccount);
             return ToResponse(updateNumber);
