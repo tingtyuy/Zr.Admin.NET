@@ -92,7 +92,7 @@ namespace ZR.Model.Business.Dto
 
         public int count1 { get; set; }
         public int count2 { get; set; }
-        public int count3 { get; set; }
+        public decimal count3 { get; set; }
         public int count4 { get; set; }
 
     }

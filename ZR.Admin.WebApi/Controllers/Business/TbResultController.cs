@@ -106,7 +106,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
                 sendSum = count.Count(),
                 count1 = count1,
                 count2 = count2,
-                count3 = count1 == 0 ? 0 : count2 / count1,
+                count3 = count1 == 0 ? 0 : (Decimal.Round((decimal)count2 / count1, 2) * 100),
                 count4 = count2 / (DateTime.Now.Day)
 
             };

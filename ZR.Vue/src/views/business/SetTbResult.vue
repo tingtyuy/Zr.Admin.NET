@@ -5,7 +5,7 @@
             <el-col :span="6">
               本月问题件总数
               <el-tag effect="dark" size="medium"style="margin-left: 10px;">
-                {{ statisticForm.count1 }}
+                 {{ statisticForm.count1 }}
               </el-tag>
             </el-col>
             <el-col :span="6">
@@ -17,7 +17,7 @@
             <el-col :span="6">
               占比
               <el-tag effect="dark" size="medium"style="margin-left: 10px;">
-                {{ statisticForm.count3 }}
+                   {{ statisticForm.count3 }}%
               </el-tag>
             </el-col>
             <el-col :span="6" >
