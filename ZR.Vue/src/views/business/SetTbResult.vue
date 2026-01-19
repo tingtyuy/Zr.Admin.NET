@@ -5,25 +5,25 @@
             <el-col :span="6">
               本月问题件总数
               <el-tag effect="dark" size="medium"style="margin-left: 10px;">
-                 {{ statisticForm.count1 }}
+                 0<!-- {{ statisticForm.count1 }} -->
               </el-tag>
             </el-col>
             <el-col :span="6">
               处理总数
               <el-tag effect="dark" size="medium"style="margin-left: 10px;">
-                {{ statisticForm.count2 }}
+                0<!-- {{ statisticForm.count2 }} -->
               </el-tag>
             </el-col>
             <el-col :span="6">
               占比
               <el-tag effect="dark" size="medium"style="margin-left: 10px;">
-                   {{ statisticForm.count3 }}%
+                  0% <!-- {{ statisticForm.count3 }}% -->
               </el-tag>
             </el-col>
             <el-col :span="6" >
               日均
               <el-tag effect="dark" size="medium"style="margin-left: 10px;">
-                {{ statisticForm.count4 }}
+                0<!-- {{ statisticForm.count4 }} -->
               </el-tag>
             </el-col>
             <!-- <el-col :span="6">
