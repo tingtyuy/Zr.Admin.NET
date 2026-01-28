@@ -146,4 +146,8 @@
     <ProjectReference Include="..\ZR.Common\ZR.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="models\" />
+  </ItemGroup>
+
 </Project>
