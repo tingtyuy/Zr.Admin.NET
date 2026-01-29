@@ -139,7 +139,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MiniExcel" Version="1.41.4" />
+    <PackageReference Include="MiniExcel" Version="1.42.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -151,6 +151,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="res\太仓申通网点质控日报-模板 - 复制.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="res\太仓申通网点质控日报-模板.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

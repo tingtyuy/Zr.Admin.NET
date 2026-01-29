@@ -8,12 +8,16 @@ using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.VisualBasic.ApplicationServices;
 using MiniExcelLibs;
+using MiniExcelLibs.OpenXml;
+using NPOI.SS.UserModel;
 using Serilog.Events;
 using SharpCompress.Common;
 using SqlSugar;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ZR.Common;
@@ -38,21 +42,16 @@ namespace ZR.WinFormsApp
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
-            var timeStamp = .GetTimeStamp(DateTime.Now, true);
-            // 获取当前应用程序的 bin/Debug 或 bin/Release 目录
+            var timeStamp = DateTime.Now.ToString("yyyyMMddhhmmsss");
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
-
-            // 设置输出文件的路径
-            string path = Path.Combine(basePath, "out", "太仓申通网点质控日报.xlsx");
-
-            // 如果模板文件在项目根目录的 Templates 文件夹中
-            // 需要先复制到 bin 目录，或者使用相对路径
-            string templatePath = Path.Combine(basePath, "res","太仓申通网点质控日报-模板.xlsx");
-
-            // 检查模板文件是否存在
+            string path = Path.Combine(basePath, "out", $"太仓申通网点质控日报{timeStamp}.xlsx");
+            string templatePath = Path.Combine(basePath, "res", "太仓申通网点质控日报-模板.xlsx");
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+            }
             if (!File.Exists(templatePath))
             {
-                // 如果模板文件不存在，提示或创建
                 MessageBox.Show($"模板文件不存在: {templatePath}");
                 return;
             }
@@ -60,15 +59,22 @@ namespace ZR.WinFormsApp
             var value = new
             {
                 Name = "Jack",
-                CreateDate = new DateTime(2021, 01, 01),
-                VIP = true,
-                Points = 123
+
             };
 
             try
             {
-                MiniExcel.SaveAsByTemplate(path, templatePath, value);
+                var config = new OpenXmlConfiguration()
+                {
+                
+                };
+                MiniExcel.SaveAsByTemplate(path, templatePath, value, config);
                 MessageBox.Show($"文件保存成功: {path}");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = path,
+                    UseShellExecute = true
+                });
             }
             catch (Exception ex)
             {
