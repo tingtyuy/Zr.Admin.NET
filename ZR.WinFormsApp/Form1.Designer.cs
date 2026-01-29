@@ -29,34 +29,33 @@
         private void InitializeComponent()
         {
             folderBrowserDialog1 = new FolderBrowserDialog();
-            button1 = new Button();
+            button2 = new Button();
             SuspendLayout();
             // 
-            // button1
+            // button2
             // 
-            button1.Location = new Point(33, 13);
-            button1.Margin = new Padding(4, 4, 4, 4);
-            button1.Name = "button1";
-            button1.Size = new Size(96, 27);
-            button1.TabIndex = 0;
-            button1.Text = "选择目录";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            button2.Location = new Point(27, 12);
+            button2.Name = "button2";
+            button2.Size = new Size(174, 36);
+            button2.TabIndex = 1;
+            button2.Text = "导出太仓日报";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(9F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1440, 960);
-            Controls.Add(button1);
-            Margin = new Padding(4, 4, 4, 4);
+            Controls.Add(button2);
+            Margin = new Padding(4);
             Name = "Form1";
-            Text = "Form1";
+            Text = "质控";
             ResumeLayout(false);
         }
 
         #endregion
         private FolderBrowserDialog folderBrowserDialog1;
-        private Button button1;
+        private Button button2;
     }
 }

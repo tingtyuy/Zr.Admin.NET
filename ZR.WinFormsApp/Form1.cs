@@ -4,6 +4,7 @@ using Mapster;
 using Masuit.Tools;
 using Masuit.Tools.Database;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.VisualBasic.ApplicationServices;
 using MiniExcelLibs;
@@ -31,23 +32,48 @@ namespace ZR.WinFormsApp
             logHelper = new Common.LogHelper(false);
         }
         /// <summary>
-        /// 选择目录
+        /// 导出太仓日报
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-            folderBrowserDialog1.Description = "请选择文件夹";
-            //folderBrowserDialog1.RootFolder = @"D:\\123456789\\md\\运单-账单计算\\MD-2025-09-账单数据"; 
-            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            var timeStamp = .GetTimeStamp(DateTime.Now, true);
+            // 获取当前应用程序的 bin/Debug 或 bin/Release 目录
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+
+            // 设置输出文件的路径
+            string path = Path.Combine(basePath, "out", "太仓申通网点质控日报.xlsx");
+
+            // 如果模板文件在项目根目录的 Templates 文件夹中
+            // 需要先复制到 bin 目录，或者使用相对路径
+            string templatePath = Path.Combine(basePath, "res","太仓申通网点质控日报-模板.xlsx");
+
+            // 检查模板文件是否存在
+            if (!File.Exists(templatePath))
             {
-                string selectedPath = folderBrowserDialog1.SelectedPath;
-                //MessageBox.Show("您选择的文件夹路径是: " + selectedPath);
-                //Test(selectedPath);
+                // 如果模板文件不存在，提示或创建
+                MessageBox.Show($"模板文件不存在: {templatePath}");
+                return;
             }
 
-        }
+            var value = new
+            {
+                Name = "Jack",
+                CreateDate = new DateTime(2021, 01, 01),
+                VIP = true,
+                Points = 123
+            };
 
-       
+            try
+            {
+                MiniExcel.SaveAsByTemplate(path, templatePath, value);
+                MessageBox.Show($"文件保存成功: {path}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"保存文件时出错: {ex.Message}");
+            }
+        }
     }
 }

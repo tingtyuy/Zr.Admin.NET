@@ -150,4 +150,10 @@
     <Folder Include="models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="res\太仓申通网点质控日报-模板.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
