@@ -257,7 +257,6 @@ import { getToken } from '@/utils/auth'
 import { treeselect } from '@/api/system/dept'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import { getDictList }from '@/api/business/company.js'
 
 export default {
   name: 'user',
