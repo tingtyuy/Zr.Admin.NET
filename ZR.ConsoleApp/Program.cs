@@ -13,5 +13,6 @@ using ZR.ConsoleApp;
 /// 2.查询最新的公式计算结果
 /// 3.批量导入excel文件，生成对应的数据库表
 //ExcelImportDemo.Run();
-await RulesEngineDemo.Run();
+//await RulesEngineDemo.Run();
+await MusicDemo.Run();
 
