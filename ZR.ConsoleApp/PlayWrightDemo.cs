@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.Playwright;
 using System;
 using System.Threading.Tasks;
 using ZR.Service;
@@ -11,58 +12,70 @@ namespace ZR.ConsoleApp
         public async static Task Run()
         {
             using var playwright = await Playwright.CreateAsync();
-            await using var browser = await playwright.Chromium.LaunchAsync(new()
+            await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
             {
                 Channel = "msedge",
                 Headless = false,
             });
-            // 加载已保存的登录状态
-            var context = await browser.NewContextAsync();
+            var storagePath = "auth.json";
+            var context = await browser.NewContextAsync(new BrowserNewContextOptions() { StorageStatePath = storagePath });
 
-            //检测时候登录
-            IPlayWrightService playWrightService = new PlayWrightService();
-            bool isLoggedIn = await playWrightService.IsLoggedInAsync("auth.json");
-
-            if (!isLoggedIn)
+            await context.StorageStateAsync(new BrowserContextStorageStateOptions
             {
-
-                // 如果未登录，提示用户登录并保存状态
-                Console.WriteLine("请先登录到 https://www.doubao.com/chat，然后按任意键继续...");
-                Console.ReadKey();
-
-            }
-            // 保存当前登录状态到文件
-            await context.StorageStateAsync(new()
-            {
-                Path = "auth.json"
+                Path = storagePath
             });
-            // 重新创建上下文以加载新的登录状态
-            context = await browser.NewContextAsync(new()
-            {
-                StorageStatePath = "auth.json"
-            });
-
             var page = await context.NewPageAsync();
             await page.GotoAsync("https://www.doubao.com/chat");
-            await page.GetByText("新对话").ClickAsync();
-            await page.GetByTestId("chat_input_input").ClickAsync();
-            await page.GetByTestId("chat_input_input").FillAsync("你好");
-            await page.GetByTestId("chat_input_send_button").ClickAsync();
 
-            Console.WriteLine("\n按任意键退出...");
-            Console.ReadKey();
+            await IsLoginIn(page);
 
 
 
+            //// 关闭当前上下文并使用保存的 storage 重新创建上下文以确保后续页面是已登录状态
+            //await context.CloseAsync();
+            //context = await browser.NewContextAsync(new BrowserNewContextOptions
+            //{
+            //    StorageStatePath = storagePath
+            //});
+
+            //page = await context.NewPageAsync();
+            //await page.GotoAsync("https://www.doubao.com/chat");
+
+            //Console.WriteLine("已检测到登录状态，继续执行...");
 
 
+            //// 已登录，继续后续操作
+            //await page.GetByText("新对话").ClickAsync();
+            //await page.GetByTestId("chat_input_input").ClickAsync();
+            //await page.GetByTestId("chat_input_input").FillAsync("你好");
+            //await page.GetByTestId("chat_input_send_button").ClickAsync();
 
+            //Console.WriteLine("\n按任意键退出...");
+            //Console.ReadKey();
 
-
-
+            //// 清理
+            //await context.CloseAsync();
         }
 
+        private static async Task IsLoginIn(IPage page)
+        {
+            var loginStatusElement = await page.WaitForSelectorAsync("data-testid=to_login_button", new PageWaitForSelectorOptions { Timeout = 3000 });
+            if (loginStatusElement != null)
+            {
+                Console.WriteLine("请先登录!然后按y继续");
+                if (Console.ReadKey().KeyChar != 'y')
+                {
+                    Console.WriteLine("操作错误,程序退出!!");
 
+                }
+                else
+                {
+                    await IsLoginIn(page);
 
+                }
+
+            }
+            Console.WriteLine("已经成功进入主页面!");
+        }
     }
 }
