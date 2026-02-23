@@ -12,22 +12,24 @@ namespace ZR.ConsoleApp
         public async static Task Run()
         {
             using var playwright = await Playwright.CreateAsync();
-            await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
+            await using var browser = await playwright.Chromium.LaunchAsync(new()
             {
                 Channel = "msedge",
                 Headless = false,
             });
+
             var storagePath = "auth.json";
             var context = await browser.NewContextAsync(new BrowserNewContextOptions() { StorageStatePath = storagePath });
 
-            await context.StorageStateAsync(new BrowserContextStorageStateOptions
-            {
-                Path = storagePath
-            });
-            var page = await context.NewPageAsync();
-            await page.GotoAsync("https://www.doubao.com/chat");
+             context = await OpenPage(browser, storagePath, context, "https://www.doubao.com/chat", "豆包", async page => { try { return await page.GetByTestId("to_login_button").IsVisibleAsync(); } catch { return false; } });
 
-            await IsLoginIn(page);
+             context = await OpenPage(browser, storagePath, context, "https://chat.deepseek.com", "deepseek", async page => { try { return await page.GetByRole(AriaRole.Button, new() { Name = "登录" }).IsVisibleAsync(); } catch { return false; } });
+            Console.ReadKey();
+
+
+
+
+
 
 
 
@@ -57,25 +59,101 @@ namespace ZR.ConsoleApp
             //await context.CloseAsync();
         }
 
-        private static async Task IsLoginIn(IPage page)
+        private static async Task<IBrowserContext> OpenPage(IBrowser browser, string storagePath, IBrowserContext context, string websiteUrl, string websiteName, Func<IPage, Task<bool>> isLoginCheck)
         {
-            var loginStatusElement = await page.WaitForSelectorAsync("data-testid=to_login_button", new PageWaitForSelectorOptions { Timeout = 3000 });
-            if (loginStatusElement != null)
+            var page = await context.NewPageAsync();
+            await page.GotoAsync(websiteUrl);
+            Thread.Sleep(3000); // 等待页面加载完成，实际使用中可以根据需要调整等待时间或使用更智能的等待方式
+                                //await page.GotoAsync(websiteUrl, new PageGotoOptions
+                                //{
+                                //    WaitUntil = WaitUntilState.Load, // 等待网络空闲
+                                //    //LoadState.DOMContentLoaded：DOM 解析完成（最快）
+                                //    //LoadState.Load：页面完全加载（包括样式、图片等资源）
+                                //    //LoadState.NetworkIdle：网络空闲（500ms 内没有网络请求）
+
+            //    Timeout = 6000 // 30秒超时
+            //});
+
+            //判断登录状态
+            var newContext = await IsLoginIn(browser, storagePath, context, page, isLoginCheck, websiteName);
+            // 重新创建页面以确保使用新的上下文
+            var newPage = await newContext.NewPageAsync();
+            await newPage.GotoAsync(websiteUrl);
+            return newContext;
+        }
+
+        private static async Task<IBrowserContext> IsLoginIn(IBrowser browser, string storagePath, IBrowserContext context, IPage page, Func<IPage, Task<bool>> isLoginCheck, string websiteName)
+        {
+
+            //var loginButtion = await page.QuerySelectorAsync("data-testid=to_login_button");
+
+            //var loginStatusElement = await doubaoPage.WaitForSelectorAsync("data-testid=to_login_button", new PageWaitForSelectorOptions { Timeout = 3000 });
+
+            // 使用传入的回调判断是否存在登录按钮
+            var hasLoginId = await isLoginCheck(page);
+            IBrowserContext? newContext = null;
+            if (!hasLoginId)
             {
-                Console.WriteLine("请先登录!然后按y继续");
-                if (Console.ReadKey().KeyChar != 'y')
+                Console.WriteLine($"{websiteName},成功打开!");
+                await context.StorageStateAsync(new BrowserContextStorageStateOptions
                 {
-                    Console.WriteLine("操作错误,程序退出!!");
-
-                }
-                else
+                    Path = storagePath
+                });
+                await context.CloseAsync();
+                newContext = await browser.NewContextAsync(new BrowserNewContextOptions
                 {
-                    await IsLoginIn(page);
+                    StorageStatePath = storagePath
+                });
+                Console.WriteLine($"{websiteName},已存储登录状态!");
+            }
+            else
+            {
 
-                }
+                newContext= await RequiredLoginAsync(browser, storagePath, context, page, isLoginCheck, websiteName);
 
             }
-            Console.WriteLine("已经成功进入主页面!");
+            if (newContext is null)
+            {
+
+                return context;
+            }
+            else
+            {
+                return newContext;
+            }
         }
+
+        private static async Task<IBrowserContext> RequiredLoginAsync(IBrowser browser, string storagePath, IBrowserContext context, IPage doubaoPage, Func<IPage, Task<bool>> isLoginCheck, string websiteName)
+        {
+            Console.WriteLine($"请先登录,{websiteName}!!! 登陆后按y键继续");
+            if (Console.ReadKey().KeyChar == 'y')
+            {
+                Console.WriteLine("用户已确认登录,重新验证");
+               return await IsLoginIn(browser, storagePath, context, doubaoPage, isLoginCheck, websiteName);
+
+            }
+            else
+            {
+                return await RequiredLoginAsync(browser, storagePath, context, doubaoPage, isLoginCheck, websiteName);
+            }
+        }
+
+        private async Task Demo()
+        {
+            using var playwright = await Playwright.CreateAsync();
+            await using var browser = await playwright.Chromium.LaunchAsync(new()
+            {
+                Channel = "msedge",
+                Headless = false,
+            });
+            var context = await browser.NewContextAsync();
+
+            var page = await context.NewPageAsync();
+            await page.GotoAsync("https://www.doubao.com/chat");
+
+            Console.ReadKey();
+        }
+
+
     }
 }
