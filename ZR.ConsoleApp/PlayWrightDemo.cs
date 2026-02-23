@@ -23,7 +23,10 @@ namespace ZR.ConsoleApp
 
              context = await OpenPage(browser, storagePath, context, "https://www.doubao.com/chat", "豆包", async page => { try { return await page.GetByTestId("to_login_button").IsVisibleAsync(); } catch { return false; } });
 
-             context = await OpenPage(browser, storagePath, context, "https://chat.deepseek.com", "deepseek", async page => { try { return await page.GetByRole(AriaRole.Button, new() { Name = "登录" }).IsVisibleAsync(); } catch { return false; } });
+
+
+
+            context = await OpenPage(browser, storagePath, context, "https://chat.deepseek.com", "deepseek", async page => { try { return await page.GetByRole(AriaRole.Button, new() { Name = "登录" }).IsVisibleAsync(); } catch { return false; } });
             Console.ReadKey();
 
 
@@ -79,6 +82,14 @@ namespace ZR.ConsoleApp
             // 重新创建页面以确保使用新的上下文
             var newPage = await newContext.NewPageAsync();
             await newPage.GotoAsync(websiteUrl);
+            //await page.GetByTestId("create_conversation_button").GetByText("新对话").ClickAsync();
+            //await page.GetByTestId("chat_input_input").ClickAsync();
+            //await page.GetByTestId("chat_input_input").FillAsync("你好");
+
+            //await page.GetByText("开启新对话").ClickAsync();
+            //await page.GetByRole(AriaRole.Textbox, new() { Name = "给 DeepSeek 发送消息" }).ClickAsync();
+            //await page.GetByRole(AriaRole.Textbox, new() { Name = "给 DeepSeek 发送消息" }).FillAsync("你好");
+
             return newContext;
         }
 
