@@ -16,4 +16,5 @@ using ZR.Infrastructure.Extensions;
 //ExcelImportDemo.Run();
 //await RulesEngineDemo.Run();
 //await MusicDemo.Run();
-await PlayWrightDemo.Run();
+//await PlayWrightDemo.Run();
+await YouTuBeVless.RunAsync();
