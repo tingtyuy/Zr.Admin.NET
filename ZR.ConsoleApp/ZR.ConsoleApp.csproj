@@ -13,6 +13,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZR.Common\ZR.Common.csproj" />
+    <ProjectReference Include="..\ZR.Service\ZR.Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

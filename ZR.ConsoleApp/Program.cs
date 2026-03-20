@@ -14,5 +14,6 @@ using ZR.ConsoleApp;
 /// 3.批量导入excel文件，生成对应的数据库表
 //ExcelImportDemo.Run();
 //await RulesEngineDemo.Run();
-await MusicDemo.Run();
+//await MusicDemo.Run();
+await OllamaDemo.Run();
 
