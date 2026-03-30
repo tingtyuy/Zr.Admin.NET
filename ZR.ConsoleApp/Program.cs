@@ -17,7 +17,6 @@ using ZR.Infrastructure.Extensions;
 //await RulesEngineDemo.Run();
 //await MusicDemo.Run();
 //await PlayWrightDemo.Run();
+//await OllamaDemo.Run();
 await YouTuBeVless.RunAsync();
-//await MusicDemo.Run();
-await OllamaDemo.Run();
 
