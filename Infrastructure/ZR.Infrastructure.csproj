@@ -23,6 +23,7 @@
 		<PackageReference Include="AspectCore.Abstractions" Version="2.4.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="OllamaSharp" Version="5.4.24" />
 		<PackageReference Include="UAParser" Version="3.1.47" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
 		<PackageReference Include="JinianNet.JNTemplate" Version="2.4.2" />

@@ -18,3 +18,6 @@ using ZR.Infrastructure.Extensions;
 //await MusicDemo.Run();
 //await PlayWrightDemo.Run();
 await YouTuBeVless.RunAsync();
+//await MusicDemo.Run();
+await OllamaDemo.Run();
+
