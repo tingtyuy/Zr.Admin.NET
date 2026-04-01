@@ -255,11 +255,9 @@ namespace ZR.Admin.WebApi.Controllers.Business
         public IActionResult ReMatch([FromBody] TbResultMatchDto parm)
         {
 
-
             long userId = HttpContext.GetUId();
             var user = sysUserService.SelectUserById(userId);
             parm.CompanyId = user.Remark;
-
 
             var model2 = _tbContactService.GetFirst(w => w.CompanyId == parm.CompanyId
               && w.IsEnable == false
@@ -267,16 +265,7 @@ namespace ZR.Admin.WebApi.Controllers.Business
               && w.客户商家名称 == parm.商家名称
               && w.对接方式 == "微信"
               );
-            model2.群名称 = parm.群名称;
-            model2.account = user.NickName;
-            model2.匹配时间 = DateTime.Now;
-
-            //if (model2 != null)
-            //{
-            //    var msg = $"商户群已经匹配过了:{model2.群名称}";
-            //    return ToResponse(ResultCode.FAIL, msg); //
-            //}
-
+   
             if (parm.Ids.Any())
             {
                 foreach (var item in parm.Ids)
@@ -288,23 +277,35 @@ namespace ZR.Admin.WebApi.Controllers.Business
                     _TbResultService.Update(model);
                 }
             }
+            if (model2 is null)
+            {
+
+                var tbContactModel = new TbContact();
+                tbContactModel.CompanyId = parm.CompanyId;
+                tbContactModel.IsEnable = false;
+                //tbContactModel.IsMatch = true;
+                //tbContactModel.MatchParam = "";
+                tbContactModel.客户 = parm.收件人信息;
+                tbContactModel.客户商家名称 = parm.商家名称;
+                tbContactModel.对接方式 = "微信";
+                tbContactModel.群名称 = parm.群名称;
+                tbContactModel.account = user.NickName;
+                tbContactModel.匹配时间 = DateTime.Now;
 
 
-            //var tbContactModel = new TbContact();
-            //tbContactModel.CompanyId = parm.CompanyId;
-            //tbContactModel.IsEnable = false;
-            ////tbContactModel.IsMatch = true;
-            ////tbContactModel.MatchParam = "";
-            //tbContactModel.客户 = parm.收件人信息;
-            //tbContactModel.客户商家名称 = parm.商家名称;
-            //tbContactModel.对接方式 = "微信";
-            //tbContactModel.群名称 = parm.群名称;
-            //tbContactModel.account = user.NickName;
-            //tbContactModel.匹配时间 = DateTime.Now;
+                var response = _tbContactService.AddTbContact(tbContactModel);
+                return SUCCESS(response);
+            }
+            else {
+                model2.群名称 = parm.群名称;
+                model2.account = user.NickName;
+                model2.匹配时间 = DateTime.Now;
 
-
-            var response = _tbContactService.UpdateTbContact(model2);
-            return SUCCESS(response);
+                var response = _tbContactService.UpdateTbContact(model2);
+                return SUCCESS(response);
+            }
+  
+     
         }
 
         /// <summary>
