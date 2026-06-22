@@ -1,126 +1,177 @@
-using Infrastructure.Extensions;
-using Infrastructure.Helper;
-using Mapster;
-using Masuit.Tools;
-using Masuit.Tools.Database;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.IdentityModel.Logging;
-using Microsoft.VisualBasic.ApplicationServices;
-using MiniExcelLibs;
 using RasterEdge.Imaging.Basic;
 using RasterEdge.XDoc.Word;
-using Serilog.Events;
-using SharpCompress.Common;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SqlSugar;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using ZR.Common;
-using ZR.Common.ExcelHelper;
 using ZR.Infrastructure.Images;
-using static NPOI.SS.Formula.Functions.Countif;
-namespace ZR.WinFormsApp
+using PdfSharp.Pdf;
+using PdfSharp.Drawing;
+
+namespace ZR.WinFormsApp;
+
+public partial class Form1 : Form
 {
-    public partial class Form1 : Form
+    private string? _selectedFolder;
+    private string? _wordFilePath;
+
+    public Form1()
     {
-        public readonly DbHelper dbHelper;
-        public readonly Common.LogHelper logHelper;
-        public Form1()
-        {
-            InitializeComponent();
-            dbHelper = new DbHelper();
-            logHelper = new Common.LogHelper(false);
-        }
-        /// <summary>
-        /// ѡ��Ŀ¼
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
-        {
-            folderBrowserDialog1.Description = "��ѡ���ļ���";
-            //folderBrowserDialog1.RootFolder = @"D:\\123456789\\md\\�˵�-�˵�����\\MD-2025-09-�˵�����"; 
-            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
-            {
-                string selectedPath = folderBrowserDialog1.SelectedPath;
-                //MessageBox.Show("��ѡ����ļ���·����: " + selectedPath);
-                //Test(selectedPath);
-            }
+        InitializeComponent();
+    }
 
-        }
-        /// <summary>
-        /// Select Word
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button3_Click(object sender, EventArgs e)
+    private void btnSelectFolder_Click(object sender, EventArgs e)
+    {
+        folderBrowserDialog1.Description = "请选择工作目录";
+        if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
         {
-            // 1. ���� Word �ĵ�
-            string filePath = @"";
-            //string filePath = @"C:\Users\ms363\Desktop\��ͬ����\ʯ��ׯ-��ͬ\������ͨ���º�ͬ .docx";
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                filePath = openFileDialog1.FileName;
-                lbWordInputPath.Text = filePath;
-            }
-
+            _selectedFolder = folderBrowserDialog1.SelectedPath;
+            lbSelectedFolder.Text = _selectedFolder;
         }
-        /// <summary>
-        /// Word To Image
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button2_Click(object sender, EventArgs e)
-        {
+    }
 
-            DOCXDocument doc = new DOCXDocument(lbWordInputPath.Text);
-            var outputDir = Path.Combine(Path.GetDirectoryName(lbWordInputPath.Text), "output");
+    private void btnInit_Click(object sender, EventArgs e)
+    {
+        if (_selectedFolder != null && Directory.Exists(_selectedFolder))
+        {
+            System.Diagnostics.Process.Start("explorer.exe", _selectedFolder);
+        }
+        else
+        {
+            MessageBox.Show("请先选择一个有效目录", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+    }
+
+    private void btnSelectWord_Click(object sender, EventArgs e)
+    {
+        openFileDialog1.Filter = "Word 文档|*.docx;*.doc|所有文件|*.*";
+        if (openFileDialog1.ShowDialog() == DialogResult.OK)
+        {
+            _wordFilePath = openFileDialog1.FileName;
+            lbWordPath.Text = _wordFilePath;
+        }
+    }
+
+    private void btnWordToImage_Click(object sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(_wordFilePath) || !File.Exists(_wordFilePath))
+        {
+            MessageBox.Show("请先选择一个有效的 Word 文件", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        try
+        {
+            DOCXDocument doc = new DOCXDocument(_wordFilePath);
+            var outputDir = Path.Combine(Path.GetDirectoryName(_wordFilePath)!, "output");
             doc.ConvertToImages(ImageType.PNG, outputDir, "page");
-            MessageBox.Show("ת�����");
+            MessageBox.Show($"转换完成！图片保存在：{outputDir}", "完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        /// <summary>
-        /// Merge Image To 1
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void button4_ClickAsync(object sender, EventArgs e)
+        catch (Exception ex)
         {
-            var btn = sender as Button;
-            btn.Enabled = false;
-            btn.Text = "������...";
-            // ʹ��ʾ��
-            string folderPath = @"C:\output\";
-            string outputPath = @"C:\output\merged\long_image.png";
+            MessageBox.Show($"转换失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
 
-            await ImageMerger.MergeImagesVerticallyAsync(folderPath, outputPath);
+    private async void btnMergeImages_ClickAsync(object sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(_selectedFolder) || !Directory.Exists(_selectedFolder))
+        {
+            MessageBox.Show("请先选择一个有效目录", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
 
+        var btn = (Button)sender;
+        btn.Enabled = false;
+        btn.Text = "合并中...";
+
+        try
+        {
+            string outputPath = Path.Combine(_selectedFolder, "merged.png");
+            await ImageMerger.MergeImagesVerticallyAsync(_selectedFolder, outputPath);
+            MessageBox.Show($"合并完成！文件保存在：{outputPath}", "完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"合并失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
             btn.Enabled = true;
-            btn.Text = "Merge Image To 1";
+            btn.Text = "纵向合并图片";
         }
+    }
 
-        private void button5_Click(object sender, EventArgs e)
+    private async void btnImagesToPdf_Click(object sender, EventArgs e)
+    {
+        if (openFileDialogImages.ShowDialog() != DialogResult.OK)
+            return;
+
+        if (openFileDialogImages.FileNames.Length == 0)
+            return;
+
+        saveFileDialog1.FileName = "output.pdf";
+        if (saveFileDialog1.ShowDialog() != DialogResult.OK)
+            return;
+
+        var btn = (Button)sender;
+        btn.Enabled = false;
+        btn.Text = "转换中...";
+
+        try
         {
-            lbWordInputPath.Text = folderBrowserDialog1.InitialDirectory;
-        }
+            var imageFiles = openFileDialogImages.FileNames
+                .Where(f => IsImageFile(f))
+                .OrderBy(f => f)
+                .ToList();
 
-        private void Form1_Load(object sender, EventArgs e)
+            if (imageFiles.Count == 0)
+            {
+                MessageBox.Show("未选择有效的图片文件", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            await Task.Run(() =>
+            {
+                using var document = new PdfDocument();
+                foreach (var imageFile in imageFiles)
+                {
+                    using var img = XImage.FromFile(imageFile);
+                    var page = document.AddPage();
+                    page.Width = XUnit.FromPoint(img.PointWidth);
+                    page.Height = XUnit.FromPoint(img.PointHeight);
+                    using var gfx = XGraphics.FromPdfPage(page);
+                    gfx.DrawImage(img, 0, 0);
+                }
+                document.Save(saveFileDialog1.FileName);
+            });
+
+            MessageBox.Show($"PDF 生成完成！共 {imageFiles.Count} 页\n文件保存在：{saveFileDialog1.FileName}",
+                "完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
         {
-
+            MessageBox.Show($"转换失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-
-        private void excelToolStripMenuItem_Click(object sender, EventArgs e)
+        finally
         {
-             
+            btn.Enabled = true;
+            btn.Text = "多图片转 PDF";
         }
+    }
 
-        private void tempToolStripMenuItem_Click(object sender, EventArgs e)
-        {
+    private void excelMenuItem_Click(object sender, EventArgs e)
+    {
+        var excelForm = new Excel.ExcelMainForm();
+        excelForm.ShowDialog();
+    }
 
-        }
+    private void tempMenuItem_Click(object sender, EventArgs e)
+    {
+        MessageBox.Show("此功能开发中...", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
+    private static bool IsImageFile(string path)
+    {
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        return ext is ".jpg" or ".jpeg" or ".png" or ".bmp" or ".gif" or ".tiff" or ".webp";
     }
 }

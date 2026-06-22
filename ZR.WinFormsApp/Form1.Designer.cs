@@ -1,215 +1,219 @@
-﻿namespace ZR.WinFormsApp
+﻿namespace ZR.WinFormsApp;
+
+partial class Form1
 {
-    partial class Form1
+    private System.ComponentModel.IContainer components = null;
+
+    protected override void Dispose(bool disposing)
     {
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
-
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
+        if (disposing && (components != null))
         {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
+            components.Dispose();
         }
-
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            folderBrowserDialog1 = new FolderBrowserDialog();
-            button1 = new Button();
-            button2 = new Button();
-            button3 = new Button();
-            groupBox1 = new GroupBox();
-            lbWordInputPath = new Label();
-            groupBox2 = new GroupBox();
-            button4 = new Button();
-            button5 = new Button();
-            openFileDialog1 = new OpenFileDialog();
-            menuStrip1 = new MenuStrip();
-            excelToolStripMenuItem = new ToolStripMenuItem();
-            wordToolStripMenuItem = new ToolStripMenuItem();
-            imageToolStripMenuItem = new ToolStripMenuItem();
-            tempToolStripMenuItem = new ToolStripMenuItem();
-            groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
-            menuStrip1.SuspendLayout();
-            SuspendLayout();
-            // 
-            // button1
-            // 
-            button1.Location = new Point(40, 70);
-            button1.Margin = new Padding(4);
-            button1.Name = "button1";
-            button1.Size = new Size(96, 27);
-            button1.TabIndex = 0;
-            button1.Text = "选择目录";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
-            // 
-            // button2
-            // 
-            button2.Location = new Point(16, 101);
-            button2.Name = "button2";
-            button2.Size = new Size(165, 29);
-            button2.TabIndex = 1;
-            button2.Text = "Word To Image";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
-            // 
-            // button3
-            // 
-            button3.Location = new Point(179, 35);
-            button3.Margin = new Padding(4);
-            button3.Name = "button3";
-            button3.Size = new Size(153, 27);
-            button3.TabIndex = 2;
-            button3.Text = "Select Word";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(lbWordInputPath);
-            groupBox1.Controls.Add(button3);
-            groupBox1.Controls.Add(button2);
-            groupBox1.Location = new Point(715, 160);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(596, 420);
-            groupBox1.TabIndex = 3;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Word";
-            // 
-            // lbWordInputPath
-            // 
-            lbWordInputPath.AutoSize = true;
-            lbWordInputPath.Location = new Point(28, 42);
-            lbWordInputPath.Name = "lbWordInputPath";
-            lbWordInputPath.Size = new Size(144, 20);
-            lbWordInputPath.TabIndex = 3;
-            lbWordInputPath.Text = "请选择WORD路径...";
-            // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(button4);
-            groupBox2.Location = new Point(715, 652);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(621, 408);
-            groupBox2.TabIndex = 4;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Image";
-            // 
-            // button4
-            // 
-            button4.Location = new Point(29, 39);
-            button4.Name = "button4";
-            button4.Size = new Size(187, 29);
-            button4.TabIndex = 0;
-            button4.Text = "Merge Image To 1";
-            button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_ClickAsync;
-            // 
-            // button5
-            // 
-            button5.Location = new Point(191, 68);
-            button5.Name = "button5";
-            button5.Size = new Size(94, 29);
-            button5.TabIndex = 5;
-            button5.Text = "Init";
-            button5.UseVisualStyleBackColor = true;
-            button5.Click += button5_Click;
-            // 
-            // openFileDialog1
-            // 
-            openFileDialog1.FileName = "openFileDialog1";
-            // 
-            // menuStrip1
-            // 
-            menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { excelToolStripMenuItem, wordToolStripMenuItem, imageToolStripMenuItem, tempToolStripMenuItem });
-            menuStrip1.Location = new Point(0, 0);
-            menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1440, 28);
-            menuStrip1.TabIndex = 6;
-            menuStrip1.Text = "menuStrip1";
-            // 
-            // excelToolStripMenuItem
-            // 
-            excelToolStripMenuItem.Name = "excelToolStripMenuItem";
-            excelToolStripMenuItem.Size = new Size(60, 24);
-            excelToolStripMenuItem.Text = "Excel";
-            excelToolStripMenuItem.Click += excelToolStripMenuItem_Click;
-            // 
-            // wordToolStripMenuItem
-            // 
-            wordToolStripMenuItem.Name = "wordToolStripMenuItem";
-            wordToolStripMenuItem.Size = new Size(64, 24);
-            wordToolStripMenuItem.Text = "Word";
-            // 
-            // imageToolStripMenuItem
-            // 
-            imageToolStripMenuItem.Name = "imageToolStripMenuItem";
-            imageToolStripMenuItem.Size = new Size(68, 24);
-            imageToolStripMenuItem.Text = "Image";
-            // 
-            // tempToolStripMenuItem
-            // 
-            tempToolStripMenuItem.Name = "tempToolStripMenuItem";
-            tempToolStripMenuItem.Size = new Size(65, 24);
-            tempToolStripMenuItem.Text = "Temp";
-            tempToolStripMenuItem.Click += tempToolStripMenuItem_Click;
-            // 
-            // Form1
-            // 
-            AutoScaleDimensions = new SizeF(9F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1440, 960);
-            Controls.Add(button5);
-            Controls.Add(groupBox2);
-            Controls.Add(groupBox1);
-            Controls.Add(button1);
-            Controls.Add(menuStrip1);
-            MainMenuStrip = menuStrip1;
-            Margin = new Padding(4);
-            Name = "Form1";
-            Text = "Form1";
-            Load += Form1_Load;
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
-            groupBox2.ResumeLayout(false);
-            menuStrip1.ResumeLayout(false);
-            menuStrip1.PerformLayout();
-            ResumeLayout(false);
-            PerformLayout();
-        }
-
-        #endregion
-        private FolderBrowserDialog folderBrowserDialog1;
-        private Button button1;
-        private Button button2;
-        private Button button3;
-        private GroupBox groupBox1;
-        private GroupBox groupBox2;
-        private Button button4;
-        private Label lbWordInputPath;
-        private Button button5;
-        private OpenFileDialog openFileDialog1;
-        private MenuStrip menuStrip1;
-        private ToolStripMenuItem excelToolStripMenuItem;
-        private ToolStripMenuItem wordToolStripMenuItem;
-        private ToolStripMenuItem imageToolStripMenuItem;
-        private ToolStripMenuItem tempToolStripMenuItem;
+        base.Dispose(disposing);
     }
+
+    private void InitializeComponent()
+    {
+        folderBrowserDialog1 = new FolderBrowserDialog();
+        btnSelectFolder = new Button();
+        btnWordToImage = new Button();
+        btnSelectWord = new Button();
+        gbWord = new GroupBox();
+        lbWordPath = new Label();
+        gbImage = new GroupBox();
+        btnMergeImages = new Button();
+        btnImagesToPdf = new Button();
+        btnInit = new Button();
+        openFileDialog1 = new OpenFileDialog();
+        menuStrip1 = new MenuStrip();
+        excelMenuItem = new ToolStripMenuItem();
+        wordMenuItem = new ToolStripMenuItem();
+        imageMenuItem = new ToolStripMenuItem();
+        tempMenuItem = new ToolStripMenuItem();
+        lbSelectedFolder = new Label();
+        openFileDialogImages = new OpenFileDialog();
+        saveFileDialog1 = new SaveFileDialog();
+        gbWord.SuspendLayout();
+        gbImage.SuspendLayout();
+        menuStrip1.SuspendLayout();
+        SuspendLayout();
+
+        // btnSelectFolder
+        btnSelectFolder.Location = new Point(40, 70);
+        btnSelectFolder.Margin = new Padding(4);
+        btnSelectFolder.Name = "btnSelectFolder";
+        btnSelectFolder.Size = new Size(96, 27);
+        btnSelectFolder.TabIndex = 0;
+        btnSelectFolder.Text = "选择目录";
+        btnSelectFolder.UseVisualStyleBackColor = true;
+        btnSelectFolder.Click += btnSelectFolder_Click;
+
+        // lbSelectedFolder
+        lbSelectedFolder.AutoSize = true;
+        lbSelectedFolder.Location = new Point(145, 75);
+        lbSelectedFolder.Name = "lbSelectedFolder";
+        lbSelectedFolder.Size = new Size(80, 20);
+        lbSelectedFolder.TabIndex = 7;
+        lbSelectedFolder.Text = "未选择目录";
+
+        // btnInit
+        btnInit.Location = new Point(330, 68);
+        btnInit.Name = "btnInit";
+        btnInit.Size = new Size(94, 29);
+        btnInit.TabIndex = 5;
+        btnInit.Text = "打开目录";
+        btnInit.UseVisualStyleBackColor = true;
+        btnInit.Click += btnInit_Click;
+
+        // gbWord
+        gbWord.Controls.Add(lbWordPath);
+        gbWord.Controls.Add(btnSelectWord);
+        gbWord.Controls.Add(btnWordToImage);
+        gbWord.Location = new Point(40, 130);
+        gbWord.Name = "gbWord";
+        gbWord.Size = new Size(580, 200);
+        gbWord.TabIndex = 3;
+        gbWord.TabStop = false;
+        gbWord.Text = "Word 工具";
+
+        // lbWordPath
+        lbWordPath.AutoSize = true;
+        lbWordPath.Location = new Point(20, 42);
+        lbWordPath.Name = "lbWordPath";
+        lbWordPath.Size = new Size(128, 20);
+        lbWordPath.TabIndex = 3;
+        lbWordPath.Text = "请选择 Word 文件...";
+
+        // btnSelectWord
+        btnSelectWord.Location = new Point(20, 70);
+        btnSelectWord.Margin = new Padding(4);
+        btnSelectWord.Name = "btnSelectWord";
+        btnSelectWord.Size = new Size(153, 27);
+        btnSelectWord.TabIndex = 2;
+        btnSelectWord.Text = "选择 Word 文件";
+        btnSelectWord.UseVisualStyleBackColor = true;
+        btnSelectWord.Click += btnSelectWord_Click;
+
+        // btnWordToImage
+        btnWordToImage.Location = new Point(20, 110);
+        btnWordToImage.Name = "btnWordToImage";
+        btnWordToImage.Size = new Size(165, 29);
+        btnWordToImage.TabIndex = 1;
+        btnWordToImage.Text = "Word 转图片";
+        btnWordToImage.UseVisualStyleBackColor = true;
+        btnWordToImage.Click += btnWordToImage_Click;
+
+        // gbImage
+        gbImage.Controls.Add(btnMergeImages);
+        gbImage.Controls.Add(btnImagesToPdf);
+        gbImage.Location = new Point(40, 350);
+        gbImage.Name = "gbImage";
+        gbImage.Size = new Size(580, 200);
+        gbImage.TabIndex = 4;
+        gbImage.TabStop = false;
+        gbImage.Text = "图片工具";
+
+        // btnMergeImages
+        btnMergeImages.Location = new Point(20, 40);
+        btnMergeImages.Name = "btnMergeImages";
+        btnMergeImages.Size = new Size(200, 29);
+        btnMergeImages.TabIndex = 0;
+        btnMergeImages.Text = "纵向合并图片";
+        btnMergeImages.UseVisualStyleBackColor = true;
+        btnMergeImages.Click += btnMergeImages_ClickAsync;
+
+        // btnImagesToPdf
+        btnImagesToPdf.Location = new Point(20, 80);
+        btnImagesToPdf.Name = "btnImagesToPdf";
+        btnImagesToPdf.Size = new Size(200, 29);
+        btnImagesToPdf.TabIndex = 1;
+        btnImagesToPdf.Text = "多图片转 PDF";
+        btnImagesToPdf.UseVisualStyleBackColor = true;
+        btnImagesToPdf.Click += btnImagesToPdf_Click;
+
+        // openFileDialog1
+        openFileDialog1.FileName = "";
+
+        // openFileDialogImages
+        openFileDialogImages.FileName = "";
+        openFileDialogImages.Multiselect = true;
+        openFileDialogImages.Filter = "图片文件|*.jpg;*.jpeg;*.png;*.bmp;*.gif|所有文件|*.*";
+
+        // saveFileDialog1
+        saveFileDialog1.Filter = "PDF 文件|*.pdf";
+
+        // menuStrip1
+        menuStrip1.ImageScalingSize = new Size(20, 20);
+        menuStrip1.Items.AddRange(new ToolStripItem[] { excelMenuItem, wordMenuItem, imageMenuItem, tempMenuItem });
+        menuStrip1.Location = new Point(0, 0);
+        menuStrip1.Name = "menuStrip1";
+        menuStrip1.Size = new Size(700, 28);
+        menuStrip1.TabIndex = 6;
+        menuStrip1.Text = "menuStrip1";
+
+        // excelMenuItem
+        excelMenuItem.Name = "excelMenuItem";
+        excelMenuItem.Size = new Size(60, 24);
+        excelMenuItem.Text = "Excel";
+        excelMenuItem.Click += excelMenuItem_Click;
+
+        // wordMenuItem
+        wordMenuItem.Name = "wordMenuItem";
+        wordMenuItem.Size = new Size(64, 24);
+        wordMenuItem.Text = "Word";
+
+        // imageMenuItem
+        imageMenuItem.Name = "imageMenuItem";
+        imageMenuItem.Size = new Size(68, 24);
+        imageMenuItem.Text = "Image";
+
+        // tempMenuItem
+        tempMenuItem.Name = "tempMenuItem";
+        tempMenuItem.Size = new Size(65, 24);
+        tempMenuItem.Text = "Temp";
+        tempMenuItem.Click += tempMenuItem_Click;
+
+        // Form1
+        AutoScaleDimensions = new SizeF(9F, 20F);
+        AutoScaleMode = AutoScaleMode.Font;
+        ClientSize = new Size(700, 600);
+        Controls.Add(lbSelectedFolder);
+        Controls.Add(btnInit);
+        Controls.Add(gbImage);
+        Controls.Add(gbWord);
+        Controls.Add(btnSelectFolder);
+        Controls.Add(menuStrip1);
+        MainMenuStrip = menuStrip1;
+        Margin = new Padding(4);
+        Name = "Form1";
+        Text = "文档处理工具箱";
+        gbWord.ResumeLayout(false);
+        gbWord.PerformLayout();
+        gbImage.ResumeLayout(false);
+        menuStrip1.ResumeLayout(false);
+        menuStrip1.PerformLayout();
+        ResumeLayout(false);
+        PerformLayout();
+    }
+
+    private FolderBrowserDialog folderBrowserDialog1;
+    private Button btnSelectFolder;
+    private Button btnWordToImage;
+    private Button btnSelectWord;
+    private GroupBox gbWord;
+    private GroupBox gbImage;
+    private Button btnMergeImages;
+    private Button btnImagesToPdf;
+    private Label lbWordPath;
+    private Button btnInit;
+    private OpenFileDialog openFileDialog1;
+    private MenuStrip menuStrip1;
+    private ToolStripMenuItem excelMenuItem;
+    private ToolStripMenuItem wordMenuItem;
+    private ToolStripMenuItem imageMenuItem;
+    private ToolStripMenuItem tempMenuItem;
+    private Label lbSelectedFolder;
+    private OpenFileDialog openFileDialogImages;
+    private SaveFileDialog saveFileDialog1;
 }
