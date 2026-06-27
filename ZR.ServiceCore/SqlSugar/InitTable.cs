@@ -1,4 +1,4 @@
-﻿using SqlSugar.IOC;
+using SqlSugar.IOC;
 using ZR.Model;
 using ZR.Model.Content;
 using ZR.Model.Models;
@@ -26,7 +26,7 @@ namespace ZR.ServiceCore.SqlSugar
             
 
             if (!init) return;
-            StaticConfig.CodeFirst_MySqlCollate = "utf8mb4_general_ci";
+            StaticConfig.CodeFirst_MySqlCollate = "utf8mb3_general_ci";
             //建库：如果不存在创建数据库存在不会重复创建 
             db.DbMaintenance.CreateDatabase();// 注意 ：Oracle和个别国产库需不支持该方法，需要手动建库 
 
