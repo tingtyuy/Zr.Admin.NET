@@ -1,4 +1,4 @@
-﻿using Lazy.Captcha.Core;
+using Lazy.Captcha.Core;
 using Microsoft.AspNetCore.Mvc;
 using ZR.Model.Models;
 using ZR.Model.System;
@@ -55,11 +55,11 @@ namespace ZR.Admin.WebApi.Controllers.System
         {
             if (loginBody == null) { throw new CustomException("请求参数错误"); }
             loginBody.LoginIP = HttpContextExtension.GetClientUserIp(HttpContext);
-            SysConfig sysConfig = sysConfigService.GetSysConfigByKey("sys.account.captchaOnOff");
-            if (sysConfig?.ConfigValue != "off" && !SecurityCodeHelper.Validate(loginBody.Uuid, loginBody.Code))
-            {
-                return ToResponse(ResultCode.CAPTCHA_ERROR, "验证码错误");
-            }
+            // SysConfig sysConfig = sysConfigService.GetSysConfigByKey("sys.account.captchaOnOff");
+            // if (sysConfig?.ConfigValue == "on" && !SecurityCodeHelper.Validate(loginBody.Uuid, loginBody.Code))
+            // {
+            //     return ToResponse(ResultCode.CAPTCHA_ERROR, "验证码错误");
+            // }
 
             sysLoginService.CheckLockUser(loginBody.Username);
             string location = HttpContextExtension.GetIpInfo(loginBody.LoginIP);
@@ -149,14 +149,7 @@ namespace ZR.Admin.WebApi.Controllers.System
         [AllowAnonymous]
         public IActionResult CaptchaImage()
         {
-            string uuid = Guid.NewGuid().ToString().Replace("-", "");
-
-            SysConfig sysConfig = sysConfigService.GetSysConfigByKey("sys.account.captchaOnOff");
-            var captchaOff = sysConfig?.ConfigValue ?? "0";
-            var info = SecurityCodeHelper.Generate(uuid, 60);
-            var obj = new { captchaOff, uuid, img = info.Base64 };// File(stream, "image/png")
-
-            return SUCCESS(obj);
+            return SUCCESS(new { captchaOff = "off", uuid = "", img = "" });
         }
 
         /// <summary>

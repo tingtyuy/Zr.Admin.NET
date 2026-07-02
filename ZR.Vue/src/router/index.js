@@ -86,6 +86,39 @@ export const constantRoutes = [{
     component: (resolve) => require(['@/views/components/icons/index'], resolve),
     hidden: true
   },
+  {
+    path: '/ai',
+    component: Layout,
+    redirect: '/ai/submit',
+    name: 'AiModule',
+    meta: { title: 'AI功能', icon: 'guide' },
+    children: [
+      {
+        path: 'submit',
+        component: (resolve) => require(['@/views/ai/submit'], resolve),
+        name: 'AiSubmit',
+        meta: { title: 'AI图生图', icon: 'peoples' }
+      },
+      {
+        path: 'list',
+        component: (resolve) => require(['@/views/ai/list'], resolve),
+        name: 'AiList',
+        meta: { title: '任务列表', icon: 'documentation' }
+      },
+      {
+        path: 'result/:taskNo',
+        component: (resolve) => require(['@/views/ai/result'], resolve),
+        name: 'AiResult',
+        meta: { title: '任务详情', icon: 'documentation', hidden: true }
+      },
+      {
+        path: 'edit/:taskNo',
+        component: (resolve) => require(['@/views/ai/edit'], resolve),
+        name: 'AiEdit',
+        meta: { title: '编辑任务', icon: 'documentation', hidden: true }
+      }
+    ]
+  },
 ]
 
 export default new Router({

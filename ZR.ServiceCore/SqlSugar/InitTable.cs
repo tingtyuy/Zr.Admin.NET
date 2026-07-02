@@ -64,6 +64,8 @@ namespace ZR.ServiceCore.SqlSugar
             db.CodeFirst.InitTables(typeof(BannerConfig));
             db.CodeFirst.InitTables(typeof(SysUserMsg));
             db.CodeFirst.InitTables(typeof(SysFileGroup));
+            db.CodeFirst.InitTables(typeof(AiTask));
+            db.CodeFirst.InitTables(typeof(AiPromptTemplate));
             //db.CodeFirst.InitTables(typeof(SocialFans));
             //db.CodeFirst.InitTables(typeof(SocialFansInfo));
             //db.CodeFirst.InitTables(typeof(UserOnlineLog));

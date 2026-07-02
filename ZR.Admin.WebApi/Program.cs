@@ -12,6 +12,7 @@ using ZR.Common.DynamicApiSimple.Extens;
 using ZR.Infrastructure.WebExtensions;
 using ZR.ServiceCore.Signalr;
 using ZR.ServiceCore.SqlSugar;
+using ZR.ServiceCore.Services;
 using ZR.Mall;
 //using SQLitePCL;
 
@@ -52,6 +53,8 @@ builder.Services.AddSingleton(new AppSettings(builder.Configuration));
 builder.Services.AddAppService();
 //开启计划任务
 builder.Services.AddTaskSchedulers();
+//AI任务超时检测服务
+builder.Services.AddHostedService<AiTaskTimeoutService>();
 //请求大小限制
 builder.Services.AddRequestLimit(builder.Configuration);
 //sqlite 包需要的驱动
