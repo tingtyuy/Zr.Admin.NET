@@ -20,6 +20,12 @@ namespace ZR.Model.System
         public long UserId { get; set; }
 
         /// <summary>
+        /// 任务名称（如：首页、二图、三图、四图或自定义）
+        /// </summary>
+        [SugarColumn(Length = 100, IsNullable = true)]
+        public string TaskName { get; set; }
+
+        /// <summary>
         /// 功能类型: img2img
         /// </summary>
         [SugarColumn(Length = 50, DefaultValue = "img2img")]
@@ -66,15 +72,39 @@ namespace ZR.Model.System
         public int RetryCount { get; set; }
 
         /// <summary>
+        /// 处理尝试次数（每次fetch递增，callback时校验）
+        /// </summary>
+        [SugarColumn(DefaultValue = "0")]
+        public int AttemptCount { get; set; }
+
+        /// <summary>
+        /// 输入图MD5哈希（提交时计算，fetch时返回给N8N验证）
+        /// </summary>
+        [SugarColumn(Length = 32, IsNullable = true)]
+        public string InputImageHash { get; set; }
+
+        /// <summary>
         /// 错误信息
         /// </summary>
         [SugarColumn(ColumnDataType = StaticConfig.CodeFirst_BigString)]
         public string ErrorMessage { get; set; }
 
         /// <summary>
+        /// 标签(逗号分隔，如"2026-07-02,批次A")
+        /// </summary>
+        [SugarColumn(Length = 200, IsNullable = true)]
+        public string Tags { get; set; }
+
+        /// <summary>
         /// 扩展参数(JSON)
         /// </summary>
         [SugarColumn(IsJson = true, ColumnDataType = StaticConfig.CodeFirst_BigString)]
         public string ExtParams { get; set; }
+
+        /// <summary>
+        /// 发布状态: 0=未发布, 1=已发布
+        /// </summary>
+        [SugarColumn(DefaultValue = "0")]
+        public int PublishStatus { get; set; }
     }
 }

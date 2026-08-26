@@ -74,3 +74,43 @@ export function deleteTemplate(id) {
     method: 'POST',
   })
 }
+
+export function batchAddTags(taskNos, tags, removeTags) {
+  return request({
+    url: '/ai/task/batch-tags',
+    method: 'POST',
+    data: { taskNos, tags, removeTags },
+  })
+}
+
+export function batchDownloadResult(taskNos) {
+  return request({
+    url: '/ai/task/batch-download',
+    method: 'POST',
+    data: { taskNos },
+    responseType: 'blob',
+  })
+}
+
+export function getStoragePath() {
+  return request({
+    url: '/ai/task/storage-path',
+    method: 'GET',
+  })
+}
+
+export function getResultImages(params) {
+  return request({
+    url: '/ai/task/result-images',
+    method: 'GET',
+    params: params,
+  })
+}
+
+export function batchMarkPublished(taskNos) {
+  return request({
+    url: '/ai/task/batch-publish',
+    method: 'POST',
+    data: { taskNos },
+  })
+}

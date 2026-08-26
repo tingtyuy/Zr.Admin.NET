@@ -22,7 +22,7 @@ namespace ZR.Admin.WebApi.Controllers
 
         [HttpPost("submit")]
         [Log(Title = "AI任务提交", BusinessType = BusinessType.INSERT)]
-        public IActionResult Submit([FromForm] string prompt, IFormFile file)
+        public IActionResult Submit([FromForm] string prompt, IFormFile file, [FromForm] string tags = null, [FromForm] string taskName = null, [FromForm] int taskCount = 1)
         {
             if (string.IsNullOrEmpty(prompt))
             {
@@ -32,12 +32,26 @@ namespace ZR.Admin.WebApi.Controllers
             {
                 return ToResponse(ResultCode.PARAM_ERROR, "上传图片不能为空");
             }
+            if (taskCount < 1) taskCount = 1;
+            if (taskCount > 20) taskCount = 20;
 
             var userId = HttpContext.GetUId();
-            var dto = new AiTaskSubmitDto { Prompt = prompt };
-            long taskNo = _aiTaskService.SubmitTask(dto, file, userId);
+            var dto = new AiTaskSubmitDto { Prompt = prompt, Tags = tags, TaskName = taskName };
 
-            return SUCCESS(new { taskNo = taskNo.ToString() });
+            var taskNos = new List<string>();
+            for (int i = 0; i < taskCount; i++)
+            {
+                string name = taskName;
+                if (taskCount > 1 && !string.IsNullOrEmpty(taskName))
+                {
+                    name = $"{taskName}{i + 1}";
+                }
+                dto.TaskName = name;
+                long taskNo = _aiTaskService.SubmitTask(dto, file, userId);
+                taskNos.Add(taskNo.ToString());
+            }
+
+            return SUCCESS(new { taskNos });
         }
 
         [HttpGet("status/{taskNo}")]
@@ -61,6 +75,7 @@ namespace ZR.Admin.WebApi.Controllers
                 inputImageUrl = task.InputImagePath,
                 outputImageUrl = task.OutputImagePath,
                 prompt = task.Prompt,
+                tags = task.Tags,
                 createTime = task.Create_time,
                 completeTime = task.CompleteTime,
                 errorMessage = task.ErrorMessage
@@ -90,7 +105,9 @@ namespace ZR.Admin.WebApi.Controllers
                 taskNo = task.TaskNo.ToString(),
                 inputImageUrl = imageUrl,
                 prompt = task.Prompt,
-                extParams = task.ExtParams
+                extParams = task.ExtParams,
+                inputImageHash = task.InputImageHash,
+                attemptCount = task.AttemptCount
             });
         }
 
@@ -105,7 +122,7 @@ namespace ZR.Admin.WebApi.Controllers
 
         [HttpPost("upload")]
         [AllowAnonymous]
-        public IActionResult UploadResult([FromForm] string taskNo, [FromForm] string image)
+        public IActionResult UploadResult([FromForm] string taskNo, [FromForm] string image, [FromForm] string attemptCount = null)
         {
             if (string.IsNullOrEmpty(taskNo))
             {
@@ -120,9 +137,13 @@ namespace ZR.Admin.WebApi.Controllers
                 return ToResponse(ResultCode.PARAM_ERROR, "任务号格式错误");
             }
 
+            int? fetchAttempt = null;
+            if (!string.IsNullOrEmpty(attemptCount) && int.TryParse(attemptCount, out int ac))
+                fetchAttempt = ac;
+
             try
             {
-                var outputImageUrl = _aiTaskService.UploadBase64Image(taskNoLong, image);
+                var outputImageUrl = _aiTaskService.UploadBase64Image(taskNoLong, image, fetchAttempt);
                 return SUCCESS(new { outputImageUrl });
             }
             catch (Exception ex)
@@ -138,13 +159,13 @@ namespace ZR.Admin.WebApi.Controllers
             {
                 return ToResponse(ResultCode.PARAM_ERROR, "任务号格式错误");
             }
-            if (dto == null || string.IsNullOrEmpty(dto.Prompt))
+            if (dto == null)
             {
-                return ToResponse(ResultCode.PARAM_ERROR, "提示词不能为空");
+                return ToResponse(ResultCode.PARAM_ERROR, "参数错误");
             }
 
             var userId = HttpContext.GetUId();
-            var result = _aiTaskService.UpdateTask(taskNoLong, dto.Prompt, userId);
+            var result = _aiTaskService.UpdateTask(taskNoLong, dto.Prompt, userId, dto.Tags, dto.TaskName);
             if (result) return SUCCESS(new { message = "ok" });
             return ToResponse(ResultCode.CUSTOM_ERROR, "更新失败");
         }
@@ -157,7 +178,7 @@ namespace ZR.Admin.WebApi.Controllers
             {
                 return ToResponse(ResultCode.PARAM_ERROR, "参数错误");
             }
-            var result = _aiTaskService.CallbackSuccess(dto.TaskNo, dto.OutputImageUrl);
+            var result = _aiTaskService.CallbackSuccess(dto.TaskNo, dto.OutputImageUrl, dto.FetchAttemptCount);
             if (result) return SUCCESS(new { message = "ok" });
             return ToResponse(ResultCode.CUSTOM_ERROR, "回调处理失败");
         }
@@ -253,5 +274,113 @@ namespace ZR.Admin.WebApi.Controllers
             var result = _aiTaskService.DeleteTemplate(idLong, userId);
             return SUCCESS(result);
         }
+
+        /// <summary>
+        /// 批量管理标签
+        /// </summary>
+        [HttpPost("batch-tags")]
+        [Log(Title = "批量管理标签", BusinessType = BusinessType.UPDATE)]
+        public IActionResult BatchTags([FromBody] AiBatchTagsDto dto)
+        {
+            if (dto == null || dto.TaskNos == null || dto.TaskNos.Count == 0)
+                return ToResponse(ResultCode.PARAM_ERROR, "请选择任务");
+            if (string.IsNullOrEmpty(dto.Tags) && string.IsNullOrEmpty(dto.RemoveTags))
+                return ToResponse(ResultCode.PARAM_ERROR, "请至少添加或删除一个标签");
+
+            var userId = HttpContext.GetUId();
+            try
+            {
+                var count = _aiTaskService.BatchAddTags(dto.TaskNos, dto.Tags, dto.RemoveTags, userId);
+                return SUCCESS(new { message = $"已为{count}个任务更新标签", count });
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 批量下载结果图（ZIP）
+        /// </summary>
+        [HttpPost("batch-download")]
+        public IActionResult BatchDownload([FromBody] AiBatchDownloadDto dto)
+        {
+            if (dto == null || dto.TaskNos == null || dto.TaskNos.Count == 0)
+                return ToResponse(ResultCode.PARAM_ERROR, "请选择任务");
+
+            var userId = HttpContext.GetUId();
+            try
+            {
+                var stream = _aiTaskService.BatchDownloadResult(dto.TaskNos, userId);
+                return File(stream, "application/zip", "ai_results.zip");
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 获取结果图存储路径
+        /// </summary>
+        [HttpGet("storage-path")]
+        public IActionResult GetStoragePath()
+        {
+            var path = _aiTaskService.GetResultStoragePath();
+            var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", path.Replace('/', Path.DirectorySeparatorChar));
+            return SUCCESS(new { path = fullPath });
+        }
+
+        /// <summary>
+        /// 获取AI任务结果图列表（供QianFan Sync导入，匿名可访问，只返回未发布的）
+        /// </summary>
+        [HttpGet("result-images")]
+        [AllowAnonymous]
+        public IActionResult GetResultImages([FromQuery] int pageNum = 1, [FromQuery] int pageSize = 20, [FromQuery] string keyword = null)
+        {
+            var query = new AiTaskListDto { PageNum = pageNum, PageSize = pageSize, Status = "done" };
+            if (!string.IsNullOrEmpty(keyword))
+                query.Prompt = keyword;
+
+            long userId = 0;
+            try { userId = HttpContext.GetUId(); } catch { }
+
+            if (userId > 0)
+            {
+                var response = _aiTaskService.GetMyTaskList(query, userId);
+                var result = response.Result?
+                    .Where(x => !string.IsNullOrEmpty(x.OutputImagePath) && (x.PublishStatus == 0 || x.PublishStatus == null))
+                    .Select(x => new { id = x.Id, prompt = x.Prompt, outputImagePath = x.OutputImagePath, tags = x.Tags, createTime = x.Create_time })
+                    .ToList();
+                return SUCCESS(new { result, totalNum = result.Count });
+            }
+            else
+            {
+                var response = _aiTaskService.GetResultImageList(query);
+                return SUCCESS(response);
+            }
+        }
+
+        /// <summary>
+        /// 批量标记任务为已发布
+        /// </summary>
+        [HttpPost("batch-publish")]
+        public IActionResult BatchMarkPublished([FromBody] BatchPublishDto dto)
+        {
+            if (dto?.TaskNos == null || dto.TaskNos.Count == 0)
+                return ToResponse(ResultCode.PARAM_ERROR, "任务号不能为空");
+
+            var userId = HttpContext.GetUId();
+            var count = _aiTaskService.BatchMarkPublished(dto.TaskNos, userId);
+            return SUCCESS(new { message = $"已标记 {count} 个任务为已发布" });
+        }
     }
+}
+
+/// <summary>
+/// 批量标记已发布DTO
+/// </summary>
+public class BatchPublishDto
+{
+    public List<long> TaskNos { get; set; }
 }

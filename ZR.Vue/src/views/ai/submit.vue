@@ -41,6 +41,26 @@
             />
           </el-form-item>
 
+          <el-form-item label="任务名称">
+            <div style="display:flex;gap:8px;width:100%">
+              <el-select v-model="form.taskNameType" placeholder="选择名称" style="width:120px" @change="onNameTypeChange">
+                <el-option label="首页" value="首页" />
+                <el-option label="二图" value="二图" />
+                <el-option label="三图" value="三图" />
+                <el-option label="四图" value="四图" />
+                <el-option label="自定义" value="custom" />
+              </el-select>
+              <el-input v-if="form.taskNameType === 'custom'" v-model="form.taskName" placeholder="输入自定义名称" style="flex:1" />
+            </div>
+          </el-form-item>
+
+          <el-form-item label="生成数量">
+            <el-input-number v-model="form.taskCount" :min="1" :max="20" size="small" />
+            <span style="margin-left:8px;color:#909399;font-size:12px">
+              {{ form.taskCount > 1 && form.taskNameType !== 'custom' ? `将生成 ${form.taskCount} 个任务：${form.taskName}1 ~ ${form.taskName}${form.taskCount}` : '' }}
+            </span>
+          </el-form-item>
+
           <el-form-item>
             <el-button type="primary" @click="handleSubmit" :loading="loading">提交任务</el-button>
             <el-button @click="resetForm">重置</el-button>
@@ -92,7 +112,7 @@ export default {
   name: 'AiSubmit',
   data() {
     return {
-      form: { prompt: '', file: null, imageUrl: '' },
+      form: { prompt: '', file: null, imageUrl: '', taskNameType: '', taskName: '', taskCount: 1 },
       rules: { prompt: [{ required: true, message: '请输入提示词', trigger: 'blur' }] },
       loading: false,
       taskResult: null,
@@ -153,6 +173,13 @@ export default {
       return false
     },
     handleUpload() {},
+    onNameTypeChange(val) {
+      if (val !== 'custom') {
+        this.form.taskName = val
+      } else {
+        this.form.taskName = ''
+      }
+    },
     handleSubmit() {
       this.$refs.form.validate(valid => {
         if (!valid) return
@@ -161,14 +188,17 @@ export default {
         const fd = new FormData()
         fd.append('prompt', this.form.prompt)
         fd.append('file', this.form.file)
+        fd.append('taskName', this.form.taskName || '')
+        fd.append('taskCount', this.form.taskCount || 1)
         submitTask(fd).then(res => {
-          this.taskResult = res.data
-          this.$message.success('提交成功')
+          this.taskResult = { taskNo: res.data.taskNos ? res.data.taskNos.join(', ') : res.data.taskNo }
+          const count = res.data.taskNos ? res.data.taskNos.length : 1
+          this.$message.success(`成功提交 ${count} 个任务`)
         }).catch(() => { this.$message.error('提交失败') }).finally(() => { this.loading = false })
       })
     },
     resetForm() {
-      this.form = { prompt: '', file: null, imageUrl: '' }
+      this.form = { prompt: '', file: null, imageUrl: '', taskNameType: '', taskName: '', taskCount: 1 }
       this.selectedTemplateId = ''
       this.taskResult = null
     },

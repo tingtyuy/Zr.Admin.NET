@@ -10,7 +10,7 @@ taskkill /FI "WINDOWTITLE eq ZrAdmin-Frontend*" /F >nul 2>&1
 timeout /t 2 /nobreak >nul
 
 echo [2/3] Starting Backend (port: 8888)...
-start "ZrAdmin-Backend" cmd /k "dotnet watch --project ZR.Admin.WebApi run"
+start "ZrAdmin-Backend" cmd /k "dotnet watch --no-hot-reload  --project ZR.Admin.WebApi run"
 timeout /t 3 /nobreak >nul
 
 echo [3/3] Starting Frontend (port: 8887)...

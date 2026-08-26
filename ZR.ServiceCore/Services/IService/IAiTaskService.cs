@@ -55,7 +55,7 @@ namespace ZR.ServiceCore.Services
         /// <param name="taskNo">任务号</param>
         /// <param name="base64Image">Base64图片数据</param>
         /// <returns>结果图访问URL</returns>
-        string UploadBase64Image(long taskNo, string base64Image);
+        string UploadBase64Image(long taskNo, string base64Image, int? fetchAttemptCount = null);
 
         /// <summary>
         /// 更新任务
@@ -63,8 +63,9 @@ namespace ZR.ServiceCore.Services
         /// <param name="taskNo">任务号</param>
         /// <param name="prompt">提示词</param>
         /// <param name="userId">用户ID</param>
+        /// <param name="tags">标签</param>
         /// <returns>是否成功</returns>
-        bool UpdateTask(long taskNo, string prompt, long userId);
+        bool UpdateTask(long taskNo, string prompt, long userId, string tags = null, string taskName = null);
 
         /// <summary>
         /// N8N成功回调
@@ -72,7 +73,7 @@ namespace ZR.ServiceCore.Services
         /// <param name="taskNo">任务号</param>
         /// <param name="outputImageUrl">结果图URL</param>
         /// <returns>是否成功</returns>
-        bool CallbackSuccess(long taskNo, string outputImageUrl);
+        bool CallbackSuccess(long taskNo, string outputImageUrl, int? fetchAttemptCount = null);
 
         /// <summary>
         /// N8N失败回调
@@ -107,5 +108,30 @@ namespace ZR.ServiceCore.Services
         AiPromptTemplate SaveTemplate(AiPromptTemplateDto dto, long userId);
         bool DeleteTemplate(long id, long userId);
         bool DeleteTask(long taskNo, long userId);
+
+        /// <summary>
+        /// 批量管理标签
+        /// </summary>
+        int BatchAddTags(List<long> taskNos, string tags, string removeTags, long userId);
+
+        /// <summary>
+        /// 批量下载结果图（打包ZIP）
+        /// </summary>
+        MemoryStream BatchDownloadResult(List<long> taskNos, long userId);
+
+        /// <summary>
+        /// 获取结果图存储路径
+        /// </summary>
+        string GetResultStoragePath();
+
+        /// <summary>
+        /// 获取结果图列表（匿名可访问）
+        /// </summary>
+        object GetResultImageList(AiTaskListDto parm);
+
+        /// <summary>
+        /// 批量标记任务为已发布
+        /// </summary>
+        int BatchMarkPublished(List<long> taskNos, long userId);
     }
 }

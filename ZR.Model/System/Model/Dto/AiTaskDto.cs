@@ -11,6 +11,16 @@ namespace ZR.Model.System.Dto
         [Display(Name = "提示词")]
         [Required(ErrorMessage = "提示词不能为空")]
         public string Prompt { get; set; }
+
+        /// <summary>
+        /// 标签(逗号分隔)
+        /// </summary>
+        public string Tags { get; set; }
+
+        /// <summary>
+        /// 任务名称（如：首页、二图、三图、四图或自定义）
+        /// </summary>
+        public string TaskName { get; set; }
     }
 
     /// <summary>
@@ -45,6 +55,11 @@ namespace ZR.Model.System.Dto
         /// 功能类型筛选
         /// </summary>
         public string FuncType { get; set; }
+
+        /// <summary>
+        /// 标签筛选
+        /// </summary>
+        public string Tag { get; set; }
     }
 
     /// <summary>
@@ -71,6 +86,16 @@ namespace ZR.Model.System.Dto
         /// 扩展参数
         /// </summary>
         public string ExtParams { get; set; }
+
+        /// <summary>
+        /// 输入图MD5哈希（用于N8N验证图片正确性）
+        /// </summary>
+        public string InputImageHash { get; set; }
+
+        /// <summary>
+        /// 处理尝试次数（用于callback校验）
+        /// </summary>
+        public int AttemptCount { get; set; }
     }
 
     /// <summary>
@@ -91,6 +116,11 @@ namespace ZR.Model.System.Dto
         [Display(Name = "结果图URL")]
         [Required(ErrorMessage = "结果图URL不能为空")]
         public string OutputImageUrl { get; set; }
+
+        /// <summary>
+        /// fetch时返回的attemptCount（用于校验callback是否属于当前处理轮次）
+        /// </summary>
+        public int? FetchAttemptCount { get; set; }
     }
 
     /// <summary>
@@ -133,9 +163,47 @@ namespace ZR.Model.System.Dto
         /// <summary>
         /// 提示词
         /// </summary>
-        [Display(Name = "提示词")]
-        [Required(ErrorMessage = "提示词不能为空")]
         public string Prompt { get; set; }
+
+        /// <summary>
+        /// 标签(逗号分隔)
+        /// </summary>
+        public string Tags { get; set; }
+
+        /// <summary>
+        /// 任务名称
+        /// </summary>
+        public string TaskName { get; set; }
+    }
+
+    /// <summary>
+    /// 批量添加标签DTO
+    /// </summary>
+    public class AiBatchTagsDto
+    {
+        [Display(Name = "任务号列表")]
+        [Required(ErrorMessage = "任务号不能为空")]
+        public List<long> TaskNos { get; set; }
+
+        /// <summary>
+        /// 要添加的标签(逗号分隔)
+        /// </summary>
+        public string Tags { get; set; }
+
+        /// <summary>
+        /// 要移除的标签(逗号分隔)
+        /// </summary>
+        public string RemoveTags { get; set; }
+    }
+
+    /// <summary>
+    /// 批量下载结果图DTO
+    /// </summary>
+    public class AiBatchDownloadDto
+    {
+        [Display(Name = "任务号列表")]
+        [Required(ErrorMessage = "任务号不能为空")]
+        public List<long> TaskNos { get; set; }
     }
 
     /// <summary>
