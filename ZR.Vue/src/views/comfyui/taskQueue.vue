@@ -51,9 +51,12 @@
         <el-table-column label="输出" min-width="160" align="center">
           <template slot-scope="scope">
             <div v-if="outputs(scope.row).length > 0" class="output-list">
-              <img v-for="(o, i) in outputs(scope.row).filter(x => x.type === 'image')" :key="'i' + i" :src="o.url" class="output-thumb" @click="previewOutput(o)" />
-              <el-button v-if="outputs(scope.row).filter(x => x.type === 'video').length > 0" size="mini" type="text" icon="el-icon-video-play" @click="previewOutput(outputs(scope.row).find(x => x.type === 'video'))">
-                视频预览
+              <template v-for="(o, i) in outputs(scope.row).slice(0, 3)">
+                <video v-if="o.type === 'video'" :key="'v' + i" :src="o.url" class="output-thumb" @click="previewOutputs(scope.row)" />
+                <img v-else :key="'i' + i" :src="o.url" class="output-thumb" @click="previewOutputs(scope.row)" />
+              </template>
+              <el-button v-if="outputs(scope.row).length > 3" size="mini" type="text" @click="previewOutputs(scope.row)">
+                +{{ outputs(scope.row).length - 3 }}
               </el-button>
             </div>
             <span v-else-if="scope.row.status === 'done'" style="color:#909399">无输出</span>
@@ -82,10 +85,22 @@
     </el-card>
 
     <!-- 输出预览弹窗 -->
-    <el-dialog title="输出预览" :visible.sync="previewVisible" width="min(90vw, 800px)" top="5vh">
-      <div v-if="previewItem" style="text-align:center">
-        <img v-if="previewItem.type === 'image'" :src="previewItem.url" style="max-width:100%;max-height:75vh;object-fit:contain" />
-        <video v-else controls :src="previewItem.url" style="max-width:100%;max-height:75vh"></video>
+    <el-dialog title="输出预览" :visible.sync="previewVisible" width="min(90vw, 900px)" top="3vh">
+      <div v-if="previewList.length > 0" class="preview-container">
+        <!-- 主预览区 -->
+        <div class="preview-main">
+          <video v-if="previewList[previewIndex].type === 'video'" :key="'pv' + previewIndex" :src="previewList[previewIndex].url" controls autoplay style="max-width:100%;max-height:65vh;object-fit:contain" />
+          <img v-else :key="'pi' + previewIndex" :src="previewList[previewIndex].url" style="max-width:100%;max-height:65vh;object-fit:contain" />
+        </div>
+        <!-- 缩略图列表 -->
+        <div v-if="previewList.length > 1" class="preview-thumbs">
+          <div v-for="(item, idx) in previewList" :key="idx" class="preview-thumb-item" :class="{ active: idx === previewIndex }" @click="previewIndex = idx">
+            <video v-if="item.type === 'video'" :src="item.url" muted class="preview-thumb-img" />
+            <img v-else :src="item.url" class="preview-thumb-img" />
+            <el-icon v-if="item.type === 'video'" class="play-icon" name="video-play" />
+          </div>
+        </div>
+        <div class="preview-counter">{{ previewIndex + 1 }} / {{ previewList.length }}</div>
       </div>
     </el-dialog>
   </div>
@@ -105,7 +120,8 @@ export default {
       funcTypeText: { txt2img: '文生图', img2img: '图生图', txt2video: '文生视频', img2video: '图生视频' },
       statusText: { pending: '待执行', processing: '执行中', done: '已完成', failed: '失败', cancelled: '已取消' },
       previewVisible: false,
-      previewItem: null
+      previewList: [],
+      previewIndex: 0
     }
   },
   created() { this.getList(); this.startPolling() },
@@ -133,8 +149,14 @@ export default {
       if (!row.outputUrls) return []
       try { return JSON.parse(row.outputUrls) } catch (e) { return [] }
     },
-    previewOutput(item) {
-      this.previewItem = item
+    previewOutputs(row) {
+      const all = this.outputs(row)
+      this.previewList = all.sort((a, b) => {
+        if (a.type === 'video' && b.type !== 'video') return -1
+        if (a.type !== 'video' && b.type === 'video') return 1
+        return 0
+      })
+      this.previewIndex = 0
       this.previewVisible = true
     },
     statusTagType(status) {
@@ -199,4 +221,38 @@ export default {
   vertical-align: middle;
 }
 .copy-btn:hover { color: #409EFF; }
+.preview-container { text-align: center; }
+.preview-main { min-height: 200px; display: flex; align-items: center; justify-content: center; }
+.preview-thumbs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+.preview-thumb-item {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.preview-thumb-item:hover { border-color: #909399; }
+.preview-thumb-item.active { border-color: #409EFF; }
+.preview-thumb-img { width: 100%; height: 100%; object-fit: cover; }
+.play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 18px;
+  text-shadow: 0 1px 3px rgba(0,0,0,.6);
+}
+.preview-counter { margin-top: 8px; font-size: 12px; color: #909399; }
 </style>
