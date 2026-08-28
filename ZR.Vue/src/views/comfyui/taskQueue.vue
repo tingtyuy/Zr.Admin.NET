@@ -85,22 +85,45 @@
     </el-card>
 
     <!-- 输出预览弹窗 -->
-    <el-dialog title="输出预览" :visible.sync="previewVisible" width="min(90vw, 900px)" top="3vh">
+    <el-dialog title="输出预览" :visible.sync="previewVisible" width="min(95vw, 1100px)" top="3vh">
       <div v-if="previewList.length > 0" class="preview-container">
-        <!-- 主预览区 -->
-        <div class="preview-main">
-          <video v-if="previewList[previewIndex].type === 'video'" :key="'pv' + previewIndex" :src="previewList[previewIndex].url" controls autoplay style="max-width:100%;max-height:65vh;object-fit:contain" />
-          <img v-else :key="'pi' + previewIndex" :src="previewList[previewIndex].url" style="max-width:100%;max-height:65vh;object-fit:contain" />
-        </div>
-        <!-- 缩略图列表 -->
-        <div v-if="previewList.length > 1" class="preview-thumbs">
-          <div v-for="(item, idx) in previewList" :key="idx" class="preview-thumb-item" :class="{ active: idx === previewIndex }" @click="previewIndex = idx">
-            <video v-if="item.type === 'video'" :src="item.url" muted class="preview-thumb-img" />
-            <img v-else :src="item.url" class="preview-thumb-img" />
-            <el-icon v-if="item.type === 'video'" class="play-icon" name="video-play" />
+        <!-- 左侧文件列表 -->
+        <div class="preview-sidebar-wrap">
+          <div ref="previewSidebar" class="preview-sidebar">
+            <div
+              v-for="(item, idx) in previewList"
+              :key="idx"
+              class="preview-item"
+              :class="{ active: idx === previewIndex }"
+              @click="previewIndex = idx"
+            >
+              <video v-if="item.type === 'video'" :src="item.url" muted preload="metadata" class="preview-item-img" />
+              <img v-else :src="item.url" class="preview-item-img" />
+              <div class="preview-item-overlay">
+                <i v-if="item.type === 'video'" class="el-icon-video-play"></i>
+                <span class="preview-item-name">{{ item.filename || item.name || item.url.split('/').pop() || (item.type === 'video' ? '视频' : '图片') }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="sidebar-nav">
+            <el-tooltip content="滚动到顶部" placement="left">
+              <div class="sidebar-nav-btn" @click="scrollSidebar('top')"><i class="el-icon-top"></i></div>
+            </el-tooltip>
+            <el-tooltip content="滚动到底部" placement="left">
+              <div class="sidebar-nav-btn" @click="scrollSidebar('bottom')"><i class="el-icon-bottom"></i></div>
+            </el-tooltip>
           </div>
         </div>
-        <div class="preview-counter">{{ previewIndex + 1 }} / {{ previewList.length }}</div>
+        <!-- 右侧预览区 -->
+        <div class="preview-main">
+          <div v-if="previewList[previewIndex].type === 'video'" class="preview-video-wrap">
+            <video :key="'pv' + previewIndex" :src="previewList[previewIndex].url" controls autoplay class="preview-video"></video>
+          </div>
+          <div v-else class="preview-image-wrap">
+            <img :key="'pi' + previewIndex" :src="previewList[previewIndex].url" class="preview-image" />
+            <span class="preview-counter">{{ previewIndex + 1 }} / {{ previewList.length }}</span>
+          </div>
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -158,6 +181,13 @@ export default {
       })
       this.previewIndex = 0
       this.previewVisible = true
+    },
+    scrollSidebar(target) {
+      this.$nextTick(() => {
+        const el = this.$refs.previewSidebar
+        if (!el) return
+        el.scrollTo({ top: target === 'top' ? 0 : el.scrollHeight, behavior: 'smooth' })
+      })
     },
     statusTagType(status) {
       const map = { pending: 'warning', processing: '', done: 'success', failed: 'danger', cancelled: 'info' }
@@ -221,38 +251,99 @@ export default {
   vertical-align: middle;
 }
 .copy-btn:hover { color: #409EFF; }
-.preview-container { text-align: center; }
-.preview-main { min-height: 200px; display: flex; align-items: center; justify-content: center; }
-.preview-thumbs {
+.preview-container {
   display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #eee;
+  gap: 16px;
+  height: 70vh;
+  overflow: hidden;
 }
-.preview-thumb-item {
+.preview-sidebar-wrap {
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.preview-sidebar {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+.preview-sidebar::-webkit-scrollbar { width: 6px; }
+.preview-sidebar::-webkit-scrollbar-thumb { background: #dcdfe6; border-radius: 3px; }
+.sidebar-nav { display: flex; justify-content: center; gap: 8px; }
+.sidebar-nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f0f2f5;
+  color: #606266;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .2s;
+}
+.sidebar-nav-btn:hover { background: #409EFF; color: #fff; }
+.preview-item {
   position: relative;
-  width: 64px;
-  height: 64px;
+  height: 90px;
+  flex-shrink: 0;
   border: 2px solid transparent;
   border-radius: 6px;
   overflow: hidden;
   cursor: pointer;
   transition: border-color .2s;
 }
-.preview-thumb-item:hover { border-color: #909399; }
-.preview-thumb-item.active { border-color: #409EFF; }
-.preview-thumb-img { width: 100%; height: 100%; object-fit: cover; }
-.play-icon {
+.preview-item:hover { border-color: #909399; }
+.preview-item.active { border-color: #409EFF; }
+.preview-item-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.preview-item-overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: linear-gradient(transparent, rgba(0,0,0,.7));
   color: #fff;
-  font-size: 18px;
-  text-shadow: 0 1px 3px rgba(0,0,0,.6);
+  font-size: 12px;
 }
-.preview-counter { margin-top: 8px; font-size: 12px; color: #909399; }
+.preview-item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.preview-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  background: #f5f7fa;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+.preview-image-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.preview-image { max-width: 100%; max-height: 100%; object-fit: contain; }
+.preview-video-wrap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.preview-video { max-width: 100%; max-height: 100%; object-fit: contain; }
+.preview-counter {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: rgba(0,0,0,.5);
+  color: #fff;
+  font-size: 12px;
+  z-index: 1;
+}
 </style>
