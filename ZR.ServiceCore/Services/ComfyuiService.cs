@@ -1113,12 +1113,8 @@ namespace ZR.ServiceCore.Services
 
                 string ext = Path.GetExtension(rf.LocalPath);
                 string targetName = $"{task.Id}_{rf.NodeId}_{DateTime.Now:yyyyMMddHHmmss}{ext}";
-                bool isVideo = ext.Equals(".mp4", StringComparison.OrdinalIgnoreCase)
-                            || ext.Equals(".webm", StringComparison.OrdinalIgnoreCase)
-                            || ext.Equals(".mov", StringComparison.OrdinalIgnoreCase)
-                            || ext.Equals(".avi", StringComparison.OrdinalIgnoreCase);
 
-                string endpoint = isVideo ? "/upload/video" : "/upload/image";
+                string endpoint = "/upload/image";
                 try
                 {
                     using (var form = new MultipartFormDataContent())

@@ -60,9 +60,12 @@
             <span v-else style="color:#909399">-</span>
           </template>
         </el-table-column>
-        <el-table-column label="错误信息" min-width="150" :show-overflow-tooltip="true">
+        <el-table-column label="错误信息" min-width="200">
           <template slot-scope="scope">
-            <span v-if="scope.row.errorMessage" style="color:#F56C6C">{{ scope.row.errorMessage }}</span>
+            <template v-if="scope.row.errorMessage">
+              <span class="error-text" :title="scope.row.errorMessage" style="color:#F56C6C">{{ scope.row.errorMessage }}</span>
+              <i class="el-icon-copy-document copy-btn" title="复制错误信息" @click="copyText(scope.row.errorMessage)" />
+            </template>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -158,6 +161,20 @@ export default {
           this.getList()
         }).catch(() => { this.$message.error('出队失败') })
       }).catch(() => {})
+    },
+    copyText(text) {
+      if (!text) return
+      navigator.clipboard.writeText(text).then(() => {
+        this.$message.success('已复制')
+      }).catch(() => {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+        this.$message.success('已复制')
+      })
     }
   }
 }
@@ -167,4 +184,19 @@ export default {
 .mb8 { margin-bottom: 12px; }
 .output-list { display: flex; align-items: center; justify-content: center; gap: 4px; }
 .output-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; cursor: zoom-in; border: 1px solid #eee; }
+.error-text {
+  display: inline-block;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.copy-btn {
+  color: #909399;
+  cursor: pointer;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.copy-btn:hover { color: #409EFF; }
 </style>
