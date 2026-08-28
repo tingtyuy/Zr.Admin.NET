@@ -21,13 +21,12 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(
   (config) => {
-    // 是否需要设置 token
     if (getToken()) {
-      //将token放到请求头发送给服务器,将tokenkey放在请求头中
       config.headers['Authorization'] = 'Bearer ' + getToken()
       config.headers['userid'] = store.getters.userId
-    } else {
-      // console.log(config)
+    }
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type']
     }
     return config
   },

@@ -87,6 +87,62 @@ export const constantRoutes = [{
     hidden: true
   },
   {
+    path: '/comfyui',
+    component: Layout,
+    redirect: '/comfyui/workflow',
+    name: 'ComfyuiModule',
+    meta: { title: 'ComfyUI管理', icon: 'tool' },
+    children: [
+      {
+        path: 'workflow',
+        component: (resolve) => require(['@/views/comfyui/workflow'], resolve),
+        name: 'ComfyuiWorkflow',
+        meta: { title: '工作流管理', icon: 'upload' }
+      },
+      {
+        path: 'txt2img',
+        component: (resolve) => require(['@/views/comfyui/txt2img'], resolve),
+        name: 'ComfyuiTxt2Img',
+        meta: { title: '文生图', icon: 'edit' }
+      },
+      {
+        path: 'img2img',
+        component: (resolve) => require(['@/views/comfyui/img2img'], resolve),
+        name: 'ComfyuiImg2Img',
+        meta: { title: '图生图', icon: 'picture' }
+      },
+      {
+        path: 'txt2video',
+        component: (resolve) => require(['@/views/comfyui/txt2video'], resolve),
+        name: 'ComfyuiTxt2Video',
+        meta: { title: '文生视频', icon: 'video' }
+      },
+      {
+        path: 'img2video',
+        component: (resolve) => require(['@/views/comfyui/img2video'], resolve),
+        name: 'ComfyuiImg2Video',
+        meta: { title: '图生视频', icon: 'video-camera' }
+      },
+      {
+        path: 'task-list',
+        component: (resolve) => require(['@/views/comfyui/taskList'], resolve),
+        name: 'ComfyuiTaskList',
+        meta: { title: '任务列表', icon: 'documentation' }
+      },
+      {
+        path: 'task-queue',
+        component: (resolve) => require(['@/views/comfyui/taskQueue'], resolve),
+        name: 'ComfyuiTaskQueue',
+        meta: { title: '执行队列', icon: 'list' }
+      },
+      {
+        path: 'settings',
+        component: (resolve) => require(['@/views/comfyui/settings'], resolve),
+        name: 'ComfyuiSettings',
+        meta: { title: '服务设置', icon: 'setting' }
+      }
+    ]
+  },  {
     path: '/ai',
     component: Layout,
     redirect: '/ai/submit',

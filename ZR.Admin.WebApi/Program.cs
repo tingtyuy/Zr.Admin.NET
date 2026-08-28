@@ -14,8 +14,8 @@ using ZR.ServiceCore.Signalr;
 using ZR.ServiceCore.SqlSugar;
 using ZR.ServiceCore.Services;
 using ZR.Mall;
+using ZR.Admin.WebApi;
 //using SQLitePCL;
-
 var builder = WebApplication.CreateBuilder(args);
 // NLog: Setup NLog for Dependency injection
 //builder.Logging.ClearProviders();
@@ -55,6 +55,8 @@ builder.Services.AddAppService();
 builder.Services.AddTaskSchedulers();
 //AI任务超时检测服务
 builder.Services.AddHostedService<AiTaskTimeoutService>();
+//ComfyUI执行队列后台Worker
+builder.Services.AddHostedService<ComfyuiQueueWorker>();
 //请求大小限制
 builder.Services.AddRequestLimit(builder.Configuration);
 //sqlite 包需要的驱动
