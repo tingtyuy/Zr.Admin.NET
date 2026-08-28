@@ -91,6 +91,7 @@ export function createComfyuiTask(data) {
     url: '/comfyui/task/create',
     method: 'POST',
     data: data,
+    timeout: 0, // 大文件（参考视频）上传不设超时
     headers: { 'Content-Type': undefined },
   })
 }

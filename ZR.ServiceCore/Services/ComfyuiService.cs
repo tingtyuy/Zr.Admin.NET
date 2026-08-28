@@ -1020,13 +1020,13 @@ namespace ZR.ServiceCore.Services
                     case "value":
                         if (!string.IsNullOrEmpty(value) && nodeObj["inputs"] is JObject inputs)
                         {
-                            inputs[node.Field] = value;
+                            inputs[node.Field] = ConvertToNativeJToken(inputs[node.Field], value);
                         }
                         break;
                     case "bool":
-                        if (nodeObj["inputs"] is JObject boolInputs)
+                        if (!string.IsNullOrEmpty(value) && nodeObj["inputs"] is JObject boolInputs)
                         {
-                            boolInputs[node.Field] = "true".Equals(value, StringComparison.OrdinalIgnoreCase);
+                            boolInputs[node.Field] = ConvertToNativeJToken(boolInputs[node.Field], value);
                         }
                         break;
                     case "image":
@@ -1076,6 +1076,28 @@ namespace ZR.ServiceCore.Services
             catch
             {
                 return new List<ComfyuiRefFile>();
+            }
+        }
+
+        /// <summary>
+        /// 按工作流原字段类型转换新值，避免数字/布尔字段被写成字符串导致ComfyUI校验失败
+        /// </summary>
+        private JToken ConvertToNativeJToken(JToken original, string value)
+        {
+            if (original == null || original.Type == JTokenType.Null)
+            {
+                return value;
+            }
+            switch (original.Type)
+            {
+                case JTokenType.Integer:
+                    return long.TryParse(value, out var l) ? new JValue(l) : value;
+                case JTokenType.Float:
+                    return double.TryParse(value, out var d) ? new JValue(d) : value;
+                case JTokenType.Boolean:
+                    return bool.TryParse(value, out var b) ? new JValue(b) : value;
+                default:
+                    return value;
             }
         }
 

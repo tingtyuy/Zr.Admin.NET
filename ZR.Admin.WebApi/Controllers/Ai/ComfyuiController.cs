@@ -168,6 +168,8 @@ namespace ZR.Admin.WebApi.Controllers
 
         #region 任务
         [HttpPost("task/create")]
+        [RequestSizeLimit(500 * 1024 * 1024)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 500 * 1024 * 1024)]
         [Log(Title = "ComfyUI任务创建", BusinessType = BusinessType.INSERT)]
         public async Task<IActionResult> CreateTask()
         {
