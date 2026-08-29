@@ -53,6 +53,11 @@ namespace ZR.ServiceCore.Services
         bool DeleteWorkflow(long id, long userId);
 
         /// <summary>
+        /// 更新工作流基本信息与内容
+        /// </summary>
+        bool UpdateWorkflow(long id, ComfyuiWorkflowImportDto dto, long userId);
+
+        /// <summary>
         /// 更新工作流可变节点配置
         /// </summary>
         bool UpdateWorkflowVariables(long id, string variableNodes, long userId);
@@ -73,6 +78,11 @@ namespace ZR.ServiceCore.Services
         /// 创建ComfyUI任务（表单→草稿，可入队）。refs: nodeId->参考文件
         /// </summary>
         (List<long> taskNos, string validationError) CreateTask(ComfyuiTaskCreateDto dto, Dictionary<string, IFormFile> refs, long userId);
+
+        /// <summary>
+        /// 更新任务明细（仅草稿可编辑；校验通过后自动入队）。refs: nodeId->参考文件
+        /// </summary>
+        (List<long> taskNos, string validationError) UpdateTask(long taskId, ComfyuiTaskCreateDto dto, Dictionary<string, IFormFile> refs, long userId);
 
         /// <summary>
         /// 任务分页列表（含执行队列信息与输出）
@@ -98,6 +108,11 @@ namespace ZR.ServiceCore.Services
         /// 批量删除任务
         /// </summary>
         int BatchDeleteTask(List<long> ids, long userId);
+
+        /// <summary>
+        /// 文本翻译（联网翻译，目标语言 zh-CN / en）
+        /// </summary>
+        Task<string> TranslateAsync(string text, string target);
         #endregion
 
         #region 执行队列
@@ -132,9 +147,9 @@ namespace ZR.ServiceCore.Services
         string SubmitToComfy(string promptJson);
 
         /// <summary>
-        /// 查询ComfyUI执行历史/输出
+        /// 查询ComfyUI执行历史/输出（输出文件会下载到本地存储返回本地URL）
         /// </summary>
-        List<object> QueryHistory(string promptId);
+        List<object> QueryHistory(string promptId, long taskId = 0);
 
         /// <summary>
         /// 执行超时秒数

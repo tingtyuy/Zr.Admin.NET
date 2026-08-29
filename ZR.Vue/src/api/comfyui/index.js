@@ -4,7 +4,7 @@ import request from '@/utils/request'
 export function getComfyuiConfig() {
   return request({
     url: '/comfyui/config',
-    method: 'GET',
+    method: 'GET'
   })
 }
 
@@ -12,7 +12,7 @@ export function saveComfyuiConfig(data) {
   return request({
     url: '/comfyui/config',
     method: 'POST',
-    data: data,
+    data: data
   })
 }
 
@@ -20,7 +20,7 @@ export function testComfyuiConfig(data) {
   return request({
     url: '/comfyui/config/test',
     method: 'POST',
-    data: data,
+    data: data
   })
 }
 
@@ -29,7 +29,7 @@ export function importWorkflows(data) {
   return request({
     url: '/comfyui/workflow/import',
     method: 'POST',
-    data: data,
+    data: data
   })
 }
 
@@ -37,28 +37,28 @@ export function getWorkflowList(query) {
   return request({
     url: '/comfyui/workflow/list',
     method: 'GET',
-    params: query,
+    params: query
   })
 }
 
 export function getWorkflowDetail(id) {
   return request({
     url: `/comfyui/workflow/detail/${id}`,
-    method: 'GET',
+    method: 'GET'
   })
 }
 
 export function getWorkflowVariables(id) {
   return request({
     url: `/comfyui/workflow/variables/${id}`,
-    method: 'GET',
+    method: 'GET'
   })
 }
 
 export function getEditableNodes(id) {
   return request({
     url: `/comfyui/workflow/${id}/editable-nodes`,
-    method: 'GET',
+    method: 'GET'
   })
 }
 
@@ -66,14 +66,22 @@ export function setWorkflowCategory(data) {
   return request({
     url: '/comfyui/workflow/category',
     method: 'POST',
-    data: data,
+    data: data
   })
 }
 
 export function deleteWorkflow(id) {
   return request({
     url: `/comfyui/workflow/delete/${id}`,
+    method: 'POST'
+  })
+}
+
+export function updateComfyuiWorkflow(id, data) {
+  return request({
+    url: `/comfyui/workflow/update/${id}`,
     method: 'POST',
+    data: data
   })
 }
 
@@ -81,7 +89,7 @@ export function updateWorkflowVariables(id, variableNodes) {
   return request({
     url: `/comfyui/workflow/variables/${id}`,
     method: 'POST',
-    data: { variableNodes: variableNodes },
+    data: { variableNodes: variableNodes }
   })
 }
 
@@ -92,7 +100,7 @@ export function createComfyuiTask(data) {
     method: 'POST',
     data: data,
     timeout: 0, // 大文件（参考视频）上传不设超时
-    headers: { 'Content-Type': undefined },
+    headers: { 'Content-Type': undefined }
   })
 }
 
@@ -100,21 +108,39 @@ export function getComfyuiTaskList(query) {
   return request({
     url: '/comfyui/task/list',
     method: 'GET',
-    params: query,
+    params: query
   })
 }
 
 export function getComfyuiTaskDetail(id) {
   return request({
     url: `/comfyui/task/detail/${id}`,
-    method: 'GET',
+    method: 'GET'
+  })
+}
+
+export function updateComfyuiTask(id, data) {
+  return request({
+    url: `/comfyui/task/update/${id}`,
+    method: 'POST',
+    data: data,
+    timeout: 0, // 大文件（参考视频）上传不设超时
+    headers: { 'Content-Type': undefined }
+  })
+}
+
+export function translateComfyuiText(data) {
+  return request({
+    url: '/comfyui/translate',
+    method: 'POST',
+    data: data
   })
 }
 
 export function deleteComfyuiTask(id) {
   return request({
     url: `/comfyui/task/delete/${id}`,
-    method: 'POST',
+    method: 'POST'
   })
 }
 
@@ -122,7 +148,7 @@ export function batchDeleteComfyuiTask(ids) {
   return request({
     url: '/comfyui/task/batch-delete',
     method: 'POST',
-    data: { taskIds: ids },
+    data: { taskIds: ids }
   })
 }
 
@@ -130,7 +156,7 @@ export function enqueueComfyuiTask(ids) {
   return request({
     url: '/comfyui/task/enqueue',
     method: 'POST',
-    data: { taskIds: ids },
+    data: { taskIds: ids }
   })
 }
 
@@ -139,20 +165,20 @@ export function getComfyuiQueueList(query) {
   return request({
     url: '/comfyui/queue/list',
     method: 'GET',
-    params: query,
+    params: query
   })
 }
 
 export function cancelComfyuiQueue(id) {
   return request({
     url: `/comfyui/queue/cancel/${id}`,
-    method: 'POST',
+    method: 'POST'
   })
 }
 
 export function dequeueComfyuiQueue(id) {
   return request({
     url: `/comfyui/queue/dequeue/${id}`,
-    method: 'POST',
+    method: 'POST'
   })
 }

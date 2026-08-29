@@ -3,7 +3,7 @@
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span>ComfyUI {{ title }}</span>
-        <span style="float: right; font-size: 12px; color: #909399">创建工作流任务（草稿，可在任务列表中入队执行）</span>
+        <span style="float: right; font-size: 12px; color: #909399">创建工作流任务，创建成功后自动加入执行队列</span>
       </div>
 
       <el-form ref="form" :model="form" :rules="rules" label-width="100px" class="form-left">
@@ -19,10 +19,19 @@
         <!-- 动态显示可变节点（一个节点生成一个对应类型的输入元素） -->
         <template v-if="variables.length > 0">
           <el-form-item v-for="v in variables" :key="v.nodeId" :label="v.label || v.nodeId" :required="isFileNode(v)">
-            <el-input v-if="v.type === 'prompt' || v.type === 'value'"
-              v-model="variablesValue[v.nodeId]" :type="v.type === 'value' ? 'input' : 'textarea'"
-              :rows="v.type === 'value' ? 1 : 3"
-              :placeholder="placeholderText(v)" />
+            <template v-if="v.type === 'prompt' || v.type === 'value'">
+              <div class="input-with-switch">
+                <el-input
+                  v-model="variablesValue[v.nodeId]" :type="v.type === 'value' ? 'input' : 'textarea'"
+                  :rows="v.type === 'value' ? 1 : 3"
+                  :placeholder="placeholderText(v)"
+                  @input="handleTranslationInput(v)" />
+                <el-button class="lang-switch-btn" plain size="small" @click="handleSwitchLang(v)">中英切换</el-button>
+              </div>
+              <div v-if="translateHint[v.nodeId]" class="translate-hint">
+                <span class="hint-label">中文提示：</span>{{ translateHint[v.nodeId] }}
+              </div>
+            </template>
             <el-input-number v-else-if="v.type === 'number'"
               v-model="variablesValue[v.nodeId]" :min="0" size="small" />
             <el-switch v-else-if="v.type === 'bool'"
@@ -51,7 +60,7 @@
 
         <el-form-item label="生成数量">
           <el-input-number v-model="form.taskCount" :min="1" :max="20" size="small" />
-          <span style="margin-left:8px;color:#909399;font-size:12px">将创建 {{ form.taskCount }} 个任务（草稿）</span>
+          <span style="margin-left:8px;color:#909399;font-size:12px">将创建 {{ form.taskCount }} 个任务并自动入队执行</span>
         </el-form-item>
 
         <el-form-item>
@@ -63,10 +72,10 @@
 
       <div v-if="taskResult" class="task-result">
         <el-divider content-position="left">任务已创建</el-divider>
-        <el-alert v-if="!taskResult.validationError" :title="'已创建 ' + taskResult.taskNos.length + ' 个任务（草稿）'" type="success" :closable="false">
+        <el-alert v-if="!taskResult.validationError" :title="'已创建 ' + taskResult.taskNos.length + ' 个任务并入队执行'" type="success" :closable="false">
           <div slot="default">
-            <p>任务已保存，可到【任务列表】查看并手动入队进入ComfyUI执行队列。</p>
-            <el-button type="primary" size="small" @click="goToTaskList">去任务列表入队</el-button>
+            <p>任务已保存并自动加入ComfyUI执行队列，可到【任务列表】或【执行队列】查看进度。</p>
+            <el-button type="primary" size="small" @click="goToTaskQueue">去执行队列查看</el-button>
           </div>
         </el-alert>
         <el-alert v-else :title="'已保存 ' + taskResult.taskNos.length + ' 个草稿'" type="warning" :closable="false">
@@ -82,7 +91,7 @@
 </template>
 
 <script>
-import { getWorkflowList, getWorkflowVariables, createComfyuiTask } from '@/api/comfyui/index'
+import { getWorkflowList, getWorkflowVariables, createComfyuiTask, translateComfyuiText } from '@/api/comfyui/index'
 
 export default {
   name: 'ComfyuiCreateTask',
@@ -100,6 +109,7 @@ export default {
       workflows: [],
       variables: [],
       variablesValue: {},
+      translateHint: {},
       fileMap: {},
       fileListMap: {},
       taskResult: null
@@ -113,12 +123,17 @@ export default {
         this.workflows = res.data.result || []
         if (this.workflows.length === 0) {
           this.$message.warning('当前分类下没有工作流，请先到【工作流管理】导入')
+        } else if (!this.form.workflowId || this.workflows.length > 1) {
+          // 有工作流时默认选中第一个，避免空选项
+          this.form.workflowId = this.workflows[0].id
+          this.handleWorkflowChange(this.form.workflowId)
         }
       })
     },
     handleWorkflowChange(wid) {
       this.variables = []
       this.variablesValue = {}
+      this.translateHint = {}
       this.fileMap = {}
       this.fileListMap = {}
       if (!wid) return
@@ -137,6 +152,48 @@ export default {
     handleFileRemove(nodeId) {
       this.$set(this.fileMap, nodeId, null)
       this.$set(this.fileListMap, nodeId, [])
+    },
+    handleSwitchLang(v) {
+      const nodeId = v.nodeId
+      const text = String(this.variablesValue[nodeId] == null ? '' : this.variablesValue[nodeId]).trim()
+      if (!text) {
+        this.$message.warning('请先输入内容再进行中英文切换')
+        return
+      }
+      // 含中文则翻成英文，否则翻成中文
+      const isZh = /[\u4e00-\u9fff]/.test(text)
+      const target = isZh ? 'en' : 'zh-CN'
+      translateComfyuiText({ text: text, target: target }).then(res => {
+        const translated = res.data.translated
+        if (translated && translated !== text) {
+          this.$set(this.variablesValue, nodeId, translated)
+          this.$message.success(target === 'zh-CN' ? '已翻译成中文' : '已翻译成英文')
+        } else {
+          this.$message.info('内容已是目标语言')
+        }
+      }).catch(err => {
+        this.$message.error(err.msg || '翻译失败')
+      })
+    },
+    handleTranslationInput(v) {
+      const nodeId = v.nodeId
+      clearTimeout(this._transTimer)
+      this._transTimer = setTimeout(() => {
+        const text = String(this.variablesValue[nodeId] == null ? '' : this.variablesValue[nodeId]).trim()
+        if (!text) {
+          this.$set(this.translateHint, nodeId, '')
+          return
+        }
+        // 已是中文则无需提示
+        if (/[\u4e00-\u9fff]/.test(text)) {
+          this.$set(this.translateHint, nodeId, '')
+          return
+        }
+        translateComfyuiText({ text: text, target: 'zh-CN' }).then(res => {
+          const t = res.data.translated
+          this.$set(this.translateHint, nodeId, (t && t !== text) ? t : '')
+        }).catch(() => {})
+      }, 900)
     },
     handleSubmit() {
       this.$refs.form.validate(valid => {
@@ -180,12 +237,16 @@ export default {
       this.form = { workflowId: '', taskCount: 1 }
       this.variables = []
       this.variablesValue = {}
+      this.translateHint = {}
       this.fileMap = {}
       this.fileListMap = {}
       this.taskResult = null
     },
     goToTaskList() {
       this.$router.push({ path: '/comfyui/task-list' })
+    },
+    goToTaskQueue() {
+      this.$router.push({ path: '/comfyui/task-queue' })
     }
   }
 }
@@ -195,4 +256,9 @@ export default {
 .form-left { max-width: 720px; }
 .task-result { margin-top: 20px; }
 .upload-btn { display: inline-block; }
+.input-with-switch { display: flex; align-items: flex-start; gap: 8px; }
+.input-with-switch .el-input { flex: 1; }
+.lang-switch-btn { flex-shrink: 0; }
+.translate-hint { margin-top: 4px; font-size: 12px; color: #606266; background: #f5f7fa; padding: 4px 8px; border-radius: 4px; line-height: 1.5; }
+.hint-label { color: #409EFF; font-weight: 600; }
 </style>

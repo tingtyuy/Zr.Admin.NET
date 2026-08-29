@@ -142,7 +142,7 @@ namespace ZR.Admin.WebApi
                 ct.ThrowIfCancellationRequested();
                 try
                 {
-                    var outputs = comfyService.QueryHistory(queue.PromptId);
+                    var outputs = comfyService.QueryHistory(queue.PromptId, queue.TaskId);
                     if (outputs.Count > 0)
                     {
                         // 完成

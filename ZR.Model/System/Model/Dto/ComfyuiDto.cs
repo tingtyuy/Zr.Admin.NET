@@ -261,4 +261,22 @@ namespace ZR.Model.System.Dto
         public string OutputUrls { get; set; }
         public string QueueErrorMessage { get; set; }
     }
+
+    /// <summary>
+    /// ComfyUI文本翻译DTO
+    /// </summary>
+    public class ComfyuiTranslateDto
+    {
+        /// <summary>
+        /// 待翻译文本
+        /// </summary>
+        [Display(Name = "翻译文本")]
+        [Required(ErrorMessage = "请输入要翻译的内容")]
+        public string Text { get; set; }
+
+        /// <summary>
+        /// 目标语言：zh-CN / en（默认 zh-CN）
+        /// </summary>
+        public string Target { get; set; }
+    }
 }

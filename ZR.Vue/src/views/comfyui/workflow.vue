@@ -5,7 +5,7 @@
         <span>ComfyUI 工作流管理</span>
       </div>
 
-      <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+      <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
         <el-form-item label="名称" prop="name">
           <el-input v-model="queryParams.name" placeholder="模糊搜索名称" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
@@ -47,9 +47,10 @@
         <el-table-column label="节点数" prop="nodeCount" width="80" align="center" />
         <el-table-column label="描述" prop="description" min-width="200" :show-overflow-tooltip="true" />
         <el-table-column label="创建时间" prop="createTime" width="160" align="center" />
-        <el-table-column label="操作" width="180" align="center" fixed="right">
+        <el-table-column label="操作" width="200" align="center" fixed="right">
           <template slot-scope="scope">
             <el-button type="text" icon="el-icon-view" @click="handleView(scope.row)">查看</el-button>
+            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="text" icon="el-icon-edit-outline" @click="handleEditVariables(scope.row)">可变节点</el-button>
             <el-button type="text" icon="el-icon-delete" style="color:#F56C6C" @click="handleDelete(scope.row)">删除</el-button>
           </template>
@@ -91,8 +92,12 @@
               <el-input v-model="importForm.tags" placeholder="标签（逗号分隔，可选）" />
             </el-form-item>
             <el-form-item label="可变节点">
-              <el-input v-model="importForm.variableNodes" type="textarea" :rows="4"
-                placeholder='可选。数组JSON，定义需要用户填写的节点，如：[{"nodeId":"6","field":"text","type":"prompt","label":"正向提示词"}]。type可选 prompt/image/video/value/number/bool' />
+              <el-input
+                v-model="importForm.variableNodes"
+                type="textarea"
+                :rows="4"
+                placeholder="可选。数组JSON，定义需要用户填写的节点，如：[{&quot;nodeId&quot;:&quot;6&quot;,&quot;field&quot;:&quot;text&quot;,&quot;type&quot;:&quot;prompt&quot;,&quot;label&quot;:&quot;正向提示词&quot;}]。type可选 prompt/image/video/value/number/bool"
+              />
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -111,7 +116,7 @@
             accept=".json"
             multiple
           >
-            <i class="el-icon-upload"></i>
+            <i class="el-icon-upload" />
             <div class="el-upload__text">将JSON文件拖到此处，或<em>点击上传</em></div>
             <div slot="tip" class="el-upload__tip">支持上传多个ComfyUI API格式的JSON文件，文件名将作为工作流名称</div>
           </el-upload>
@@ -138,7 +143,7 @@
 
       <span slot="footer">
         <el-button @click="importDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmImport" :loading="importLoading">导入</el-button>
+        <el-button type="primary" :loading="importLoading" @click="confirmImport">导入</el-button>
       </span>
     </el-dialog>
 
@@ -161,6 +166,50 @@
       </div>
     </el-dialog>
 
+    <!-- 编辑工作流弹窗 -->
+    <el-dialog title="编辑工作流" :visible.sync="editDialogVisible" width="700px" top="5vh" :close-on-click-modal="false">
+      <el-form :model="editForm" label-width="80px">
+        <el-form-item label="名称" required>
+          <el-input v-model="editForm.name" placeholder="工作流名称" />
+        </el-form-item>
+        <el-form-item label="分类">
+          <el-select v-model="editForm.category" placeholder="选择分类" style="width:100%">
+            <el-option label="默认" value="default" />
+            <el-option label="文生图" value="txt2img" />
+            <el-option label="图生图" value="img2img" />
+            <el-option label="文生视频" value="txt2video" />
+            <el-option label="图生视频" value="img2video" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="editForm.description" placeholder="工作流描述（可选）" />
+        </el-form-item>
+        <el-form-item label="标签">
+          <el-input v-model="editForm.tags" placeholder="标签（逗号分隔，可选）" />
+        </el-form-item>
+        <el-form-item label="工作流JSON">
+          <el-input
+            v-model="editForm.workflowJson"
+            type="textarea"
+            :rows="10"
+            placeholder="仅支持ComfyUI API格式（顶层是节点对象，每个节点含 class_type 和 inputs）"
+          />
+        </el-form-item>
+        <el-form-item label="可变节点">
+          <el-input
+            v-model="editForm.variableNodes"
+            type="textarea"
+            :rows="3"
+            placeholder="可选。数组JSON，如：[{&quot;nodeId&quot;:&quot;6&quot;,&quot;field&quot;:&quot;text&quot;,&quot;type&quot;:&quot;prompt&quot;,&quot;label&quot;:&quot;正向提示词&quot;}]"
+          />
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="editDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="editLoading" @click="confirmEdit">保存</el-button>
+      </span>
+    </el-dialog>
+
     <!-- 设置分类弹窗 -->
     <el-dialog title="设置分类" :visible.sync="categoryDialogVisible" width="400px">
       <el-form label-width="80px">
@@ -176,7 +225,7 @@
       </el-form>
       <span slot="footer">
         <el-button @click="categoryDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmSetCategory" :loading="categoryLoading">确定</el-button>
+        <el-button type="primary" :loading="categoryLoading" @click="confirmSetCategory">确定</el-button>
       </span>
     </el-dialog>
 
@@ -185,9 +234,15 @@
       <div style="margin-bottom: 8px; color: #909399; font-size: 12px">
         系统已自动筛查出工作流中【可修改的节点】并附上用途说明，只需从中勾选需要用户填写的节点，设置类型后保存。保存后文生图/图生图等表单会按类型自动生成对应输入元素。
       </div>
-      <div v-if="editableNodeLoading" style="text-align:center;padding:20px"><i class="el-icon-loading" style="font-size:24px"></i> 正在解析可修改节点...</div>
-      <el-alert v-if="!editableNodeLoading && editableNodes.length === 0" type="warning" :closable="false" style="margin-bottom:8px"
-        title="未自动解析出可修改节点（不影响手动添加）。请确认工作流为ComfyUI API格式；你也可以直接点下方【添加节点】手动填写节点ID与字段。" show-icon />
+      <div v-if="editableNodeLoading" style="text-align:center;padding:20px"><i class="el-icon-loading" style="font-size:24px" /> 正在解析可修改节点...</div>
+      <el-alert
+        v-if="!editableNodeLoading && editableNodes.length === 0"
+        type="warning"
+        :closable="false"
+        style="margin-bottom:8px"
+        title="未自动解析出可修改节点（不影响手动添加）。请确认工作流为ComfyUI API格式；你也可以直接点下方【添加节点】手动填写节点ID与字段。"
+        show-icon
+      />
       <el-table v-if="!editableNodeLoading" :data="varRows" border size="small">
         <el-table-column label="启用" width="56" align="center">
           <template slot-scope="scope">
@@ -196,11 +251,24 @@
         </el-table-column>
         <el-table-column label="可修改节点" min-width="180">
           <template slot-scope="scope">
-            <el-select v-model="scope.row.nodeId" filterable allow-create default-first-option size="small" style="width:100%"
-              :disabled="!scope.row.enabled" placeholder="从可修改节点选择或手动输入ID" @change="(v) => onSelectEditableNode(scope.row, v)">
-              <el-option v-for="n in editableNodes" :key="n.nodeId" :value="n.nodeId"
+            <el-select
+              v-model="scope.row.nodeId"
+              filterable
+              allow-create
+              default-first-option
+              size="small"
+              style="width:100%"
+              :disabled="!scope.row.enabled"
+              placeholder="从可修改节点选择或手动输入ID"
+              @change="(v) => onSelectEditableNode(scope.row, v)"
+            >
+              <el-option
+                v-for="n in editableNodes"
+                :key="n.nodeId"
+                :value="n.nodeId"
                 :label="(n.description || n.title) + ' (#' + n.nodeId + ')'"
-                :disabled="isNodeUsed(n.nodeId, scope.row)">
+                :disabled="isNodeUsed(n.nodeId, scope.row)"
+              >
                 <div style="line-height:1.3">
                   <div><b>{{ n.title }}</b>&nbsp;<span style="color:#909399;font-size:11px">{{ n.classType }}</span></div>
                   <div style="color:#67C23A;font-size:11px">{{ n.description }}</div>
@@ -245,14 +313,14 @@
       </div>
       <span slot="footer">
         <el-button @click="varDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmVariables" :loading="varLoading">保存</el-button>
+        <el-button type="primary" :loading="varLoading" @click="confirmVariables">保存</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { importWorkflows, getWorkflowList, getWorkflowDetail, setWorkflowCategory, deleteWorkflow, updateWorkflowVariables, getEditableNodes } from '@/api/comfyui/index'
+import { importWorkflows, getWorkflowList, getWorkflowDetail, setWorkflowCategory, deleteWorkflow, updateWorkflowVariables, updateComfyuiWorkflow, getEditableNodes } from '@/api/comfyui/index'
 
 export default {
   name: 'ComfyuiWorkflow',
@@ -276,6 +344,11 @@ export default {
       // 查看
       viewDialogVisible: false,
       viewWorkflow: null,
+      // 编辑
+      editDialogVisible: false,
+      editLoading: false,
+      editTargetId: null,
+      editForm: { name: '', description: '', category: 'default', workflowJson: '', tags: '', variableNodes: '' },
       // 分类
       categoryDialogVisible: false,
       categoryLoading: false,
@@ -392,10 +465,38 @@ export default {
         reader.readAsText(file)
       })
     },
+    confirmEdit() {
+      if (!this.editTargetId) { this.$message.warning('请选择工作流'); return }
+      if (!this.editForm.name) { this.$message.warning('请输入工作流名称'); return }
+      if (!this.editForm.workflowJson) { this.$message.warning('请输入工作流JSON'); return }
+      const err = this.checkApiFormat(this.editForm.workflowJson)
+      if (err) { this.$message.error(err); return }
+      this.editLoading = true
+      updateComfyuiWorkflow(this.editTargetId, this.editForm).then(res => {
+        this.$message.success(res.data.message || '保存成功')
+        this.editDialogVisible = false
+        this.getList()
+      }).catch(() => { this.$message.error('保存失败') }).finally(() => { this.editLoading = false })
+    },
     handleView(row) {
       getWorkflowDetail(row.id).then(res => {
         this.viewWorkflow = res.data
         this.viewDialogVisible = true
+      })
+    },
+    handleEdit(row) {
+      this.editTargetId = row.id
+      getWorkflowDetail(row.id).then(res => {
+        const d = res.data
+        this.editForm = {
+          name: d.name || '',
+          description: d.description || '',
+          category: d.category || 'default',
+          workflowJson: d.workflowJson || '',
+          tags: d.tags || '',
+          variableNodes: d.variableNodes || ''
+        }
+        this.editDialogVisible = true
       })
     },
     handleEditVariables(row) {
@@ -495,7 +596,6 @@ export default {
       if (this.ids.length === 0) { this.$message.warning('请先选择工作流'); return }
       this.$confirm(`确定删除选中的 ${this.ids.length} 个工作流？`, '警告', { type: 'warning' }).then(() => {
         let deleted = 0
-        const total = this.ids.length
         const deleteNext = (index) => {
           if (index >= this.ids.length) {
             this.$message.success(`成功删除 ${deleted} 个工作流`)

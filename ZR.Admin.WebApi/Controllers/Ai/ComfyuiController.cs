@@ -147,6 +147,24 @@ namespace ZR.Admin.WebApi.Controllers
             return SUCCESS(new { message = result ? "删除成功" : "删除失败", result });
         }
 
+        [HttpPost("workflow/update/{id}")]
+        [Log(Title = "ComfyUI工作流编辑", BusinessType = BusinessType.UPDATE)]
+        public IActionResult UpdateWorkflow(string id, [FromBody] ComfyuiWorkflowImportDto dto)
+        {
+            if (!long.TryParse(id, out long idLong))
+                return ToResponse(ResultCode.PARAM_ERROR, "ID格式错误");
+            try
+            {
+                var userId = HttpContext.GetUId();
+                var result = _comfyuiService.UpdateWorkflow(idLong, dto, userId);
+                return SUCCESS(new { message = result ? "保存成功" : "保存失败", result });
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
+
         [HttpPost("workflow/variables/{id}")]
         [Log(Title = "ComfyUI工作流可变节点配置", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateVariables(string id, [FromBody] ComfyuiWorkflowVariablesDto dto)
@@ -216,6 +234,56 @@ namespace ZR.Admin.WebApi.Controllers
                 string msg = validationError == null
                     ? $"成功创建 {taskNos.Count} 个任务（草稿，可入队执行）"
                     : $"已保存为草稿（{taskNos.Count} 个），校验提示：{validationError}";
+                return SUCCESS(new { message = msg, taskNos, validationError });
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
+
+        [HttpPost("task/update/{id}")]
+        [RequestSizeLimit(500 * 1024 * 1024)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 500 * 1024 * 1024)]
+        [Log(Title = "ComfyUI任务更新", BusinessType = BusinessType.UPDATE)]
+        public async Task<IActionResult> UpdateTask(string id)
+        {
+            if (!long.TryParse(id, out long idLong))
+                return ToResponse(ResultCode.PARAM_ERROR, "ID格式错误");
+            string funcType = null, variableValues = null;
+            var refs = new Dictionary<string, IFormFile>();
+
+            if (Request.HasFormContentType)
+            {
+                var form = await Request.ReadFormAsync();
+                funcType = form["funcType"].FirstOrDefault();
+                variableValues = form["variableValues"].FirstOrDefault();
+                foreach (var f in form.Files)
+                {
+                    string key = f.Name;
+                    if (key.StartsWith("ref_")) key = key.Substring(4);
+                    if (!refs.ContainsKey(key)) refs[key] = f;
+                }
+            }
+            else
+            {
+                return ToResponse(ResultCode.PARAM_ERROR, "请以 multipart/form-data 方式提交");
+            }
+
+            var userId = HttpContext.GetUId();
+            var dto = new ComfyuiTaskCreateDto
+            {
+                WorkflowId = 0,
+                FuncType = funcType,
+                VariableValues = variableValues,
+                TaskCount = 1
+            };
+            try
+            {
+                var (taskNos, validationError) = _comfyuiService.UpdateTask(idLong, dto, refs, userId);
+                string msg = validationError == null
+                    ? $"任务已更新并入队执行"
+                    : $"已保存，校验提示：{validationError}";
                 return SUCCESS(new { message = msg, taskNos, validationError });
             }
             catch (Exception ex)
@@ -326,6 +394,30 @@ namespace ZR.Admin.WebApi.Controllers
                 var userId = HttpContext.GetUId();
                 var result = _comfyuiService.Dequeue(idLong, userId);
                 return SUCCESS(new { message = result ? "已出队" : "出队失败", result });
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
+        #endregion
+
+        #region 工具
+        /// <summary>
+        /// 文本翻译（联网翻译，目标语言 zh-CN / en）
+        /// </summary>
+        [HttpPost("translate")]
+        [Log(Title = "ComfyUI文本翻译", BusinessType = BusinessType.OTHER)]
+        public async Task<IActionResult> Translate([FromBody] ComfyuiTranslateDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Text))
+            {
+                return ToResponse(ResultCode.PARAM_ERROR, "请输入要翻译的内容");
+            }
+            try
+            {
+                var result = await _comfyuiService.TranslateAsync(dto.Text.Trim(), dto.Target);
+                return SUCCESS(new { translated = result });
             }
             catch (Exception ex)
             {

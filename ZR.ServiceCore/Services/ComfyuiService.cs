@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using Infrastructure.Attribute;
@@ -291,6 +292,40 @@ namespace ZR.ServiceCore.Services
                 .SetColumns(x => x.VariableNodes == variableNodes)
                 .Where(x => x.Id == id)
                 .ExecuteCommand() > 0;
+        }
+
+        public bool UpdateWorkflow(long id, ComfyuiWorkflowImportDto dto, long userId)
+        {
+            if (dto == null)
+            {
+                throw new CustomException("更新内容不能为空");
+            }
+            var workflow = Queryable().First(x => x.Id == id);
+            if (workflow == null)
+            {
+                throw new CustomException("工作流不存在");
+            }
+
+            var updater = Context.Updateable<ComfyuiWorkflow>()
+                .Where(x => x.Id == id);
+            updater = updater.SetColumns(x => x.Name == dto.Name);
+            updater = updater.SetColumns(x => x.Description == (dto.Description ?? ""));
+            updater = updater.SetColumns(x => x.Category == (string.IsNullOrWhiteSpace(dto.Category) ? "default" : dto.Category));
+            updater = updater.SetColumns(x => x.Tags == (dto.Tags ?? ""));
+            if (dto.VariableNodes != null)
+            {
+                updater = updater.SetColumns(x => x.VariableNodes == dto.VariableNodes);
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.WorkflowJson))
+            {
+                ValidateApiFormat(dto.WorkflowJson);
+                updater = updater
+                    .SetColumns(x => x.WorkflowJson == dto.WorkflowJson)
+                    .SetColumns(x => x.NodeCount == CountNodes(dto.WorkflowJson));
+            }
+
+            return updater.ExecuteCommand() > 0;
         }
 
         public object GetWorkflowVariableNodes(long workflowId, long userId)
@@ -727,10 +762,168 @@ namespace ZR.ServiceCore.Services
                     Create_time = DateTime.Now,
                     Create_by = userId.ToString()
                 };
+                // 校验通过的任务创建后直接加入执行队列
+                bool autoQueue = string.IsNullOrEmpty(validationError);
+                if (autoQueue)
+                {
+                    task.Queued = 1;
+                    task.Status = "pending";
+                    task.QueuedTime = DateTime.Now;
+                }
                 Context.Insertable(task).ExecuteCommand();
+
+                if (autoQueue)
+                {
+                    Context.Insertable(new ComfyuiQueue
+                    {
+                        Id = SnowFlakeSingle.Instance.NextId(),
+                        TaskId = taskNo,
+                        TaskName = task.TaskName,
+                        FuncType = dto.FuncType,
+                        WorkflowId = dto.WorkflowId,
+                        Status = "pending",
+                        Progress = 0,
+                        UserId = userId,
+                        QueuedTime = DateTime.Now,
+                        Create_time = DateTime.Now,
+                        Create_by = userId.ToString()
+                    }).ExecuteCommand();
+                }
                 taskNos.Add(taskNo);
             }
             return (taskNos, validationError);
+        }
+
+        /// <summary>
+        /// 更新任务明细（仅草稿可编辑；校验通过后自动入队）
+        /// </summary>
+        public (List<long> taskNos, string validationError) UpdateTask(long taskId, ComfyuiTaskCreateDto dto, Dictionary<string, IFormFile> refs, long userId)
+        {
+            var task = Context.Queryable<ComfyuiTask>().First(x => x.Id == taskId && x.UserId == userId);
+            if (task == null)
+            {
+                throw new CustomException("任务不存在");
+            }
+            if (task.Queued == 1)
+            {
+                // 仅执行中的任务禁止编辑，其余（待执行/完成/失败/取消）均可再编辑
+                var runningQueue = Context.Queryable<ComfyuiQueue>().First(x => x.TaskId == taskId && x.Status == "processing");
+                if (runningQueue != null)
+                {
+                    throw new CustomException("任务正在执行中，不能编辑");
+                }
+            }
+            var workflow = Context.Queryable<ComfyuiWorkflow>().First(x => x.Id == task.WorkflowId);
+            if (workflow == null)
+            {
+                throw new CustomException("工作流不存在");
+            }
+
+            // 已有参考文件
+            var refFiles = new List<ComfyuiRefFile>();
+            if (task.RefFiles.IsNotEmpty())
+            {
+                try { refFiles = JsonConvert.DeserializeObject<List<ComfyuiRefFile>>(task.RefFiles) ?? new List<ComfyuiRefFile>(); }
+                catch { refFiles = new List<ComfyuiRefFile>(); }
+            }
+            // 若上传了新参考文件，则替换对应节点的旧文件
+            if (refs != null && refs.Count > 0)
+            {
+                string storageRoot = "storage/comfyui";
+                string batchDir = Path.Combine(_webHostEnvironment.WebRootPath, storageRoot, "input", userId.ToString(), SnowFlakeSingle.Instance.NextId().ToString());
+                var newRefFiles = new List<ComfyuiRefFile>();
+                foreach (var kv in refs)
+                {
+                    var file = kv.Value;
+                    if (file == null || file.Length == 0) continue;
+                    string nodeDir = Path.Combine(batchDir, kv.Key ?? "ref");
+                    Directory.CreateDirectory(nodeDir);
+                    string ext = Path.GetExtension(file.FileName);
+                    string fname = "ref" + ext;
+                    string path = Path.Combine(nodeDir, fname);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+                    bool isVideo = ext.Equals(".mp4", StringComparison.OrdinalIgnoreCase)
+                                || ext.Equals(".webm", StringComparison.OrdinalIgnoreCase)
+                                || ext.Equals(".mov", StringComparison.OrdinalIgnoreCase)
+                                || ext.Equals(".avi", StringComparison.OrdinalIgnoreCase);
+                    newRefFiles.Add(new ComfyuiRefFile
+                    {
+                        NodeId = kv.Key,
+                        OriginalName = file.FileName,
+                        LocalPath = path,
+                        ComfyType = isVideo ? "video" : "input"
+                    });
+                }
+                // 替换旧文件（删除被替换节点的旧目录）
+                foreach (var nf in newRefFiles)
+                {
+                    var old = refFiles.FirstOrDefault(r => r.NodeId == nf.NodeId);
+                    if (old != null)
+                    {
+                        if (old.LocalPath.IsNotEmpty() && old.LocalPath != nf.LocalPath)
+                        {
+                            string oldDir = Path.GetDirectoryName(old.LocalPath);
+                            if (!string.IsNullOrEmpty(oldDir) && Directory.Exists(oldDir))
+                            {
+                                try { Directory.Delete(oldDir, true); } catch { }
+                            }
+                        }
+                        refFiles.Remove(old);
+                    }
+                    refFiles.Add(nf);
+                }
+            }
+
+            // 校验可变节点完整性
+            string validationError = ValidateReferences(workflow.VariableNodes, refFiles, task.FuncType);
+
+            string refFilesJson = JsonConvert.SerializeObject(refFiles);
+            var updater = Context.Updateable<ComfyuiTask>()
+                .SetColumns(x => x.VariableValues == dto.VariableValues)
+                .SetColumns(x => x.RefFiles == refFilesJson)
+                .SetColumns(x => x.ErrorMessage == validationError);
+            if (validationError == null)
+            {
+                updater = updater.SetColumns(x => x.Queued == 1)
+                    .SetColumns(x => x.Status == "pending")
+                    .SetColumns(x => x.QueuedTime == DateTime.Now);
+            }
+            updater.Where(x => x.Id == taskId).ExecuteCommand();
+
+            // 校验通过则（重新）入队
+            if (validationError == null)
+            {
+                // 若已有待执行队列则不重复新增，只刷新排队时间；否则新增一条队列任务
+                var pendingQueue = Context.Queryable<ComfyuiQueue>().First(x => x.TaskId == taskId && x.Status == "pending");
+                if (pendingQueue != null)
+                {
+                    Context.Updateable<ComfyuiQueue>()
+                        .SetColumns(x => x.QueuedTime == DateTime.Now)
+                        .Where(x => x.Id == pendingQueue.Id)
+                        .ExecuteCommand();
+                }
+                else
+                {
+                    Context.Insertable(new ComfyuiQueue
+                    {
+                        Id = SnowFlakeSingle.Instance.NextId(),
+                        TaskId = taskId,
+                        TaskName = task.TaskName,
+                        FuncType = task.FuncType,
+                        WorkflowId = task.WorkflowId,
+                        Status = "pending",
+                        Progress = 0,
+                        UserId = userId,
+                        QueuedTime = DateTime.Now,
+                        Create_time = DateTime.Now,
+                        Create_by = userId.ToString()
+                    }).ExecuteCommand();
+                }
+            }
+            return (new List<long> { taskId }, validationError);
         }
 
         /// <summary>
@@ -786,6 +979,11 @@ namespace ZR.ServiceCore.Services
                 queues = Context.Queryable<ComfyuiQueue>()
                     .Where(x => page.Select(t => t.Id).Contains(x.TaskId))
                     .Select(q => new ComfyuiQueue { Id = q.Id, TaskId = q.TaskId, Status = q.Status, Progress = q.Progress, OutputUrls = q.OutputUrls, ErrorMessage = q.ErrorMessage })
+                    .ToList()
+                    // 同一任务可能有多条队列记录（再次入队），取最新一条
+                    .OrderByDescending(q => q.Id)
+                    .GroupBy(q => q.TaskId)
+                    .Select(g => g.First())
                     .ToList();
             }
 
@@ -835,10 +1033,36 @@ namespace ZR.ServiceCore.Services
             {
                 throw new CustomException("任务不存在");
             }
-            if (task.Queued == 1)
+            var runningQueue = Context.Queryable<ComfyuiQueue>().First(x => x.TaskId == id && x.Status == "processing");
+            if (runningQueue != null)
             {
-                throw new CustomException("任务已入队，请先出队或取消");
+                throw new CustomException("任务正在执行中，不能删除");
             }
+            // 清理该任务的所有历史队列记录（含待执行取消、已完成/失败记录）
+            Context.Deleteable<ComfyuiQueue>().Where(x => x.TaskId == id).ExecuteCommand();
+            // 清理本地参考文件和输出文件
+            try
+            {
+                string storageRoot = "storage/comfyui";
+                string outDir = Path.Combine(_webHostEnvironment.WebRootPath, storageRoot, "output", task.Id.ToString());
+                if (Directory.Exists(outDir))
+                {
+                    Directory.Delete(outDir, true);
+                }
+                if (task.RefFiles.IsNotEmpty())
+                {
+                    var files = JsonConvert.DeserializeObject<List<ComfyuiRefFile>>(task.RefFiles) ?? new List<ComfyuiRefFile>();
+                    foreach (var f in files.Where(f => f.LocalPath.IsNotEmpty()))
+                    {
+                        string dir = Path.GetDirectoryName(f.LocalPath);
+                        if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                        {
+                            try { Directory.Delete(dir, true); } catch { }
+                        }
+                    }
+                }
+            }
+            catch { }
             return Context.Deleteable<ComfyuiTask>().Where(x => x.Id == id).ExecuteCommand() > 0;
         }
 
@@ -850,10 +1074,22 @@ namespace ZR.ServiceCore.Services
             }
             int count = 0;
             var tasks = Context.Queryable<ComfyuiTask>()
-                .Where(x => taskIds.Contains(x.Id) && x.Queued == 0)
+                .Where(x => taskIds.Contains(x.Id))
                 .ToList();
-            foreach (var task in tasks)
+            // 执行中的任务不可重复入队
+            var runningIds = Context.Queryable<ComfyuiQueue>()
+                .Where(x => taskIds.Contains(x.TaskId) && x.Status == "processing")
+                .Select(x => x.TaskId)
+                .ToList();
+            foreach (var task in tasks.Where(t => !runningIds.Contains(t.Id)))
             {
+                // 已在待执行队列中则跳过（不重复排队）
+                var pendingExists = Context.Queryable<ComfyuiQueue>()
+                    .Any(x => x.TaskId == task.Id && x.Status == "pending");
+                if (pendingExists)
+                {
+                    continue;
+                }
                 // 更新任务为pending入队状态
                 Context.Updateable<ComfyuiTask>()
                     .SetColumns(x => x.Queued == 1)
@@ -862,7 +1098,7 @@ namespace ZR.ServiceCore.Services
                     .Where(x => x.Id == task.Id)
                     .ExecuteCommand();
 
-                // 创建队列记录
+                // 新增一条队列记录（已完成/失败任务再次入队即为新队列任务）
                 var queue = new ComfyuiQueue
                 {
                     Id = SnowFlakeSingle.Instance.NextId(),
@@ -889,9 +1125,68 @@ namespace ZR.ServiceCore.Services
             {
                 return 0;
             }
+            // 排除执行中的任务
+            var runningIds = Context.Queryable<ComfyuiQueue>()
+                .Where(x => ids.Contains(x.TaskId) && x.Status == "processing")
+                .Select(x => x.TaskId)
+                .ToList();
+            var deletable = ids.Where(i => !runningIds.Contains(i)).ToList();
+            if (deletable.Count == 0)
+            {
+                return 0;
+            }
+            // 清理关联队列记录
+            Context.Deleteable<ComfyuiQueue>().Where(x => deletable.Contains(x.TaskId)).ExecuteCommand();
             return Context.Deleteable<ComfyuiTask>()
-                .Where(x => ids.Contains(x.Id) && x.Queued == 0)
+                .Where(x => deletable.Contains(x.Id))
                 .ExecuteCommand();
+        }
+
+        /// <summary>
+        /// 文本翻译：联网调用免费翻译接口，支持中英文互译
+        /// </summary>
+        public async Task<string> TranslateAsync(string text, string target)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                throw new CustomException("请输入要翻译的内容");
+            }
+            text = text.Trim();
+            if (target != "zh-CN" && target != "en")
+            {
+                target = "zh-CN";
+            }
+            // 已是目标语言则原文返回
+            bool isChinese = text.Any(c => c >= 0x4E00 && c <= 0x9FFF);
+            if ((target == "zh-CN" && isChinese) || (target == "en" && !isChinese))
+            {
+                return text;
+            }
+            string source = isChinese ? "zh-CN" : "en";
+            string url = "https://api.mymemory.translated.net/get" +
+                $"?q={Uri.EscapeDataString(text)}&langpair={source}|{target}";
+            try
+            {
+                using var resp = await _httpClient.GetAsync(url);
+                resp.EnsureSuccessStatusCode();
+                string json = await resp.Content.ReadAsStringAsync();
+                var jobj = JObject.Parse(json);
+                string translated = jobj["responseData"]?["translatedText"]?.ToString();
+                if (string.IsNullOrWhiteSpace(translated) || translated.Contains("MYMEMORY WARNING"))
+                {
+                    throw new CustomException("翻译失败，请稍后再试");
+                }
+                return WebUtility.HtmlDecode(translated);
+            }
+            catch (CustomException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "ComfyUI文本翻译失败");
+                throw new CustomException("翻译服务暂时不可用，请稍后再试");
+            }
         }
         #endregion
 
@@ -901,7 +1196,7 @@ namespace ZR.ServiceCore.Services
             return Context.Queryable<ComfyuiQueue>()
                 .WhereIF(parm.Status.IsNotEmpty(), x => x.Status == parm.Status)
                 .WhereIF(parm.FuncType.IsNotEmpty(), x => x.FuncType == parm.FuncType)
-                .OrderBy(x => x.QueuedTime, OrderByType.Asc)
+                .OrderBy(x => x.QueuedTime, OrderByType.Desc)
                 .ToPage(parm);
         }
 
@@ -1171,9 +1466,9 @@ namespace ZR.ServiceCore.Services
         }
 
         /// <summary>
-        /// 查询ComfyUI执行历史，返回输出文件列表（image/video）
+        /// 查询ComfyUI执行历史，返回输出文件列表（image/video），输出文件会下载到本地存储
         /// </summary>
-        public List<object> QueryHistory(string promptId)
+        public List<object> QueryHistory(string promptId, long taskId = 0)
         {
             var result = new List<object>();
             if (string.IsNullOrWhiteSpace(promptId)) return result;
@@ -1200,7 +1495,8 @@ namespace ZR.ServiceCore.Services
                             string url = $"{GetServerUrl()}/view?filename={filename}&subfolder={subfolder}&type={type}";
                             bool isVideo = filename.EndsWith(".mp4") || filename.EndsWith(".webm") || filename.EndsWith(".avi")
                                         || filename.EndsWith(".mov") || filename.EndsWith(".gif");
-                            result.Add(new { url = url, type = isVideo ? "video" : "image", filename = filename });
+                            string localUrl = DownloadOutputToLocal(url, filename, taskId);
+                            result.Add(new { url = localUrl, type = isVideo ? "video" : "image", filename = filename });
                         }
                     }
                 }
@@ -1215,12 +1511,59 @@ namespace ZR.ServiceCore.Services
                         if (filename.IsNotEmpty())
                         {
                             string url = $"{GetServerUrl()}/view?filename={filename}&subfolder={subfolder}&type={type}";
-                            result.Add(new { url = url, type = "video", filename = filename });
+                            string localUrl = DownloadOutputToLocal(url, filename, taskId);
+                            result.Add(new { url = localUrl, type = "video", filename = filename });
                         }
                     }
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// 获取ComfyUI输出存储根目录
+        /// </summary>
+        private string GetStorageRoot()
+        {
+            var root = GetConfig("StorageRoot");
+            return string.IsNullOrWhiteSpace(root) ? "storage/comfyui" : root;
+        }
+
+        /// <summary>
+        /// 将ComfyUI输出文件下载到本地存储目录，返回本地访问URL；失败则回退远程URL
+        /// </summary>
+        private string DownloadOutputToLocal(string comfyUrl, string filename, long taskId)
+        {
+            if (string.IsNullOrWhiteSpace(comfyUrl) || taskId <= 0) return comfyUrl;
+            try
+            {
+                using var response = _httpClient.GetAsync(comfyUrl).Result;
+                if (!response.IsSuccessStatusCode) return comfyUrl;
+                var bytes = response.Content.ReadAsByteArrayAsync().Result;
+                if (bytes == null || bytes.Length == 0) return comfyUrl;
+
+                string storageRoot = GetStorageRoot();
+                string outputDir = Path.Combine(_webHostEnvironment.WebRootPath, storageRoot, "output", taskId.ToString());
+                Directory.CreateDirectory(outputDir);
+
+                string ext = Path.GetExtension(filename);
+                string name = Path.GetFileNameWithoutExtension(filename);
+                string targetName = $"{name}_{DateTime.Now:yyyyMMddHHmmssfff}{ext}";
+                string filePath = Path.Combine(outputDir, targetName);
+                File.WriteAllBytes(filePath, bytes);
+
+                string accessUrl = string.Concat(
+                    _optionsSetting.Upload.UploadUrl.TrimEnd('/'), "/",
+                    storageRoot.Replace("\\", "/"), "/output/",
+                    taskId, "/", targetName);
+                logger.Info($"ComfyUI输出文件已下载到本地: taskId={taskId}, file={targetName}");
+                return accessUrl;
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, $"下载ComfyUI输出文件到本地失败，回退远程URL: {comfyUrl}");
+                return comfyUrl;
+            }
         }
         #endregion
     }
