@@ -27,6 +27,9 @@
         <el-form-item label="名称" prop="prompt">
           <el-input v-model="queryParams.prompt" placeholder="任务名/工作流名" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
+        <el-form-item label="日期" prop="date">
+          <el-date-picker v-model="queryParams.date" type="date" value-format="yyyy-MM-dd" placeholder="选择创建日期" clearable size="small" style="width: 140px" @change="handleQuery" />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -71,7 +74,7 @@
             <div v-if="outputs(scope.row).length > 0" class="output-list">
               <template v-for="(o, i) in outputs(scope.row).slice(0, 3)">
                 <video v-if="o.type === 'video'" :key="'v' + i" :src="o.url" muted preload="metadata" class="output-thumb" @click="previewOutputs(scope.row)" />
-                <img v-else :key="'i' + i" :src="o.url" class="output-thumb" @click="previewOutputs(scope.row)" />
+                <img v-else :key="'i' + i" :src="o.url" class="output-thumb" @click="previewOutputs(scope.row)">
               </template>
               <el-button v-if="outputs(scope.row).length > 3" size="mini" type="text" @click="previewOutputs(scope.row)">
                 +{{ outputs(scope.row).length - 3 }}
@@ -123,9 +126,12 @@
               <template v-if="v.type === 'prompt' || v.type === 'value'">
                 <div class="input-with-switch">
                   <el-input
-                    v-model="detailDialog.values[v.nodeId]" :type="v.type === 'value' ? 'input' : 'textarea'"
-                    :rows="v.type === 'value' ? 1 : 3" :placeholder="v.type === 'prompt' ? '描述你想要生成的内容...' : '请输入...'"
-                    @input="handleTranslationInput(v)" />
+                    v-model="detailDialog.values[v.nodeId]"
+                    :type="v.type === 'value' ? 'input' : 'textarea'"
+                    :rows="v.type === 'value' ? 1 : 3"
+                    :placeholder="v.type === 'prompt' ? '描述你想要生成的内容...' : '请输入...'"
+                    @input="handleTranslationInput(v)"
+                  />
                   <el-button class="lang-switch-btn" plain size="small" @click="handleSwitchLang(v)">中英切换</el-button>
                 </div>
                 <div v-if="detailDialog.translateHint[v.nodeId]" class="translate-hint">
@@ -133,14 +139,25 @@
                 </div>
               </template>
               <el-input-number v-else-if="v.type === 'number'" v-model="detailDialog.values[v.nodeId]" :min="0" size="small" />
-              <el-switch v-else-if="v.type === 'bool'" v-model="detailDialog.values[v.nodeId]"
-                active-text="是" inactive-text="否" :active-value="true" :inactive-value="false" />
-              <el-upload v-else-if="isFileNode(v)" class="upload-btn"
-                action="#" :auto-upload="false" :limit="1"
+              <el-switch
+                v-else-if="v.type === 'bool'"
+                v-model="detailDialog.values[v.nodeId]"
+                active-text="是"
+                inactive-text="否"
+                :active-value="true"
+                :inactive-value="false"
+              />
+              <el-upload
+                v-else-if="isFileNode(v)"
+                class="upload-btn"
+                action="#"
+                :auto-upload="false"
+                :limit="1"
                 :accept="v.type === 'video' ? '.mp4,.webm,.mov,.avi' : '.png,.jpg,.jpeg,.webp,.gif,.bmp'"
                 :on-change="(file) => handleEditFileChange(v.nodeId, file)"
                 :on-remove="() => handleEditFileRemove(v.nodeId)"
-                :file-list="fileListMap[v.nodeId] || []">
+                :file-list="fileListMap[v.nodeId] || []"
+              >
                 <el-button size="small" type="primary" icon="el-icon-upload">{{ v.type === 'video' ? '替换参考视频' : '替换参考图' }}</el-button>
                 <div slot="tip" class="el-upload__tip">
                   <span v-if="fileOfNode(v)" style="color:#67C23A">当前文件：{{ fileOfNode(v).originalName }}</span>
@@ -189,7 +206,7 @@
           <div class="output-list">
             <template v-for="(o, i) in outputs(rowOfDetail).slice(0, 3)">
               <video v-if="o.type === 'video'" :key="'v' + i" :src="o.url" muted preload="metadata" class="output-thumb" @click="previewOutputs(rowOfDetail)" />
-              <img v-else :key="'i' + i" :src="o.url" class="output-thumb" @click="previewOutputs(rowOfDetail)" />
+              <img v-else :key="'i' + i" :src="o.url" class="output-thumb" @click="previewOutputs(rowOfDetail)">
             </template>
             <el-button v-if="outputs(rowOfDetail).length > 3" size="mini" type="text" @click="previewOutputs(rowOfDetail)">
               +{{ outputs(rowOfDetail).length - 3 }}
@@ -220,29 +237,29 @@
               @click="previewIndex = idx"
             >
               <video v-if="item.type === 'video'" :src="item.url" muted preload="metadata" class="preview-item-img" />
-              <img v-else :src="item.url" class="preview-item-img" />
+              <img v-else :src="item.url" class="preview-item-img">
               <div class="preview-item-overlay">
-                <i v-if="item.type === 'video'" class="el-icon-video-play"></i>
+                <i v-if="item.type === 'video'" class="el-icon-video-play" />
                 <span class="preview-item-name">{{ item.filename || item.name || item.url.split('/').pop() || (item.type === 'video' ? '视频' : '图片') }}</span>
               </div>
             </div>
           </div>
           <div class="sidebar-nav">
             <el-tooltip content="滚动到顶部" placement="left">
-              <div class="sidebar-nav-btn" @click="scrollSidebar('top')"><i class="el-icon-top"></i></div>
+              <div class="sidebar-nav-btn" @click="scrollSidebar('top')"><i class="el-icon-top" /></div>
             </el-tooltip>
             <el-tooltip content="滚动到底部" placement="left">
-              <div class="sidebar-nav-btn" @click="scrollSidebar('bottom')"><i class="el-icon-bottom"></i></div>
+              <div class="sidebar-nav-btn" @click="scrollSidebar('bottom')"><i class="el-icon-bottom" /></div>
             </el-tooltip>
           </div>
         </div>
         <!-- 右侧预览区 -->
         <div class="preview-main">
           <div v-if="previewList[previewIndex].type === 'video'" class="preview-video-wrap">
-            <video :key="'pv' + previewIndex" :src="previewList[previewIndex].url" controls autoplay class="preview-video"></video>
+            <video :key="'pv' + previewIndex" :src="previewList[previewIndex].url" controls autoplay class="preview-video" />
           </div>
           <div v-else class="preview-image-wrap">
-            <img :key="'pi' + previewIndex" :src="previewList[previewIndex].url" class="preview-image" />
+            <img :key="'pi' + previewIndex" :src="previewList[previewIndex].url" class="preview-image">
             <span class="preview-counter">{{ previewIndex + 1 }} / {{ previewList.length }}</span>
           </div>
         </div>
@@ -261,7 +278,7 @@ export default {
       taskList: [],
       loading: false,
       total: 0,
-      queryParams: { pageNum: 1, pageSize: 20, status: '', funcType: '', prompt: '' },
+      queryParams: { pageNum: 1, pageSize: 20, status: '', funcType: '', prompt: '', date: this.todayStr() },
       ids: [],
       multiple: true,
       funcTypeText: { txt2img: '文生图', img2img: '图生图', txt2video: '文生视频', img2video: '图生视频' },
@@ -284,7 +301,8 @@ export default {
       fileListMap: {}
     }
   },
-  created() { this.getList() },
+  created() { this.getList(); this.startPolling() },
+  beforeDestroy() { this.stopPolling() },
   methods: {
     getList() {
       this.loading = true
@@ -293,8 +311,22 @@ export default {
         this.total = res.data.totalNum
       }).finally(() => { this.loading = false })
     },
+    startPolling() {
+      this.pollingTimer = setInterval(() => {
+        if (this.isAnyRunning()) this.getList()
+      }, 5000)
+    },
+    stopPolling() { if (this.pollingTimer) { clearInterval(this.pollingTimer); this.pollingTimer = null } },
+    isAnyRunning() {
+      return this.taskList.some(x => x.queued === 1 && (x.queueStatus === 'pending' || x.queueStatus === 'processing'))
+    },
     handleQuery() { this.queryParams.pageNum = 1; this.getList() },
-    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 20, status: '', funcType: '', prompt: '' }; this.getList() },
+    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 20, status: '', funcType: '', prompt: '', date: this.todayStr() }; this.getList() },
+    todayStr() {
+      const pad = n => (n < 10 ? '0' + n : '' + n)
+      const d = new Date()
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+    },
     handleSelectionChange(selection) {
       this.ids = selection.filter(x => x.queued === 0).map(item => item.id)
       this.multiple = !this.ids.length

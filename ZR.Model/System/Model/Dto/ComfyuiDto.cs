@@ -213,6 +213,11 @@ namespace ZR.Model.System.Dto
         public string Status { get; set; }
         public string FuncType { get; set; }
         public int? Queued { get; set; }
+
+        /// <summary>
+        /// 按创建日期过滤（yyyy-MM-dd）
+        /// </summary>
+        public string Date { get; set; }
     }
 
     /// <summary>
@@ -232,6 +237,11 @@ namespace ZR.Model.System.Dto
     {
         public string Status { get; set; }
         public string FuncType { get; set; }
+
+        /// <summary>
+        /// 按入队日期过滤（yyyy-MM-dd）
+        /// </summary>
+        public string Date { get; set; }
     }
 
     /// <summary>

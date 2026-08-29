@@ -24,6 +24,9 @@
             <el-option label="图生视频" value="img2video" />
           </el-select>
         </el-form-item>
+        <el-form-item label="日期" prop="date">
+          <el-date-picker v-model="queryParams.date" type="date" value-format="yyyy-MM-dd" placeholder="选择入队日期" clearable size="small" style="width: 140px" @change="handleQuery" />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -53,7 +56,7 @@
             <div v-if="outputs(scope.row).length > 0" class="output-list">
               <template v-for="(o, i) in outputs(scope.row).slice(0, 3)">
                 <video v-if="o.type === 'video'" :key="'v' + i" :src="o.url" class="output-thumb" @click="previewOutputs(scope.row)" />
-                <img v-else :key="'i' + i" :src="o.url" class="output-thumb" @click="previewOutputs(scope.row)" />
+                <img v-else :key="'i' + i" :src="o.url" class="output-thumb" @click="previewOutputs(scope.row)">
               </template>
               <el-button v-if="outputs(scope.row).length > 3" size="mini" type="text" @click="previewOutputs(scope.row)">
                 +{{ outputs(scope.row).length - 3 }}
@@ -98,29 +101,29 @@
               @click="previewIndex = idx"
             >
               <video v-if="item.type === 'video'" :src="item.url" muted preload="metadata" class="preview-item-img" />
-              <img v-else :src="item.url" class="preview-item-img" />
+              <img v-else :src="item.url" class="preview-item-img">
               <div class="preview-item-overlay">
-                <i v-if="item.type === 'video'" class="el-icon-video-play"></i>
+                <i v-if="item.type === 'video'" class="el-icon-video-play" />
                 <span class="preview-item-name">{{ item.filename || item.name || item.url.split('/').pop() || (item.type === 'video' ? '视频' : '图片') }}</span>
               </div>
             </div>
           </div>
           <div class="sidebar-nav">
             <el-tooltip content="滚动到顶部" placement="left">
-              <div class="sidebar-nav-btn" @click="scrollSidebar('top')"><i class="el-icon-top"></i></div>
+              <div class="sidebar-nav-btn" @click="scrollSidebar('top')"><i class="el-icon-top" /></div>
             </el-tooltip>
             <el-tooltip content="滚动到底部" placement="left">
-              <div class="sidebar-nav-btn" @click="scrollSidebar('bottom')"><i class="el-icon-bottom"></i></div>
+              <div class="sidebar-nav-btn" @click="scrollSidebar('bottom')"><i class="el-icon-bottom" /></div>
             </el-tooltip>
           </div>
         </div>
         <!-- 右侧预览区 -->
         <div class="preview-main">
           <div v-if="previewList[previewIndex].type === 'video'" class="preview-video-wrap">
-            <video :key="'pv' + previewIndex" :src="previewList[previewIndex].url" controls autoplay class="preview-video"></video>
+            <video :key="'pv' + previewIndex" :src="previewList[previewIndex].url" controls autoplay class="preview-video" />
           </div>
           <div v-else class="preview-image-wrap">
-            <img :key="'pi' + previewIndex" :src="previewList[previewIndex].url" class="preview-image" />
+            <img :key="'pi' + previewIndex" :src="previewList[previewIndex].url" class="preview-image">
             <span class="preview-counter">{{ previewIndex + 1 }} / {{ previewList.length }}</span>
           </div>
         </div>
@@ -139,7 +142,7 @@ export default {
       queueList: [],
       loading: false,
       total: 0,
-      queryParams: { pageNum: 1, pageSize: 20, status: '', funcType: '' },
+      queryParams: { pageNum: 1, pageSize: 20, status: '', funcType: '', date: this.todayStr() },
       funcTypeText: { txt2img: '文生图', img2img: '图生图', txt2video: '文生视频', img2video: '图生视频' },
       statusText: { pending: '待执行', processing: '执行中', done: '已完成', failed: '失败', cancelled: '已取消' },
       previewVisible: false,
@@ -167,7 +170,12 @@ export default {
       return this.queueList.some(x => x.status === 'pending' || x.status === 'processing')
     },
     handleQuery() { this.queryParams.pageNum = 1; this.getList() },
-    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 20, status: '', funcType: '' }; this.getList() },
+    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 20, status: '', funcType: '', date: this.todayStr() }; this.getList() },
+    todayStr() {
+      const pad = n => (n < 10 ? '0' + n : '' + n)
+      const d = new Date()
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+    },
     outputs(row) {
       if (!row.outputUrls) return []
       try { return JSON.parse(row.outputUrls) } catch (e) { return [] }

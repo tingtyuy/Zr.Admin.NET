@@ -960,10 +960,18 @@ namespace ZR.ServiceCore.Services
 
         public PagedInfo<ComfyuiTaskView> GetTaskList(ComfyuiTaskListDto parm, long userId)
         {
+            DateTime? dateStart = null, dateEnd = null;
+            if (parm.Date.IsNotEmpty() && DateTime.TryParse(parm.Date, out var dateVal))
+            {
+                dateStart = dateVal.Date;
+                dateEnd = dateVal.Date.AddDays(1);
+            }
+
             var query = Context.Queryable<ComfyuiTask>()
                 .WhereIF(parm.Status.IsNotEmpty(), x => x.Status == parm.Status)
                 .WhereIF(parm.FuncType.IsNotEmpty(), x => x.FuncType == parm.FuncType)
                 .WhereIF(parm.Queued.HasValue, x => x.Queued == parm.Queued.Value)
+                .WhereIF(dateStart.HasValue, x => x.CreatedTime >= dateStart.Value && x.CreatedTime < dateEnd.Value)
                 .WhereIF(parm.Prompt.IsNotEmpty(), x => (x.TaskName != null && x.TaskName.Contains(parm.Prompt)) || x.WorkflowName.Contains(parm.Prompt));
 
             int total = query.Count();
@@ -1193,9 +1201,17 @@ namespace ZR.ServiceCore.Services
         #region 执行队列
         public PagedInfo<ComfyuiQueue> GetQueueList(ComfyuiQueueListDto parm, long userId)
         {
+            DateTime? dateStart = null, dateEnd = null;
+            if (parm.Date.IsNotEmpty() && DateTime.TryParse(parm.Date, out var dateVal))
+            {
+                dateStart = dateVal.Date;
+                dateEnd = dateVal.Date.AddDays(1);
+            }
+
             return Context.Queryable<ComfyuiQueue>()
                 .WhereIF(parm.Status.IsNotEmpty(), x => x.Status == parm.Status)
                 .WhereIF(parm.FuncType.IsNotEmpty(), x => x.FuncType == parm.FuncType)
+                .WhereIF(dateStart.HasValue, x => x.QueuedTime >= dateStart.Value && x.QueuedTime < dateEnd.Value)
                 .OrderBy(x => x.QueuedTime, OrderByType.Desc)
                 .ToPage(parm);
         }
