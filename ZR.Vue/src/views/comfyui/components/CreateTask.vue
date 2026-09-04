@@ -49,8 +49,8 @@
               :inactive-value="false"
             />
             <div v-else-if="v.type === 'seed'" style="display:flex;align-items:center;gap:12px">
-              <el-input-number v-model="variablesValue[v.nodeId]" :min="0" :max="999999999" size="small" style="width:180px" />
-              <el-checkbox v-model="seedRandom">随机</el-checkbox>
+              <el-input-number v-model="variablesValue[v.nodeId]" :min="0" :max="2147483646" size="small" style="width:180px" />
+              <el-checkbox v-model="seedRandom" @change="onSeedRandomChange">随机</el-checkbox>
               <span style="color:#909399;font-size:12px">{{ seedRandom ? '每个任务将使用不同种子，生成不同结果' : '所有任务使用相同种子，结果可复现' }}</span>
             </div>
             <el-upload
@@ -141,6 +141,13 @@ export default {
   created() { this.loadWorkflows() },
   methods: {
     isFileNode(v) { return v.type === 'image' || v.type === 'video' },
+    randSeed() { return Math.floor(Math.random() * 2147483647) },
+    onSeedRandomChange(val) {
+      const seed = val ? this.randSeed() : 0
+      this.variables.forEach(v => {
+        if (v.type === 'seed') this.$set(this.variablesValue, v.nodeId, seed)
+      })
+    },
     loadWorkflows() {
       getWorkflowList({ pageNum: 1, pageSize: 100, category: this.funcType }).then(res => {
         this.workflows = res.data.result || []
@@ -162,9 +169,10 @@ export default {
       if (!wid) return
       getWorkflowVariables(wid).then(res => {
         this.variables = (res.data || []).filter(v => v.enabled !== false)
+        const seed = this.variables.some(v => v.type === 'seed') && this.seedRandom ? this.randSeed() : 0
         this.variables.forEach(v => {
           if (v.type === 'seed') {
-            this.$set(this.variablesValue, v.nodeId, 0)
+            this.$set(this.variablesValue, v.nodeId, seed)
           } else if (v.type === 'value') {
             this.$set(this.variablesValue, v.nodeId, 1)
           }

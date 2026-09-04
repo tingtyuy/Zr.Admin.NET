@@ -34,7 +34,17 @@
         </el-form-item>
       </el-form>
 
-      <el-table v-loading="loading" :data="queueList" border stripe>
+      <el-row :gutter="10" class="mb8">
+        <el-col :span="1.5">
+          <el-button type="warning" plain icon="el-icon-refresh-right" size="mini" :disabled="multiple" @click="handleBatchRetry">批量重试</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <span style="font-size:12px;color:#909399;line-height:28px">勾选记录后批量重试（排队/执行中的记录不可选）</span>
+        </el-col>
+      </el-row>
+
+      <el-table v-loading="loading" :data="queueList" border stripe @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="45" align="center" :selectable="row => row.status !== 'pending' && row.status !== 'processing'" />
         <el-table-column label="任务名" prop="taskName" min-width="160" :show-overflow-tooltip="true" />
         <el-table-column label="类型" prop="funcType" width="90" align="center">
           <template slot-scope="scope">
@@ -76,9 +86,10 @@
           </template>
         </el-table-column>
         <el-table-column label="入队时间" prop="queuedTime" width="150" align="center" />
-        <el-table-column label="操作" width="120" align="center" fixed="right">
+        <el-table-column label="操作" width="170" align="center" fixed="right">
           <template slot-scope="scope">
             <el-button v-if="scope.row.status === 'pending'" type="text" icon="el-icon-close" style="color:#F56C6C" @click="handleCancel(scope.row)">取消</el-button>
+            <el-button v-if="scope.row.status !== 'pending' && scope.row.status !== 'processing'" type="text" icon="el-icon-refresh-right" style="color:#E6A23C" @click="handleRetry(scope.row)">重试</el-button>
             <el-button v-if="scope.row.status === 'done' || scope.row.status === 'failed'" type="text" icon="el-icon-back" @click="handleDequeue(scope.row)">出队</el-button>
           </template>
         </el-table-column>
@@ -133,7 +144,7 @@
 </template>
 
 <script>
-import { getComfyuiQueueList, cancelComfyuiQueue, dequeueComfyuiQueue } from '@/api/comfyui/index'
+import { getComfyuiQueueList, cancelComfyuiQueue, dequeueComfyuiQueue, retryComfyuiQueue, batchRetryComfyuiQueue } from '@/api/comfyui/index'
 
 export default {
   name: 'ComfyuiQueueList',
@@ -147,7 +158,9 @@ export default {
       statusText: { pending: '待执行', processing: '执行中', done: '已完成', failed: '失败', cancelled: '已取消' },
       previewVisible: false,
       previewList: [],
-      previewIndex: 0
+      previewIndex: 0,
+      selectedRows: [],
+      multiple: true
     }
   },
   created() { this.getList(); this.startPolling() },
@@ -220,6 +233,27 @@ export default {
           this.$message.success(res.data.message)
           this.getList()
         }).catch(() => { this.$message.error('出队失败') })
+      }).catch(() => {})
+    },
+    handleSelectionChange(rows) {
+      this.selectedRows = rows
+      this.multiple = !rows.length
+    },
+    handleRetry(row) {
+      this.$confirm(`确定重试任务「${row.taskName}」？将重新构建参数并加入执行队列`, '确认', { type: 'warning' }).then(() => {
+        retryComfyuiQueue(row.id).then(res => {
+          this.$message.success(res.data.message)
+          this.getList()
+        }).catch(() => { this.$message.error('重试失败') })
+      }).catch(() => {})
+    },
+    handleBatchRetry() {
+      if (!this.selectedRows.length) { this.$message.warning('请勾选失败记录'); return }
+      this.$confirm(`确定重试选中的 ${this.selectedRows.length} 个任务？`, '确认', { type: 'warning' }).then(() => {
+        batchRetryComfyuiQueue(this.selectedRows.map(x => x.id)).then(res => {
+          this.$message.success(res.data.message)
+          this.getList()
+        }).catch(() => { this.$message.error('批量重试失败') })
       }).catch(() => {})
     },
     copyText(text) {

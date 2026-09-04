@@ -132,6 +132,16 @@ namespace ZR.ServiceCore.Services
         bool Dequeue(long id, long userId);
 
         /// <summary>
+        /// 重试（失败的队列记录重置为待执行，Worker 重新构建并执行）
+        /// </summary>
+        bool RetryQueue(long id, long userId);
+
+        /// <summary>
+        /// 批量重试（跳过不满足重试条件的记录），返回成功数
+        /// </summary>
+        int BatchRetryQueue(List<long> ids, long userId);
+
+        /// <summary>
         /// 上传任务参考文件到ComfyUI input目录（回填ComfyName）
         /// </summary>
         void UploadReferenceToComfy(ComfyuiTask task);

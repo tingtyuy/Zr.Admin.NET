@@ -1272,6 +1272,70 @@ namespace ZR.ServiceCore.Services
 
             return Context.Deleteable<ComfyuiQueue>().Where(x => x.Id == id).ExecuteCommand() > 0;
         }
+
+        public bool RetryQueue(long id, long userId)
+        {
+            var queue = Context.Queryable<ComfyuiQueue>().First(x => x.Id == id);
+            if (queue == null)
+            {
+                throw new CustomException("队列记录不存在");
+            }
+            if (queue.Status == "pending" || queue.Status == "processing")
+            {
+                throw new CustomException("该记录正在排队/执行中，无需重试");
+            }
+            // 防止重复排队
+            var inQueue = Context.Queryable<ComfyuiQueue>()
+                .Any(x => x.TaskId == queue.TaskId && x.Id != id && (x.Status == "pending" || x.Status == "processing"));
+            if (inQueue)
+            {
+                throw new CustomException("该任务已在队列中（待执行/执行中），请勿重复重试");
+            }
+
+            var now = DateTime.Now;
+            // 任务同步为待执行状态
+            Context.Updateable<ComfyuiTask>()
+                .SetColumns(x => x.Queued == 1)
+                .SetColumns(x => x.Status == "pending")
+                .SetColumns(x => x.QueuedTime == now)
+                .SetColumns(x => x.ErrorMessage == null)
+                .Where(x => x.Id == queue.TaskId)
+                .ExecuteCommand();
+
+            // 重置队列记录为待执行，Worker 会重新构建prompt并执行
+            return Context.Updateable<ComfyuiQueue>()
+                .SetColumns(x => x.Status == "pending")
+                .SetColumns(x => x.Progress == 0)
+                .SetColumns(x => x.ErrorMessage == null)
+                .SetColumns(x => x.CompleteTime == null)
+                .SetColumns(x => x.QueuedTime == now)
+                .Where(x => x.Id == id)
+                .ExecuteCommand() > 0;
+        }
+
+        public int BatchRetryQueue(List<long> ids, long userId)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                throw new CustomException("请选择任务");
+            }
+            int count = 0;
+            foreach (var id in ids)
+            {
+                try
+                {
+                    if (RetryQueue(id, userId))
+                    {
+                        count++;
+                    }
+                }
+                catch (CustomException)
+                {
+                    // 跳过不满足重试条件的记录
+                }
+            }
+            return count;
+        }
         #endregion
 
         #region 内部工具

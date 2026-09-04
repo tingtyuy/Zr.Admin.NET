@@ -109,38 +109,29 @@
           <el-descriptions-item label="状态">
             <el-tag size="small" :type="statusTagType(rowOfDetail)">{{ statusText(rowOfDetail) }}</el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="种子">{{ seedModeText(detailData.seedMode) }}</el-descriptions-item>
+          <el-descriptions-item label="种子">{{ seedModeText(detailData.seedMode) }}<span v-if="detailDialog.mode !== 'edit' && seedValueText()" style="margin-left:8px;color:#606266">{{ seedValueText() }}</span></el-descriptions-item>
           <el-descriptions-item label="创建时间">{{ detailData.createTime }}</el-descriptions-item>
           <el-descriptions-item label="入队时间">{{ detailData.queuedTime || '-' }}</el-descriptions-item>
-          <el-descriptions-item v-if="detailErrorText" label="错误信息" :span="2">
-            <span style="color:#F56C6C">{{ detailErrorText }}</span>
+          <el-descriptions-item v-if="detailErrorText()" label="错误信息" :span="2">
+            <span style="color:#F56C6C">{{ detailErrorText() }}</span>
           </el-descriptions-item>
         </el-descriptions>
 
         <!-- 编辑模式：变量/参考文件表单 -->
         <template v-if="detailDialog.mode === 'edit'">
           <el-divider content-position="left">编辑输入</el-divider>
-          <el-form label-width="100px">
-            <el-form-item label="种子模式">
-              <el-radio-group v-model="detailDialog.seedMode" size="small">
-                <el-radio label="random">随机种子</el-radio>
-                <el-radio label="fixed">固定种子</el-radio>
-              </el-radio-group>
-              <span style="margin-left:8px;color:#909399;font-size:12px">随机种子用于每次生成不同结果，固定种子用于复现工作流原结果</span>
-            </el-form-item>
-          </el-form>
           <div v-if="detailDialog.variables.length === 0" style="color:#909399;font-size:12px">
             该工作流未配置可变节点，无需填写。保存后直接入队按工作流原JSON执行。
           </div>
           <el-form v-else ref="detailForm" :model="detailDialog.values" label-width="100px">
             <el-form-item v-for="v in detailDialog.variables" :key="v.nodeId" :label="v.label || v.nodeId" :required="isFileNode(v)">
-              <template v-if="v.type === 'prompt' || v.type === 'value'">
+              <template v-if="v.type === 'prompt'">
                 <div class="input-with-switch">
                   <el-input
                     v-model="detailDialog.values[v.nodeId]"
-                    :type="v.type === 'value' ? 'input' : 'textarea'"
-                    :rows="v.type === 'value' ? 1 : 3"
-                    :placeholder="v.type === 'prompt' ? '描述你想要生成的内容...' : '请输入...'"
+                    type="textarea"
+                    :rows="3"
+                    placeholder="描述你想要生成的内容..."
                     @input="handleTranslationInput(v)"
                   />
                   <el-button class="lang-switch-btn" plain size="small" @click="handleSwitchLang(v)">中英切换</el-button>
@@ -149,7 +140,17 @@
                   <span class="hint-label">中文提示：</span>{{ detailDialog.translateHint[v.nodeId] }}
                 </div>
               </template>
-              <el-input-number v-else-if="v.type === 'number'" v-model="detailDialog.values[v.nodeId]" :min="0" size="small" />
+              <el-input-number
+                v-else-if="v.type === 'value' || v.type === 'number'"
+                v-model="detailDialog.values[v.nodeId]"
+                :min="0"
+                size="small"
+              />
+              <div v-else-if="v.type === 'seed'" style="display:flex;align-items:center;gap:12px">
+                <el-input-number v-model="detailDialog.values[v.nodeId]" :min="0" :max="2147483646" size="small" style="width:180px" />
+                <el-checkbox v-model="detailDialog.seedRandom" @change="onEditSeedRandomChange">随机</el-checkbox>
+                <span style="color:#909399;font-size:12px">{{ detailDialog.seedRandom ? '每个任务将使用不同种子，生成不同结果' : '所有任务使用相同种子，结果可复现' }}</span>
+              </div>
               <el-switch
                 v-else-if="v.type === 'bool'"
                 v-model="detailDialog.values[v.nodeId]"
@@ -301,7 +302,7 @@ export default {
       detailData: null,
       detailDialog: {
         mode: 'view',
-        seedMode: 'random',
+        seedRandom: true,
         loading: false,
         saving: false,
         row: null,
@@ -394,6 +395,22 @@ export default {
     },
     isFileNode(v) { return v.type === 'image' || v.type === 'video' },
     seedModeText(mode) { return mode === 'fixed' ? '固定种子' : '随机种子' },
+    randSeed() { return Math.floor(Math.random() * 2147483647) },
+    seedValueText() {
+      const values = this.parseJson(this.detailData && this.detailData.variableValues, {})
+      const parts = this.detailDialog.variables
+        .filter(v => v.type === 'seed')
+        .map(v => (values[v.nodeId] != null && values[v.nodeId] !== '') ? String(values[v.nodeId]) : '')
+      const fixed = (this.detailData && this.detailData.seedMode) === 'fixed'
+      const list = parts.filter(p => p !== '' && (p !== '0' || fixed))
+      return list.length ? '：' + list.join('，') : ''
+    },
+    onEditSeedRandomChange(val) {
+      const seed = val ? this.randSeed() : 0
+      this.detailDialog.variables.forEach(v => {
+        if (v.type === 'seed') this.$set(this.detailDialog.values, v.nodeId, seed)
+      })
+    },
     parseJson(json, fallback) {
       if (!json) return fallback
       try { return JSON.parse(json) } catch (e) { return fallback }
@@ -405,7 +422,12 @@ export default {
     valueOfNode(v) {
       if (!v || v.type === 'image' || v.type === 'video') return '-'
       const values = this.parseJson(this.detailData ? this.detailData.variableValues : null, {})
-      return values[v.nodeId] == null ? '-' : values[v.nodeId]
+      const val = values[v.nodeId]
+      if (val == null) return '-'
+      if (v.type === 'seed' && (this.detailData.seedMode || 'random') !== 'fixed' && String(val) === '0') {
+        return '0（占位值，执行时由后端随机生成）'
+      }
+      return val
     },
     formatJson(json) {
       try { return JSON.stringify(JSON.parse(json), null, 2) } catch (e) { return json }
@@ -422,7 +444,7 @@ export default {
       }
       this.detailVisible = true
       this.detailDialog.mode = mode
-      this.detailDialog.seedMode = row.seedMode || 'random'
+      this.detailDialog.seedRandom = (row.seedMode || 'random') !== 'fixed'
       this.detailDialog.loading = true
       this.detailDialog.saving = false
       this.detailDialog.row = row
@@ -434,15 +456,21 @@ export default {
       this.fileListMap = {}
       getComfyuiTaskDetail(row.id).then(res => {
         this.detailData = res.data
-        this.detailDialog.seedMode = res.data.seedMode || 'random'
+        this.detailDialog.seedRandom = (res.data.seedMode || 'random') !== 'fixed'
         this.detailDialog.refFiles = this.parseJson(res.data.refFiles, [])
         getWorkflowVariables(row.workflowId).then(r2 => {
           this.detailDialog.variables = (r2.data || []).filter(v => v.enabled !== false)
           if (mode === 'edit') {
             const values = this.parseJson(res.data.variableValues, {})
+            const seed = this.detailDialog.seedRandom ? this.randSeed() : 0
             this.detailDialog.variables.forEach(v => {
-              this.$set(this.detailDialog.values, v.nodeId,
-                values[v.nodeId] != null ? values[v.nodeId] : (v.type === 'bool' ? false : ''))
+              if (v.type === 'seed') {
+                this.$set(this.detailDialog.values, v.nodeId,
+                  this.detailDialog.seedRandom ? seed : (values[v.nodeId] != null ? values[v.nodeId] : 0))
+              } else {
+                this.$set(this.detailDialog.values, v.nodeId,
+                  values[v.nodeId] != null ? values[v.nodeId] : (v.type === 'bool' ? false : ''))
+              }
             })
           }
         }).finally(() => { this.detailDialog.loading = false })
@@ -504,7 +532,7 @@ export default {
       const fd = new FormData()
       fd.append('workflowId', this.detailData.workflowId)
       fd.append('funcType', this.detailData.funcType)
-      fd.append('seedMode', this.detailDialog.seedMode || 'random')
+      fd.append('seedMode', this.detailDialog.seedRandom ? 'random' : 'fixed')
       const values = {}
       this.detailDialog.variables.forEach(v => {
         if (this.isFileNode(v)) return

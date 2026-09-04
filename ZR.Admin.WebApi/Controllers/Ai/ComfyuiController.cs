@@ -404,6 +404,42 @@ namespace ZR.Admin.WebApi.Controllers
                 return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
             }
         }
+
+        [HttpPost("queue/retry/{id}")]
+        [Log(Title = "ComfyUI队列重试", BusinessType = BusinessType.UPDATE)]
+        public IActionResult RetryQueue(string id)
+        {
+            if (!long.TryParse(id, out long idLong))
+                return ToResponse(ResultCode.PARAM_ERROR, "ID格式错误");
+            try
+            {
+                var userId = HttpContext.GetUId();
+                var result = _comfyuiService.RetryQueue(idLong, userId);
+                return SUCCESS(new { message = result ? "已重新入队" : "重试失败", result });
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
+
+        [HttpPost("queue/batch-retry")]
+        [Log(Title = "ComfyUI队列批量重试", BusinessType = BusinessType.UPDATE)]
+        public IActionResult BatchRetryQueue([FromBody] ComfyuiQueueEnqueueDto dto)
+        {
+            if (dto?.TaskIds == null || dto.TaskIds.Count == 0)
+                return ToResponse(ResultCode.PARAM_ERROR, "请选择任务");
+            try
+            {
+                var userId = HttpContext.GetUId();
+                var count = _comfyuiService.BatchRetryQueue(dto.TaskIds, userId);
+                return SUCCESS(new { message = $"已重试 {count} 个任务", count });
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
         #endregion
 
         #region 工具

@@ -182,3 +182,18 @@ export function dequeueComfyuiQueue(id) {
     method: 'POST'
   })
 }
+
+export function retryComfyuiQueue(id) {
+  return request({
+    url: `/comfyui/queue/retry/${id}`,
+    method: 'POST'
+  })
+}
+
+export function batchRetryComfyuiQueue(ids) {
+  return request({
+    url: '/comfyui/queue/batch-retry',
+    method: 'POST',
+    data: { taskIds: ids }
+  })
+}
