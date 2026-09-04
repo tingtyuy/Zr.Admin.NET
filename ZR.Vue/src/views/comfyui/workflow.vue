@@ -294,6 +294,7 @@
               <el-option label="图片" value="image" />
               <el-option label="视频" value="video" />
               <el-option label="数值" value="value" />
+              <el-option label="随机种子" value="seed" />
             </el-select>
           </template>
         </el-table-column>

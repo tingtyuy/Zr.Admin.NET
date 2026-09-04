@@ -695,7 +695,6 @@ namespace ZR.ServiceCore.Services
             int taskCount = dto.TaskCount;
             if (taskCount < 1) taskCount = 1;
             if (taskCount > 20) taskCount = 20;
-
             var workflow = Context.Queryable<ComfyuiWorkflow>().First(x => x.Id == dto.WorkflowId);
             if (workflow == null)
             {
@@ -1052,6 +1051,16 @@ namespace ZR.ServiceCore.Services
             // 清理该任务的所有历史队列记录（含待执行取消、已完成/失败记录）
             Context.Deleteable<ComfyuiQueue>().Where(x => x.TaskId == id).ExecuteCommand();
             // 清理本地参考文件和输出文件
+            CleanTaskFiles(task);
+            return Context.Deleteable<ComfyuiTask>().Where(x => x.Id == id).ExecuteCommand() > 0;
+        }
+
+        /// <summary>
+        /// 清理任务的本地参考文件和输出文件
+        /// </summary>
+        private void CleanTaskFiles(ComfyuiTask task)
+        {
+            if (task == null) return;
             try
             {
                 string storageRoot = "storage/comfyui";
@@ -1074,7 +1083,6 @@ namespace ZR.ServiceCore.Services
                 }
             }
             catch { }
-            return Context.Deleteable<ComfyuiTask>().Where(x => x.Id == id).ExecuteCommand() > 0;
         }
 
         public int EnqueueTasks(List<long> taskIds, long userId)
@@ -1146,8 +1154,15 @@ namespace ZR.ServiceCore.Services
             {
                 return 0;
             }
+            // 先取出任务（用于清理本地文件）
+            var tasks = Context.Queryable<ComfyuiTask>().Where(x => deletable.Contains(x.Id)).ToList();
             // 清理关联队列记录
             Context.Deleteable<ComfyuiQueue>().Where(x => deletable.Contains(x.TaskId)).ExecuteCommand();
+            // 清理本地参考文件和输出文件
+            foreach (var t in tasks)
+            {
+                CleanTaskFiles(t);
+            }
             return Context.Deleteable<ComfyuiTask>()
                 .Where(x => deletable.Contains(x.Id))
                 .ExecuteCommand();
@@ -1343,6 +1358,12 @@ namespace ZR.ServiceCore.Services
                             boolInputs[node.Field] = ConvertToNativeJToken(boolInputs[node.Field], value);
                         }
                         break;
+                    case "seed":
+                        if (!string.IsNullOrEmpty(value) && nodeObj["inputs"] is JObject seedInputs)
+                        {
+                            seedInputs[node.Field] = ConvertToNativeJToken(seedInputs[node.Field], value);
+                        }
+                        break;
                     case "image":
                     case "video":
                         if (nodeObj["inputs"] is JObject refInputs)
@@ -1404,6 +1425,7 @@ namespace ZR.ServiceCore.Services
             var mode = (seedMode ?? string.Empty).Trim().ToLowerInvariant();
             return mode == "fixed" ? "fixed" : "random";
         }
+
 
         private List<ComfyuiRefFile> ParseRefFiles(string json)
         {
@@ -1528,6 +1550,7 @@ namespace ZR.ServiceCore.Services
             if (entry == null) return result;
             var outputs = entry["outputs"] as JObject;
             if (outputs == null) return result;
+            var pending = new List<(string url, string filename, bool isVideo)>();
             foreach (var outProp in outputs.Properties())
             {
                 var images = outProp.Value["images"] as JArray;
@@ -1543,8 +1566,7 @@ namespace ZR.ServiceCore.Services
                             string url = $"{GetServerUrl()}/view?filename={filename}&subfolder={subfolder}&type={type}";
                             bool isVideo = filename.EndsWith(".mp4") || filename.EndsWith(".webm") || filename.EndsWith(".avi")
                                         || filename.EndsWith(".mov") || filename.EndsWith(".gif");
-                            string localUrl = DownloadOutputToLocal(url, filename, taskId);
-                            result.Add(new { url = localUrl, type = isVideo ? "video" : "image", filename = filename });
+                            pending.Add((url, filename, isVideo));
                         }
                     }
                 }
@@ -1559,11 +1581,18 @@ namespace ZR.ServiceCore.Services
                         if (filename.IsNotEmpty())
                         {
                             string url = $"{GetServerUrl()}/view?filename={filename}&subfolder={subfolder}&type={type}";
-                            string localUrl = DownloadOutputToLocal(url, filename, taskId);
-                            result.Add(new { url = localUrl, type = "video", filename = filename });
+                            pending.Add((url, filename, true));
                         }
                     }
                 }
+            }
+            int total = pending.Count;
+            int seq = 0;
+            foreach (var p in pending)
+            {
+                seq++;
+                string localUrl = DownloadOutputToLocal(p.url, p.filename, taskId, seq, total);
+                result.Add(new { url = localUrl, type = p.isVideo ? "video" : "image", filename = p.filename });
             }
             return result;
         }
@@ -1580,7 +1609,7 @@ namespace ZR.ServiceCore.Services
         /// <summary>
         /// 将ComfyUI输出文件下载到本地存储目录，返回本地访问URL；失败则回退远程URL
         /// </summary>
-        private string DownloadOutputToLocal(string comfyUrl, string filename, long taskId)
+        private string DownloadOutputToLocal(string comfyUrl, string filename, long taskId, int seq = 0, int total = 0)
         {
             if (string.IsNullOrWhiteSpace(comfyUrl) || taskId <= 0) return comfyUrl;
             try
@@ -1596,7 +1625,10 @@ namespace ZR.ServiceCore.Services
 
                 string ext = Path.GetExtension(filename);
                 string name = Path.GetFileNameWithoutExtension(filename);
-                string targetName = $"{name}_{DateTime.Now:yyyyMMddHHmmssfff}{ext}";
+                // 同一任务生成多个结果时，按序号命名（_1/_2/...），否则用时间戳
+                string targetName = total > 1
+                    ? $"{name}_{seq}{ext}"
+                    : $"{name}_{DateTime.Now:yyyyMMddHHmmssfff}{ext}";
                 string filePath = Path.Combine(outputDir, targetName);
                 File.WriteAllBytes(filePath, bytes);
 

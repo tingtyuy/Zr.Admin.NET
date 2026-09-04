@@ -175,17 +175,7 @@ export default {
       version: defaultSettings.version,
     }
   },
-  mounted() {
-    this.$notify({
-      title: 'Vue2停止更新公告',
-      message:
-        'Vue2已不再更新新功能，请使用Vue3版本<a href="https://gitee.com/izory/ZRAdmin-vue" target="_blank"> https://gitee.com/izory/ZRAdmin-vue </a>',
-      position: 'bottom-right',
-      type: 'warning',
-      dangerouslyUseHTMLString: true,
-      duration: 0,
-    })
-  },
+  mounted() {},
   methods: {
     goTarget(href) {
       window.open(href, '_blank')

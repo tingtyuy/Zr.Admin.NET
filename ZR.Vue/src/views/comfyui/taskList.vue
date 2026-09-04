@@ -28,7 +28,8 @@
           <el-input v-model="queryParams.prompt" placeholder="任务名/工作流名" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
         <el-form-item label="日期" prop="date">
-          <el-date-picker v-model="queryParams.date" type="date" value-format="yyyy-MM-dd" placeholder="选择创建日期" clearable size="small" style="width: 140px" @change="handleQuery" />
+          <el-date-picker v-model="queryParams.date" type="date" value-format="yyyy-MM-dd" placeholder="选择创建日期" clearable size="small" style="width: 140px" :disabled="showAll" @change="handleQuery" />
+          <el-checkbox v-model="showAll" style="margin-left:8px" @change="handleShowAllChange">显示全部</el-checkbox>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -288,6 +289,7 @@ export default {
       taskList: [],
       loading: false,
       total: 0,
+      showAll: false,
       queryParams: { pageNum: 1, pageSize: 20, status: '', funcType: '', prompt: '', date: this.todayStr() },
       ids: [],
       multiple: true,
@@ -332,15 +334,19 @@ export default {
       return this.taskList.some(x => x.queued === 1 && (x.queueStatus === 'pending' || x.queueStatus === 'processing'))
     },
     handleQuery() { this.queryParams.pageNum = 1; this.getList() },
-    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 20, status: '', funcType: '', prompt: '', date: this.todayStr() }; this.getList() },
+    resetQuery() { this.showAll = false; this.queryParams = { pageNum: 1, pageSize: 20, status: '', funcType: '', prompt: '', date: this.todayStr() }; this.getList() },
+    handleShowAllChange(val) {
+      this.queryParams.date = val ? '' : this.todayStr()
+      this.handleQuery()
+    },
     todayStr() {
       const pad = n => (n < 10 ? '0' + n : '' + n)
       const d = new Date()
       return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
     },
     handleSelectionChange(selection) {
-      this.ids = selection.filter(x => x.queued === 0).map(item => item.id)
-      this.multiple = !this.ids.length
+      this.ids = selection.map(item => item.id)
+      this.multiple = !selection.length
     },
     statusText(row) {
       if (row.queued === 1 && row.queueStatus) {

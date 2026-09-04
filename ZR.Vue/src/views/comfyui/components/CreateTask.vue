@@ -19,12 +19,12 @@
         <!-- 动态显示可变节点（一个节点生成一个对应类型的输入元素） -->
         <template v-if="variables.length > 0">
           <el-form-item v-for="v in variables" :key="v.nodeId" :label="v.label || v.nodeId" :required="isFileNode(v)">
-            <template v-if="v.type === 'prompt' || v.type === 'value'">
+            <template v-if="v.type === 'prompt'">
               <div class="input-with-switch">
                 <el-input
                   v-model="variablesValue[v.nodeId]"
-                  :type="v.type === 'value' ? 'input' : 'textarea'"
-                  :rows="v.type === 'value' ? 1 : 3"
+                  type="textarea"
+                  :rows="3"
                   :placeholder="placeholderText(v)"
                   @input="handleTranslationInput(v)"
                 />
@@ -35,7 +35,7 @@
               </div>
             </template>
             <el-input-number
-              v-else-if="v.type === 'number'"
+              v-else-if="v.type === 'value' || v.type === 'number'"
               v-model="variablesValue[v.nodeId]"
               :min="0"
               size="small"
@@ -48,6 +48,11 @@
               :active-value="true"
               :inactive-value="false"
             />
+            <div v-else-if="v.type === 'seed'" style="display:flex;align-items:center;gap:12px">
+              <el-input-number v-model="variablesValue[v.nodeId]" :min="0" :max="999999999" size="small" style="width:180px" />
+              <el-checkbox v-model="seedRandom">随机</el-checkbox>
+              <span style="color:#909399;font-size:12px">{{ seedRandom ? '每个任务将使用不同种子，生成不同结果' : '所有任务使用相同种子，结果可复现' }}</span>
+            </div>
             <el-upload
               v-else-if="isFileNode(v)"
               class="upload-btn"
@@ -78,14 +83,6 @@
         <el-form-item label="生成数量">
           <el-input-number v-model="form.taskCount" :min="1" :max="20" size="small" />
           <span style="margin-left:8px;color:#909399;font-size:12px">将创建 {{ form.taskCount }} 个任务并自动入队执行</span>
-        </el-form-item>
-
-        <el-form-item label="种子模式">
-          <el-radio-group v-model="form.seedMode" size="small">
-            <el-radio label="random">随机种子</el-radio>
-            <el-radio label="fixed">固定种子</el-radio>
-          </el-radio-group>
-          <span style="margin-left:8px;color:#909399;font-size:12px">随机种子用于每次生成不同结果，固定种子用于复现工作流原结果</span>
         </el-form-item>
 
         <el-form-item>
@@ -126,10 +123,11 @@ export default {
   },
   data() {
     return {
-      form: { workflowId: '', taskCount: 1, seedMode: 'random' },
+      form: { workflowId: '', taskCount: 1 },
       rules: {
         workflowId: [{ required: true, message: '请选择工作流', trigger: 'change' }]
       },
+      seedRandom: true,
       loading: false,
       workflows: [],
       variables: [],
@@ -164,6 +162,13 @@ export default {
       if (!wid) return
       getWorkflowVariables(wid).then(res => {
         this.variables = (res.data || []).filter(v => v.enabled !== false)
+        this.variables.forEach(v => {
+          if (v.type === 'seed') {
+            this.$set(this.variablesValue, v.nodeId, 0)
+          } else if (v.type === 'value') {
+            this.$set(this.variablesValue, v.nodeId, 1)
+          }
+        })
       })
     },
     placeholderText(v) {
@@ -239,7 +244,7 @@ export default {
       fd.append('workflowId', this.form.workflowId)
       fd.append('funcType', this.funcType)
       fd.append('taskCount', this.form.taskCount || 1)
-      fd.append('seedMode', this.form.seedMode || 'random')
+      fd.append('seedMode', this.seedRandom ? 'random' : 'fixed')
       const values = {}
       this.variables.forEach(v => {
         if (this.isFileNode(v)) return
@@ -260,7 +265,8 @@ export default {
       }).finally(() => { this.loading = false })
     },
     resetForm() {
-      this.form = { workflowId: '', taskCount: 1, seedMode: 'random' }
+      this.form = { workflowId: '', taskCount: 1 }
+      this.seedRandom = true
       this.variables = []
       this.variablesValue = {}
       this.translateHint = {}
