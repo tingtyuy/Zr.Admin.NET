@@ -79,6 +79,12 @@ namespace ZR.Model.System
         public string ErrorMessage { get; set; }
 
         /// <summary>
+        /// 自媒体发布状态: pending=待发布, published=已发布
+        /// </summary>
+        [SugarColumn(Length = 20, DefaultValue = "pending")]
+        public string PublishStatus { get; set; } = "pending";
+
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime? CreatedTime { get; set; }

@@ -43,6 +43,12 @@
           <el-button type="primary" plain icon="el-icon-upload2" size="mini" :disabled="multiple" @click="handleEnqueue">入队执行</el-button>
         </el-col>
         <el-col :span="1.5">
+          <el-button type="success" plain icon="el-icon-finished" size="mini" :disabled="multiple" @click="handleBatchPublish('published')">批量已发布</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button plain icon="el-icon-refresh-left" size="mini" :disabled="multiple" @click="handleBatchPublish('pending')">批量待发布</el-button>
+        </el-col>
+        <el-col :span="1.5">
           <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleBatchDelete">批量删除</el-button>
         </el-col>
       </el-row>
@@ -61,6 +67,17 @@
             <el-tag size="small" :type="statusTagType(scope.row)">
               {{ statusText(scope.row) }}
             </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="发布状态" width="110" align="center">
+          <template slot-scope="scope">
+            <el-tag
+              size="small"
+              :type="scope.row.publishStatus === 'published' ? 'success' : 'warning'"
+              :effect="scope.row.publishStatus === 'published' ? 'light' : 'dark'"
+              style="cursor:pointer"
+              @click="togglePublishStatus(scope.row)"
+            >{{ scope.row.publishStatus === 'published' ? '已发布' : '待发布' }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="进度" width="140" align="center">
@@ -281,7 +298,7 @@
 </template>
 
 <script>
-import { getComfyuiTaskList, getComfyuiTaskDetail, getWorkflowVariables, updateComfyuiTask, translateComfyuiText, deleteComfyuiTask, batchDeleteComfyuiTask, enqueueComfyuiTask } from '@/api/comfyui/index'
+import { getComfyuiTaskList, getComfyuiTaskDetail, getWorkflowVariables, updateComfyuiTask, translateComfyuiText, deleteComfyuiTask, batchDeleteComfyuiTask, enqueueComfyuiTask, updateComfyuiPublishStatus, batchUpdateComfyuiPublishStatus } from '@/api/comfyui/index'
 
 export default {
   name: 'ComfyuiTaskList',
@@ -348,6 +365,36 @@ export default {
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
       this.multiple = !selection.length
+    },
+    // 单个切换：弹窗确认后生效
+    togglePublishStatus(row) {
+      const next = row.publishStatus === 'published' ? 'pending' : 'published'
+      const label = next === 'published' ? '已发布' : '待发布'
+      this.$confirm(`确定将该任务标记为【${label}】吗？`, '确认修改', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        return updateComfyuiPublishStatus(row.id, next)
+      }).then(() => {
+        row.publishStatus = next
+        this.$message.success('更新成功')
+      }).catch(() => {})
+    },
+    // 批量操作：弹窗确认后生效
+    handleBatchPublish(publishStatus) {
+      const label = publishStatus === 'published' ? '已发布' : '待发布'
+      this.$confirm(`确定将选中的 ${this.ids.length} 个任务标记为【${label}】吗？`, '批量操作', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        return batchUpdateComfyuiPublishStatus(this.ids, publishStatus)
+      }).then(res => {
+        this.$message.success(res.data.message)
+        const idSet = new Set(this.ids)
+        this.taskList.forEach(r => { if (idSet.has(r.id)) r.publishStatus = publishStatus })
+      }).catch(() => {})
     },
     statusText(row) {
       if (row.queued === 1 && row.queueStatus) {

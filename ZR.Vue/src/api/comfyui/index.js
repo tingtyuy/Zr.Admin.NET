@@ -160,6 +160,22 @@ export function enqueueComfyuiTask(ids) {
   })
 }
 
+export function updateComfyuiPublishStatus(id, publishStatus) {
+  return request({
+    url: `/comfyui/task/publish-status/${id}`,
+    method: 'POST',
+    data: { publishStatus }
+  })
+}
+
+export function batchUpdateComfyuiPublishStatus(ids, publishStatus) {
+  return request({
+    url: '/comfyui/task/publish-status/batch',
+    method: 'POST',
+    data: { taskIds: ids, publishStatus }
+  })
+}
+
 // ===== 执行队列 =====
 export function getComfyuiQueueList(query) {
   return request({

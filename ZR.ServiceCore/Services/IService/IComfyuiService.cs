@@ -110,6 +110,16 @@ namespace ZR.ServiceCore.Services
         int BatchDeleteTask(List<long> ids, long userId);
 
         /// <summary>
+        /// 更新任务自媒体发布状态（pending=待发布 / published=已发布）
+        /// </summary>
+        bool UpdatePublishStatus(long id, string publishStatus, long userId);
+
+        /// <summary>
+        /// 批量更新任务自媒体发布状态
+        /// </summary>
+        int BatchUpdatePublishStatus(List<long> ids, string publishStatus, long userId);
+
+        /// <summary>
         /// 文本翻译（联网翻译，目标语言 zh-CN / en）
         /// </summary>
         Task<string> TranslateAsync(string text, string target);

@@ -264,6 +264,7 @@ namespace ZR.Model.System.Dto
         public string SeedMode { get; set; }
         public int Queued { get; set; }
         public string Status { get; set; }
+        public string PublishStatus { get; set; }
         public string ErrorMessage { get; set; }
         public DateTime? CreatedTime { get; set; }
         public DateTime? QueuedTime { get; set; }
@@ -276,6 +277,40 @@ namespace ZR.Model.System.Dto
         public int Progress { get; set; }
         public string OutputUrls { get; set; }
         public string QueueErrorMessage { get; set; }
+    }
+
+    /// <summary>
+    /// ComfyUI任务自媒体发布状态更新DTO
+    /// </summary>
+    public class ComfyuiPublishStatusDto
+    {
+        [Display(Name = "任务ID")]
+        [Required(ErrorMessage = "任务ID不能为空")]
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 发布状态: pending=待发布, published=已发布
+        /// </summary>
+        [Display(Name = "发布状态")]
+        [Required(ErrorMessage = "发布状态不能为空")]
+        public string PublishStatus { get; set; }
+    }
+
+    /// <summary>
+    /// ComfyUI任务自媒体发布状态批量更新DTO
+    /// </summary>
+    public class ComfyuiPublishStatusBatchDto
+    {
+        [Display(Name = "任务ID列表")]
+        [Required(ErrorMessage = "请选择任务")]
+        public List<long> TaskIds { get; set; }
+
+        /// <summary>
+        /// 发布状态: pending=待发布, published=已发布
+        /// </summary>
+        [Display(Name = "发布状态")]
+        [Required(ErrorMessage = "发布状态不能为空")]
+        public string PublishStatus { get; set; }
     }
 
     /// <summary>

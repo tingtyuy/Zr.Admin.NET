@@ -1009,6 +1009,7 @@ namespace ZR.ServiceCore.Services
                     SeedMode = NormalizeSeedMode(t.SeedMode),
                     Queued = t.Queued,
                     Status = t.Status,
+                    PublishStatus = t.PublishStatus ?? "pending",
                     ErrorMessage = t.ErrorMessage,
                     CreatedTime = t.CreatedTime,
                     QueuedTime = t.QueuedTime,
@@ -1053,6 +1054,38 @@ namespace ZR.ServiceCore.Services
             // 清理本地参考文件和输出文件
             CleanTaskFiles(task);
             return Context.Deleteable<ComfyuiTask>().Where(x => x.Id == id).ExecuteCommand() > 0;
+        }
+
+        public bool UpdatePublishStatus(long id, string publishStatus, long userId)
+        {
+            var mode = (publishStatus ?? string.Empty).Trim().ToLowerInvariant();
+            if (mode != "pending" && mode != "published")
+            {
+                throw new CustomException("发布状态无效");
+            }
+            var task = Context.Queryable<ComfyuiTask>().First(x => x.Id == id && x.UserId == userId);
+            if (task == null)
+            {
+                throw new CustomException("任务不存在");
+            }
+            return Context.Updateable<ComfyuiTask>()
+                .SetColumns(x => x.PublishStatus == mode)
+                .Where(x => x.Id == id)
+                .ExecuteCommand() > 0;
+        }
+
+        public int BatchUpdatePublishStatus(List<long> ids, string publishStatus, long userId)
+        {
+            var mode = (publishStatus ?? string.Empty).Trim().ToLowerInvariant();
+            if (mode != "pending" && mode != "published")
+            {
+                throw new CustomException("发布状态无效");
+            }
+            if (ids == null || ids.Count == 0) return 0;
+            return Context.Updateable<ComfyuiTask>()
+                .SetColumns(x => x.PublishStatus == mode)
+                .Where(x => ids.Contains(x.Id) && x.UserId == userId)
+                .ExecuteCommand();
         }
 
         /// <summary>

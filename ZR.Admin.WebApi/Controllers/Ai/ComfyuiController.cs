@@ -342,6 +342,40 @@ namespace ZR.Admin.WebApi.Controllers
             return SUCCESS(new { message = $"已删除 {count} 个任务", count });
         }
 
+        [HttpPost("task/publish-status/{id}")]
+        [Log(Title = "ComfyUI任务发布状态", BusinessType = BusinessType.UPDATE)]
+        public IActionResult UpdatePublishStatus(string id, [FromBody] ComfyuiPublishStatusDto dto)
+        {
+            if (!long.TryParse(id, out long idLong))
+                return ToResponse(ResultCode.PARAM_ERROR, "ID格式错误");
+            try
+            {
+                var userId = HttpContext.GetUId();
+                var result = _comfyuiService.UpdatePublishStatus(idLong, dto?.PublishStatus, userId);
+                return SUCCESS(new { message = result ? "更新成功" : "更新失败", result });
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
+
+        [HttpPost("task/publish-status/batch")]
+        [Log(Title = "ComfyUI任务批量发布状态", BusinessType = BusinessType.UPDATE)]
+        public IActionResult BatchUpdatePublishStatus([FromBody] ComfyuiPublishStatusBatchDto dto)
+        {
+            try
+            {
+                var userId = HttpContext.GetUId();
+                var count = _comfyuiService.BatchUpdatePublishStatus(dto?.TaskIds, dto?.PublishStatus, userId);
+                return SUCCESS(new { message = $"已更新 {count} 个任务", count });
+            }
+            catch (Exception ex)
+            {
+                return ToResponse(ResultCode.CUSTOM_ERROR, ex.Message);
+            }
+        }
+
         [HttpPost("task/enqueue")]
         [Log(Title = "ComfyUI任务入队", BusinessType = BusinessType.UPDATE)]
         public IActionResult Enqueue([FromBody] ComfyuiQueueEnqueueDto dto)
