@@ -22,23 +22,34 @@
             <template v-if="v.type === 'prompt' || v.type === 'value'">
               <div class="input-with-switch">
                 <el-input
-                  v-model="variablesValue[v.nodeId]" :type="v.type === 'value' ? 'input' : 'textarea'"
+                  v-model="variablesValue[v.nodeId]"
+                  :type="v.type === 'value' ? 'input' : 'textarea'"
                   :rows="v.type === 'value' ? 1 : 3"
                   :placeholder="placeholderText(v)"
-                  @input="handleTranslationInput(v)" />
+                  @input="handleTranslationInput(v)"
+                />
                 <el-button class="lang-switch-btn" plain size="small" @click="handleSwitchLang(v)">中英切换</el-button>
               </div>
               <div v-if="translateHint[v.nodeId]" class="translate-hint">
                 <span class="hint-label">中文提示：</span>{{ translateHint[v.nodeId] }}
               </div>
             </template>
-            <el-input-number v-else-if="v.type === 'number'"
-              v-model="variablesValue[v.nodeId]" :min="0" size="small" />
-            <el-switch v-else-if="v.type === 'bool'"
+            <el-input-number
+              v-else-if="v.type === 'number'"
               v-model="variablesValue[v.nodeId]"
-              active-text="是" inactive-text="否"
-              :active-value="true" :inactive-value="false" />
-            <el-upload v-else-if="isFileNode(v)"
+              :min="0"
+              size="small"
+            />
+            <el-switch
+              v-else-if="v.type === 'bool'"
+              v-model="variablesValue[v.nodeId]"
+              active-text="是"
+              inactive-text="否"
+              :active-value="true"
+              :inactive-value="false"
+            />
+            <el-upload
+              v-else-if="isFileNode(v)"
               class="upload-btn"
               action="#"
               :auto-upload="false"
@@ -46,7 +57,8 @@
               :accept="v.type === 'video' ? '.mp4,.webm,.mov,.avi' : '.png,.jpg,.jpeg,.webp,.gif,.bmp'"
               :on-change="(file) => handleFileChange(v.nodeId, file)"
               :on-remove="() => handleFileRemove(v.nodeId)"
-              :file-list="fileListMap[v.nodeId] || []">
+              :file-list="fileListMap[v.nodeId] || []"
+            >
               <el-button size="small" type="primary" icon="el-icon-upload">{{ v.type === 'video' ? '选择参考视频' : '选择参考图' }}</el-button>
               <div slot="tip" class="el-upload__tip">上传后会自动同步到ComfyUI的input目录</div>
             </el-upload>
@@ -55,17 +67,30 @@
             </div>
           </el-form-item>
         </template>
-        <el-alert v-else-if="form.workflowId" type="warning" :closable="false" style="margin-bottom:16px"
-          title="该工作流未配置可变节点，将直接按工作流原JSON执行。如需替换提示词/参考图，请到【工作流管理】配置可变节点。" />
+        <el-alert
+          v-else-if="form.workflowId"
+          type="warning"
+          :closable="false"
+          style="margin-bottom:16px"
+          title="该工作流未配置可变节点，将直接按工作流原JSON执行。如需替换提示词/参考图，请到【工作流管理】配置可变节点。"
+        />
 
         <el-form-item label="生成数量">
           <el-input-number v-model="form.taskCount" :min="1" :max="20" size="small" />
           <span style="margin-left:8px;color:#909399;font-size:12px">将创建 {{ form.taskCount }} 个任务并自动入队执行</span>
         </el-form-item>
 
+        <el-form-item label="种子模式">
+          <el-radio-group v-model="form.seedMode" size="small">
+            <el-radio label="random">随机种子</el-radio>
+            <el-radio label="fixed">固定种子</el-radio>
+          </el-radio-group>
+          <span style="margin-left:8px;color:#909399;font-size:12px">随机种子用于每次生成不同结果，固定种子用于复现工作流原结果</span>
+        </el-form-item>
+
         <el-form-item>
-          <el-button type="primary" @click="handleSubmit" :loading="loading">创建任务</el-button>
-          <el-button @click="handleSaveDraft" :loading="loading" icon="el-icon-document">保存草稿</el-button>
+          <el-button type="primary" :loading="loading" @click="handleSubmit">创建任务</el-button>
+          <el-button :loading="loading" icon="el-icon-document" @click="handleSaveDraft">保存草稿</el-button>
           <el-button @click="resetForm">重置</el-button>
         </el-form-item>
       </el-form>
@@ -101,7 +126,7 @@ export default {
   },
   data() {
     return {
-      form: { workflowId: '', taskCount: 1 },
+      form: { workflowId: '', taskCount: 1, seedMode: 'random' },
       rules: {
         workflowId: [{ required: true, message: '请选择工作流', trigger: 'change' }]
       },
@@ -214,6 +239,7 @@ export default {
       fd.append('workflowId', this.form.workflowId)
       fd.append('funcType', this.funcType)
       fd.append('taskCount', this.form.taskCount || 1)
+      fd.append('seedMode', this.form.seedMode || 'random')
       const values = {}
       this.variables.forEach(v => {
         if (this.isFileNode(v)) return
@@ -234,7 +260,7 @@ export default {
       }).finally(() => { this.loading = false })
     },
     resetForm() {
-      this.form = { workflowId: '', taskCount: 1 }
+      this.form = { workflowId: '', taskCount: 1, seedMode: 'random' }
       this.variables = []
       this.variablesValue = {}
       this.translateHint = {}

@@ -754,6 +754,7 @@ namespace ZR.ServiceCore.Services
                     WorkflowId = dto.WorkflowId,
                     WorkflowName = workflow.Name,
                     VariableValues = dto.VariableValues,
+                    SeedMode = NormalizeSeedMode(dto.SeedMode),
                     RefFiles = refFilesJson,
                     Queued = 0,
                     Status = "draft",
@@ -883,6 +884,7 @@ namespace ZR.ServiceCore.Services
             string refFilesJson = JsonConvert.SerializeObject(refFiles);
             var updater = Context.Updateable<ComfyuiTask>()
                 .SetColumns(x => x.VariableValues == dto.VariableValues)
+                .SetColumns(x => x.SeedMode == NormalizeSeedMode(dto.SeedMode))
                 .SetColumns(x => x.RefFiles == refFilesJson)
                 .SetColumns(x => x.ErrorMessage == validationError);
             if (validationError == null)
@@ -1005,6 +1007,7 @@ namespace ZR.ServiceCore.Services
                     FuncType = t.FuncType,
                     WorkflowId = t.WorkflowId,
                     WorkflowName = t.WorkflowName,
+                    SeedMode = NormalizeSeedMode(t.SeedMode),
                     Queued = t.Queued,
                     Status = t.Status,
                     ErrorMessage = t.ErrorMessage,
@@ -1370,7 +1373,36 @@ namespace ZR.ServiceCore.Services
                 }
             }
 
+            ApplySeedMode(prompt, task.SeedMode);
+
             return prompt.ToString(Formatting.None);
+        }
+
+        /// <summary>
+        /// 按任务种子模式处理prompt中的seed/noise_seed：random每次随机，fixed保持工作流原值
+        /// </summary>
+        private void ApplySeedMode(JObject prompt, string seedMode)
+        {
+            if (NormalizeSeedMode(seedMode) != "random") return;
+            long seed = Random.Shared.Next(0, int.MaxValue);
+            foreach (var prop in prompt.Properties())
+            {
+                if (prop.Value is not JObject node) continue;
+                if (node["inputs"] is not JObject inputs) continue;
+                foreach (string key in new[] { "seed", "noise_seed" })
+                {
+                    if (inputs[key] is JValue { Type: JTokenType.Integer })
+                    {
+                        inputs[key] = new JValue(seed);
+                    }
+                }
+            }
+        }
+
+        private static string NormalizeSeedMode(string seedMode)
+        {
+            var mode = (seedMode ?? string.Empty).Trim().ToLowerInvariant();
+            return mode == "fixed" ? "fixed" : "random";
         }
 
         private List<ComfyuiRefFile> ParseRefFiles(string json)

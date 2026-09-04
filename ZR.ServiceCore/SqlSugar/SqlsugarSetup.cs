@@ -64,6 +64,8 @@ namespace ZR.ServiceCore.SqlSugar
 
                 InitTable.InitNewTb();
             }
+
+            InitTable.InitComfyuiTask();
         }
 
         /// <summary>

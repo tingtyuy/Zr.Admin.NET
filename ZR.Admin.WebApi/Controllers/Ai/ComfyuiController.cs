@@ -191,7 +191,7 @@ namespace ZR.Admin.WebApi.Controllers
         [Log(Title = "ComfyUI任务创建", BusinessType = BusinessType.INSERT)]
         public async Task<IActionResult> CreateTask()
         {
-            string workflowId = null, funcType = null, variableValues = null;
+            string workflowId = null, funcType = null, variableValues = null, seedMode = null;
             int taskCount = 1;
             var refs = new Dictionary<string, IFormFile>();
 
@@ -201,6 +201,7 @@ namespace ZR.Admin.WebApi.Controllers
                 workflowId = form["workflowId"].FirstOrDefault();
                 funcType = form["funcType"].FirstOrDefault();
                 variableValues = form["variableValues"].FirstOrDefault();
+                seedMode = form["seedMode"].FirstOrDefault();
                 if (form.ContainsKey("taskCount") && int.TryParse(form["taskCount"].FirstOrDefault(), out int tc))
                     taskCount = tc;
                 foreach (var f in form.Files)
@@ -226,7 +227,8 @@ namespace ZR.Admin.WebApi.Controllers
                 WorkflowId = wid,
                 FuncType = funcType,
                 VariableValues = variableValues,
-                TaskCount = taskCount
+                TaskCount = taskCount,
+                SeedMode = seedMode
             };
             try
             {
@@ -250,7 +252,7 @@ namespace ZR.Admin.WebApi.Controllers
         {
             if (!long.TryParse(id, out long idLong))
                 return ToResponse(ResultCode.PARAM_ERROR, "ID格式错误");
-            string funcType = null, variableValues = null;
+            string funcType = null, variableValues = null, seedMode = null;
             var refs = new Dictionary<string, IFormFile>();
 
             if (Request.HasFormContentType)
@@ -258,6 +260,7 @@ namespace ZR.Admin.WebApi.Controllers
                 var form = await Request.ReadFormAsync();
                 funcType = form["funcType"].FirstOrDefault();
                 variableValues = form["variableValues"].FirstOrDefault();
+                seedMode = form["seedMode"].FirstOrDefault();
                 foreach (var f in form.Files)
                 {
                     string key = f.Name;
@@ -276,7 +279,8 @@ namespace ZR.Admin.WebApi.Controllers
                 WorkflowId = 0,
                 FuncType = funcType,
                 VariableValues = variableValues,
-                TaskCount = 1
+                TaskCount = 1,
+                SeedMode = seedMode
             };
             try
             {

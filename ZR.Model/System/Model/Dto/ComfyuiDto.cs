@@ -189,6 +189,11 @@ namespace ZR.Model.System.Dto
         /// 可变节点最终值JSON（nodeId->value）
         /// </summary>
         public string VariableValues { get; set; }
+
+        /// <summary>
+        /// 种子模式：random=每次随机，fixed=沿用工作流固定种子
+        /// </summary>
+        public string SeedMode { get; set; } = "random";
     }
 
     /// <summary>
@@ -256,6 +261,7 @@ namespace ZR.Model.System.Dto
         [JsonConverter(typeof(ValueToStringConverter))]
         public long WorkflowId { get; set; }
         public string WorkflowName { get; set; }
+        public string SeedMode { get; set; }
         public int Queued { get; set; }
         public string Status { get; set; }
         public string ErrorMessage { get; set; }

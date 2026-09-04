@@ -23,7 +23,7 @@ namespace ZR.ServiceCore.SqlSugar
             var db = DbScoped.SugarScope;
             //可在此处单独更新某个表的结构，无视配置
             //例如：db.CodeFirst.InitTables(typeof(EmailLog));
-            
+            InitComfyuiTask();
 
             if (!init) return;
             StaticConfig.CodeFirst_MySqlCollate = "utf8mb3_general_ci";
@@ -73,6 +73,14 @@ namespace ZR.ServiceCore.SqlSugar
             //db.CodeFirst.InitTables(typeof(SocialFans));
             //db.CodeFirst.InitTables(typeof(SocialFansInfo));
             //db.CodeFirst.InitTables(typeof(UserOnlineLog));
+        }
+        public static void InitComfyuiTask()
+        {
+            var db = DbScoped.SugarScope;
+            if (db.DbMaintenance.IsAnyTable("comfyui_task"))
+            {
+                db.CodeFirst.InitTables(typeof(ComfyuiTask));
+            }
         }
         public static void InitNewTb()
         {

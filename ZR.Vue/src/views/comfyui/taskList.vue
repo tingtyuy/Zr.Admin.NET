@@ -108,6 +108,7 @@
           <el-descriptions-item label="状态">
             <el-tag size="small" :type="statusTagType(rowOfDetail)">{{ statusText(rowOfDetail) }}</el-tag>
           </el-descriptions-item>
+          <el-descriptions-item label="种子">{{ seedModeText(detailData.seedMode) }}</el-descriptions-item>
           <el-descriptions-item label="创建时间">{{ detailData.createTime }}</el-descriptions-item>
           <el-descriptions-item label="入队时间">{{ detailData.queuedTime || '-' }}</el-descriptions-item>
           <el-descriptions-item v-if="detailErrorText" label="错误信息" :span="2">
@@ -118,6 +119,15 @@
         <!-- 编辑模式：变量/参考文件表单 -->
         <template v-if="detailDialog.mode === 'edit'">
           <el-divider content-position="left">编辑输入</el-divider>
+          <el-form label-width="100px">
+            <el-form-item label="种子模式">
+              <el-radio-group v-model="detailDialog.seedMode" size="small">
+                <el-radio label="random">随机种子</el-radio>
+                <el-radio label="fixed">固定种子</el-radio>
+              </el-radio-group>
+              <span style="margin-left:8px;color:#909399;font-size:12px">随机种子用于每次生成不同结果，固定种子用于复现工作流原结果</span>
+            </el-form-item>
+          </el-form>
           <div v-if="detailDialog.variables.length === 0" style="color:#909399;font-size:12px">
             该工作流未配置可变节点，无需填写。保存后直接入队按工作流原JSON执行。
           </div>
@@ -289,6 +299,7 @@ export default {
       detailData: null,
       detailDialog: {
         mode: 'view',
+        seedMode: 'random',
         loading: false,
         saving: false,
         row: null,
@@ -376,6 +387,7 @@ export default {
       return Object.assign({}, this.detailDialog.row, this.detailData || {})
     },
     isFileNode(v) { return v.type === 'image' || v.type === 'video' },
+    seedModeText(mode) { return mode === 'fixed' ? '固定种子' : '随机种子' },
     parseJson(json, fallback) {
       if (!json) return fallback
       try { return JSON.parse(json) } catch (e) { return fallback }
@@ -404,6 +416,7 @@ export default {
       }
       this.detailVisible = true
       this.detailDialog.mode = mode
+      this.detailDialog.seedMode = row.seedMode || 'random'
       this.detailDialog.loading = true
       this.detailDialog.saving = false
       this.detailDialog.row = row
@@ -415,6 +428,7 @@ export default {
       this.fileListMap = {}
       getComfyuiTaskDetail(row.id).then(res => {
         this.detailData = res.data
+        this.detailDialog.seedMode = res.data.seedMode || 'random'
         this.detailDialog.refFiles = this.parseJson(res.data.refFiles, [])
         getWorkflowVariables(row.workflowId).then(r2 => {
           this.detailDialog.variables = (r2.data || []).filter(v => v.enabled !== false)
@@ -484,6 +498,7 @@ export default {
       const fd = new FormData()
       fd.append('workflowId', this.detailData.workflowId)
       fd.append('funcType', this.detailData.funcType)
+      fd.append('seedMode', this.detailDialog.seedMode || 'random')
       const values = {}
       this.detailDialog.variables.forEach(v => {
         if (this.isFileNode(v)) return

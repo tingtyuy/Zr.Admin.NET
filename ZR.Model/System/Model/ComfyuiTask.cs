@@ -49,6 +49,12 @@ namespace ZR.Model.System
         public string VariableValues { get; set; }
 
         /// <summary>
+        /// 种子模式：random=每次随机，fixed=沿用工作流固定种子
+        /// </summary>
+        [SugarColumn(Length = 20, IsNullable = true, DefaultValue = "random")]
+        public string SeedMode { get; set; } = "random";
+
+        /// <summary>
         /// 参考文件路径集合JSON（数组：nodeId/localPath/originalName/comfyName）
         /// </summary>
         [SugarColumn(ColumnDataType = StaticConfig.CodeFirst_BigString, IsNullable = true)]
