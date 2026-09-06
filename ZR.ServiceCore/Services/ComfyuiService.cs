@@ -1063,7 +1063,12 @@ namespace ZR.ServiceCore.Services
             {
                 throw new CustomException("发布状态无效");
             }
-            var task = Context.Queryable<ComfyuiTask>().First(x => x.Id == id && x.UserId == userId);
+            var query = Context.Queryable<ComfyuiTask>().Where(x => x.Id == id);
+            if (userId > 0)
+            {
+                query = query.Where(x => x.UserId == userId);
+            }
+            var task = query.First();
             if (task == null)
             {
                 throw new CustomException("任务不存在");

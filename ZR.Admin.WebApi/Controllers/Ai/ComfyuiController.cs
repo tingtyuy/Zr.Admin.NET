@@ -297,6 +297,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         [HttpGet("task/list")]
+        [AllowAnonymous]
         public IActionResult GetTaskList([FromQuery] ComfyuiTaskListDto parm)
         {
             var userId = HttpContext.GetUId();
@@ -304,6 +305,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         [HttpGet("task/detail/{id}")]
+        [AllowAnonymous]
         public IActionResult GetTaskDetail(string id)
         {
             if (!long.TryParse(id, out long idLong))
@@ -343,6 +345,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         [HttpPost("task/publish-status/{id}")]
+        [AllowAnonymous]
         [Log(Title = "ComfyUI任务发布状态", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdatePublishStatus(string id, [FromBody] ComfyuiPublishStatusDto dto)
         {
